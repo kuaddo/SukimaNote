@@ -9,7 +9,7 @@ using Android.OS;
 
 namespace SukimaNote.Droid
 {
-	[Activity(Label = "SukimaNote", Icon = "@drawable/icon", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+	[Activity(Label = "SukimaNote.Droid", Icon = "@drawable/icon", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
 	public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsApplicationActivity
 	{
 		protected override void OnCreate(Bundle bundle)
@@ -17,7 +17,7 @@ namespace SukimaNote.Droid
 			base.OnCreate(bundle);
 
 			global::Xamarin.Forms.Forms.Init(this, bundle);
-			LoadApplication(new App());
+			LoadApplication(new Main());
 		}
 	}
 }
