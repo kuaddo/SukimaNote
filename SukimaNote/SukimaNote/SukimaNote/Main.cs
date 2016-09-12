@@ -144,6 +144,11 @@ namespace SukimaNote
 				Title = "本体設定",
 				TargetType = typeof(SettingPage),
 			});
+			this.Add(new MenuItem()
+			{
+				Title = "テスト",
+				TargetType = typeof(testPage),
+			});
 		}
 	}
 }
