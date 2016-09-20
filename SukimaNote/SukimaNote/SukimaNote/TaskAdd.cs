@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Xamarin.Forms;
+using PCLStorage;
 
 namespace SukimaNote
 {
@@ -16,17 +17,14 @@ namespace SukimaNote
 		public string Remark { get; set; }		// 備考
 	}
 
-	// タスクの詳細画面を描画するページ
-	public class ShowTask : ContentPage
-	{
-
-	}
-
 	// タスクの追加の設定ページ
-	public class AddTaskPage : ContentPage
+	public class TaskAddPage : ContentPage
 	{
-		public AddTaskPage()
+		IFolder rootFolder = FileSystem.Current.LocalStorage;
+
+		public TaskAddPage()
 		{
+			Title = "タスク追加";
 			// NavigationBarを非表示に
 			NavigationPage.SetHasNavigationBar(this, false);
 
@@ -60,14 +58,12 @@ namespace SukimaNote
 			var input = new StackLayout { Spacing = 3, Children = { title, restTime, unitTime, term, remark },	};
 
 
-
 			// 「戻る」ボタン
 			var backButton = new Button
 			{
 				Text = "Back",
 				FontSize = 30,
 				BackgroundColor = Color.Aqua,
-				HorizontalOptions = LayoutOptions.Start,
 			};
 			// タスクを追加しないで戻る
 			backButton.Clicked += async (sender, e) =>
@@ -81,18 +77,36 @@ namespace SukimaNote
 				Text = "Save",
 				FontSize = 30,
 				BackgroundColor = Color.Aqua,
-				HorizontalOptions = LayoutOptions.End,
 			};
-			saveButton.Clicked += (sender, e) =>
+			saveButton.Clicked += async (sender, e) =>
 			{
-				var taskData = new TaskData();
-				taskData.Title		= titleEntry.Text;
-				taskData.RestTime	= restTimePicker.SelectedIndex;             // Indexをint型で保存
-				taskData.UnitTime	= unitTimePicker.SelectedIndex;
-				taskData.Term		= termDatePicker.Date;
-				taskData.Remark		= remarkEditor.Text;
-				Application.Current.Properties["1"] = taskData;
-				DisplayAlert("Save", titleEntry.Text + "が保存されました。", "OK");
+				if (titleEntry.Text == "")
+				{
+					await DisplayAlert("エラー","タイトルを入力てください","OK");
+				}
+				else
+				{
+					IFile file = await rootFolder.CreateFileAsync(titleEntry.Text + ".txt", CreationCollisionOption.GenerateUniqueName );
+					await file.WriteAllTextAsync(titleEntry.Text + '\n');
+				}
+				await DisplayAlert("Save", titleEntry.Text + "が保存されました。", "OK");
+			};
+
+			// test
+			var fileListLabel = new Label { FontSize = 10, BackgroundColor = Color.Aqua };
+			var searchButton = new Button
+			{
+				Text = "Search",
+				FontSize = 30,
+				BackgroundColor = Color.Aqua,
+			};
+			searchButton.Clicked += async (sender, e) =>
+			{
+				IList<IFile> fileList = await rootFolder.GetFilesAsync();
+				foreach (var file in fileList)
+				{
+					fileListLabel.Text += file.Name + '\n';
+				}
 			};
 
 			// test
@@ -101,44 +115,9 @@ namespace SukimaNote
 				Text = "Load",
 				FontSize = 30,
 				BackgroundColor = Color.Aqua,
-				HorizontalOptions = LayoutOptions.End,
 			};
 			loadButton.Clicked += (sender, e) =>
 			{
-				if (Application.Current.Properties.ContainsKey("1"))
-				{
-					var taskData = new TaskData();
-					taskData = (TaskData)Application.Current.Properties["1"];
-					titleEntry.Text					= taskData.Title;
-					restTimePicker.SelectedIndex	= taskData.RestTime;
-					unitTimePicker.SelectedIndex	= taskData.UnitTime;
-					termDatePicker.Date				= taskData.Term;
-					remarkEditor.Text				= taskData.Remark;
-					DisplayAlert("Load", taskData.Title + "がロードされました", "OK");
-				}
-				else
-				{
-					DisplayAlert("Error", "データは保存されていません", "OK");
-				}
-			};
-
-			// test
-			var deleteButton = new Button
-			{
-				Text = "Delete",
-				FontSize = 30,
-				BackgroundColor = Color.Aqua,
-				HorizontalOptions = LayoutOptions.End,
-			};
-			deleteButton.Clicked += (sender, e) =>
-			{
-				// 特定のIDのデータを削除する方法が知りたい
-				Application.Current.Properties.Clear();
-
-				if (!Application.Current.Properties.ContainsKey("id"))
-				{
-					DisplayAlert("Delete", "削除されました", "OK");
-				}
 			};
 
 			// backとsaveの間を埋めるラベル
@@ -154,7 +133,7 @@ namespace SukimaNote
 			{
 				BackgroundColor = Color.Navy,
 				Orientation = StackOrientation.Horizontal,
-				Children = { backButton, fillLabel, saveButton, loadButton, deleteButton },
+				Children = { backButton, fillLabel, saveButton, searchButton,loadButton },
 				VerticalOptions = LayoutOptions.Start,
 				Spacing = 5,
 			};
@@ -164,29 +143,8 @@ namespace SukimaNote
 			{
 				// iOSのみ上部に空白を取る
 				Padding = new Thickness(0, Device.OnPlatform(20, 0, 0), 0, 0),
-				Children = { topBar, input}
+				Children = { topBar, input, fileListLabel}
 			};
-		}
-	}
-
-	// test
-	public class testPage : ContentPage
-	{
-		public testPage()
-		{
-			Title = "TestPage";
-
-			var button = new Button
-			{
-				Text = "test",
-				FontSize = 30,
-			};
-			button.Clicked += async (sender, e) =>
-			{
-				await Navigation.PushAsync(new AddTaskPage());
-			};
-
-			Content = button;
 		}
 	}
 }

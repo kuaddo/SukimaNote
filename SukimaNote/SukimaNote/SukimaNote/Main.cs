@@ -42,8 +42,7 @@ namespace SukimaNote
 			// 最初のページのセット。選択されたことにしてイベントを呼び出す
 			menuPage.Menu.SelectedItem = new MenuItem
 			{
-				Title = "SchedulePage",
-				TargetType = typeof(SchedulePage),
+				TargetType = typeof(SettingPage),
 			};
 		}
 
@@ -136,8 +135,8 @@ namespace SukimaNote
 		{
 			this.Add(new MenuItem()
 			{
-				Title = "スケジュール設定",
-				TargetType = typeof(SchedulePage),
+				Title = "タスク一覧",
+				TargetType = typeof(TaskListPage),
 			});
 			this.Add(new MenuItem()
 			{
@@ -146,8 +145,8 @@ namespace SukimaNote
 			});
 			this.Add(new MenuItem()
 			{
-				Title = "テスト",
-				TargetType = typeof(testPage),
+				Title = "スケジュール設定",
+				TargetType = typeof(SchedulePage),
 			});
 		}
 	}

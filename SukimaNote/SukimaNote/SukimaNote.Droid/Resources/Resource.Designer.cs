@@ -26,6 +26,8 @@ namespace SukimaNote.Droid
 		
 		public static void UpdateIdValues()
 		{
+			global::PCLStorage.Resource.String.ApplicationName = global::SukimaNote.Droid.Resource.String.ApplicationName;
+			global::PCLStorage.Resource.String.Hello = global::SukimaNote.Droid.Resource.String.Hello;
 			global::Xamarin.Forms.Platform.Resource.Animation.abc_fade_in = global::SukimaNote.Droid.Resource.Animation.abc_fade_in;
 			global::Xamarin.Forms.Platform.Resource.Animation.abc_fade_out = global::SukimaNote.Droid.Resource.Animation.abc_fade_out;
 			global::Xamarin.Forms.Platform.Resource.Animation.abc_grow_fade_in_from_bottom = global::SukimaNote.Droid.Resource.Animation.abc_grow_fade_in_from_bottom;
