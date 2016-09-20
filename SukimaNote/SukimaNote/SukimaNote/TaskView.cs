@@ -21,9 +21,11 @@ namespace SukimaNote
 	// タスクのListViewを作成
 	public class TaskListView : ListView
 	{
-		private TaskListView(List<TaskData> taskDataList)
+		public TaskListView()
 		{
-			ItemsSource = taskDataList;
+			// Listが返るまで待機
+			// TODO: 待つ時間を指定して、何かあったときにフリーズしないようにする
+			ItemsSource = MakeTaskListDataAsync().Result;
 
 			var cell = new DataTemplate(typeof(TextCell));
 			cell.SetBinding(TextCell.TextProperty, "Title");
@@ -31,16 +33,25 @@ namespace SukimaNote
 			ItemTemplate = cell;
 		}
 
-		// 非同期メソッドで実装するしかなかった。ListViewのデータクラス
-		public async static Task<TaskListView> BuildTaskListViewAsync()
+		// 非同期メソッドで実装するしかなかった。
+		// ConfigureAwait(false)で移行の処理をワーカースレッドに行わせることで、デッドロックを回避
+		// UIの処理はメインスレッドしかできないようなので、ここではビジネスロジックのみを実行
+		// staticにしてアプリ起動時にTaskListを作成し、タスクの削除・追加をした時のみに更新するべきか？
+		private async static Task<List<TaskData>> MakeTaskListDataAsync()
 		{
 			IFolder rootFolder = FileSystem.Current.LocalStorage;
 			IList<IFile> files = await rootFolder.GetFilesAsync().ConfigureAwait(false);
 			var taskDataArray = await Task.WhenAll(files.Select(async file => {
-				var title = await file.ReadAllTextAsync();
-				return new TaskData { Title = title };
+				var allText = await file.ReadAllTextAsync();
+				var propertyArray = allText.Split(':');
+				return new TaskData { Title = propertyArray[0],
+									  RestTime = int.Parse(propertyArray[1]),
+									  UnitTime = int.Parse(propertyArray[2]),
+									  Term = new DateTime(long.Parse(propertyArray[3])),
+									  Remark = propertyArray[4],
+									};
 			})).ConfigureAwait(false);
-			return new TaskListView(taskDataArray.ToList());
+			return taskDataArray.ToList();
 		}
 	}
 
@@ -52,18 +63,18 @@ namespace SukimaNote
 		public TaskListPage()
 		{
 			Title = "タスク一覧";
-			TaskListView listView = TaskListView.BuildTaskListViewAsync().Result;
-
-			var updateButton = new Button
+			var listView = new TaskListView();
+			listView.ItemSelected += (sender, e) =>
 			{
-				Text = "Update",
-				FontSize = 30,
-				BackgroundColor = Color.Aqua,
+				TaskData taskData = e.SelectedItem as TaskData;
+				var newPage = new TaskDetailPage();
+				newPage.title.Text += taskData.Title;
+				newPage.restTime.Text += newPage.ar[taskData.RestTime];
+				newPage.unitTime.Text += newPage.ar[taskData.UnitTime];
+				newPage.term.Text += taskData.Term.ToString();
+				newPage.remark.Text += taskData.Remark;
+				Navigation.PushAsync(newPage);
 			};
-			/*updateButton.Clicked += async (sender, e) =>
-			{
-				
-			};*/
 		
 			// TaskAddPageへ遷移するボタン
 			var shiftButton = new Button
@@ -97,16 +108,7 @@ namespace SukimaNote
 
 			Content = new StackLayout
 			{
-				Children =
-				{
-					listView,
-					new StackLayout
-					{
-						Orientation = StackOrientation.Horizontal,
-						Children = { updateButton, allDeleteButton }
-					},
-					shiftButton
-				},
+				Children = { listView, allDeleteButton, shiftButton	}
 			};
 		}
 	}
@@ -114,6 +116,19 @@ namespace SukimaNote
 	// タスクの詳細画面を描画するページ
 	public class TaskDetailPage : ContentPage
 	{
+		public List<string> ar = Enumerable.Range(1, 60).Select(n => string.Format("{0}分", n)).ToList();
 
+		// 形式はTaskAddPageと同様
+		// TODO: プロパティに書き直す
+		public Label title = new Label { Text = "Title: ", FontSize = 20 };
+		public Label restTime = new Label { Text = "RestTime: ", FontSize = 20 };
+		public Label unitTime = new Label { Text = "UnitTime: ", FontSize = 20 };
+		public Label term = new Label { Text = "Term: ", FontSize = 20 };
+		public Label remark = new Label { Text = "Remark: ", FontSize = 20 };
+
+		public TaskDetailPage()
+		{
+			Content = new StackLayout { Children = { title, restTime, unitTime, term, remark } };
+		}
 	}
 }

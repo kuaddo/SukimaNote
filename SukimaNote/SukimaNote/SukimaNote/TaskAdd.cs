@@ -11,9 +11,9 @@ namespace SukimaNote
 	public class TaskData
 	{
 		public string Title { get; set; }		// タイトル
-		public int RestTime { get; set; }		// 予想残り時間
-		public int UnitTime { get; set; }		// 最低単位作業時間
-		public DateTime Term { get; set; }		// 期限。int型ではなく時間を表す型を探す
+		public int RestTime { get; set; }		// 予想残り時間(インデックスで保存)	
+		public int UnitTime { get; set; }       // 最低単位作業時間(インデックスで保存)	
+		public DateTime Term { get; set; }		// 期限
 		public string Remark { get; set; }		// 備考
 	}
 
@@ -28,13 +28,13 @@ namespace SukimaNote
 			// NavigationBarを非表示に
 			NavigationPage.SetHasNavigationBar(this, false);
 
+			// 1~60分までのリストの作成
+			var ar = Enumerable.Range(1, 60).Select(n => string.Format("{0}分", n)).ToList();
+
 			// タスクのデータ入力部分
 			// タイトル入力
 			var titleEntry = new Entry { Keyboard = Keyboard.Text, BackgroundColor = Color.Green };
 			var title = new StackLayout { Children = { new Label { Text = "タイトル"}, titleEntry } };
-
-			// 1~60分までのリストの作成
-			var ar = Enumerable.Range(1, 60).Select(n => string.Format("{0}分", n)).ToList();
 
 			// 予想残り時間入力
 			var restTimePicker = new Picker { BackgroundColor = Color.Green };
@@ -55,10 +55,17 @@ namespace SukimaNote
 			var remarkEditor = new Editor { BackgroundColor = Color.Green, HeightRequest = 250 };
 			var remark = new StackLayout { Children = {	new Label { Text = "備考" }, remarkEditor} };
 
-			var input = new StackLayout { Spacing = 3, Children = { title, restTime, unitTime, term, remark },	};
+			// それぞれの初期値
+			titleEntry.Text = "Task";
+			restTimePicker.SelectedIndex = 9;
+			unitTimePicker.SelectedIndex = 9;
+			termDatePicker.Date = new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay);	// 次の日
+			remarkEditor.Text = ""; 
 
+			var input = new StackLayout { Spacing = 3, Children = { title, restTime, unitTime, term, remark }, };
 
 			// 「戻る」ボタン
+			// TODO: 戻ってからページを再生成するとフリーズするバグを直す
 			var backButton = new Button
 			{
 				Text = "Back",
@@ -87,7 +94,11 @@ namespace SukimaNote
 				else
 				{
 					IFile file = await rootFolder.CreateFileAsync(titleEntry.Text + ".txt", CreationCollisionOption.GenerateUniqueName );
-					await file.WriteAllTextAsync(titleEntry.Text + '\n');
+					await file.WriteAllTextAsync(titleEntry.Text						+ ':' +
+												 restTimePicker.SelectedIndex			+ ':' +
+												 unitTimePicker.SelectedIndex			+ ':' +
+												 termDatePicker.Date.Ticks.ToString()	+ ':' +		// long型のTicksをstringにして保存
+												 remarkEditor.Text						+ ':');
 				}
 				await DisplayAlert("Save", titleEntry.Text + "が保存されました。", "OK");
 			};
@@ -109,17 +120,6 @@ namespace SukimaNote
 				}
 			};
 
-			// test
-			var loadButton = new Button
-			{
-				Text = "Load",
-				FontSize = 30,
-				BackgroundColor = Color.Aqua,
-			};
-			loadButton.Clicked += (sender, e) =>
-			{
-			};
-
 			// backとsaveの間を埋めるラベル
 			var fillLabel = new Label
 			{
@@ -133,7 +133,7 @@ namespace SukimaNote
 			{
 				BackgroundColor = Color.Navy,
 				Orientation = StackOrientation.Horizontal,
-				Children = { backButton, fillLabel, saveButton, searchButton,loadButton },
+				Children = { backButton, fillLabel, saveButton, searchButton },
 				VerticalOptions = LayoutOptions.Start,
 				Spacing = 5,
 			};
