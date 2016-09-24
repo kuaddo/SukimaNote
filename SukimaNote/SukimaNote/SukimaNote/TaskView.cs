@@ -8,16 +8,6 @@ using System.Threading.Tasks;
 
 namespace SukimaNote
 {
-	/* TaskAdd.csのプロパティのクラスを使用
-	public class TaskData
-	{
-		public string Title { get; set; }       // タイトル
-		public int RestTime { get; set; }       // 予想残り時間
-		public int UnitTime { get; set; }       // 最低単位作業時間
-		public DateTime Term { get; set; }      // 期限。int型ではなく時間を表す型を探す
-		public string Remark { get; set; }      // 備考
-	}*/
-
 	// タスクのListViewを作成
 	public class TaskListView : ListView
 	{
@@ -64,6 +54,7 @@ namespace SukimaNote
 		{
 			Title = "タスク一覧";
 			var listView = new TaskListView();
+			// 詳細ページに移行
 			listView.ItemSelected += (sender, e) =>
 			{
 				TaskData taskData = e.SelectedItem as TaskData;
@@ -85,6 +76,7 @@ namespace SukimaNote
 			};
 			shiftButton.Clicked += async (sender, e) =>
 			{
+				// TODO: NavigationではなくてMasterDetailのItemを入れ替えるように遷移させる
 				await Navigation.PushAsync(new TaskAddPage());
 			};
 
@@ -119,15 +111,17 @@ namespace SukimaNote
 		public List<string> ar = Enumerable.Range(1, 60).Select(n => string.Format("{0}分", n)).ToList();
 
 		// 形式はTaskAddPageと同様
-		// TODO: プロパティに書き直す
+		// TODO: TaskDataプロパティを使いデータを受け取り、Labelはコンストラクタに記述する
 		public Label title = new Label { Text = "Title: ", FontSize = 20 };
 		public Label restTime = new Label { Text = "RestTime: ", FontSize = 20 };
-		public Label unitTime = new Label { Text = "UnitTime: ", FontSize = 20 };
 		public Label term = new Label { Text = "Term: ", FontSize = 20 };
+		public Label unitTime = new Label { Text = "UnitTime: ", FontSize = 20 };
 		public Label remark = new Label { Text = "Remark: ", FontSize = 20 };
 
 		public TaskDetailPage()
 		{
+			// プロパティを参照すれば正しく表示される
+			Title = "タスク詳細(" + this.title.Text + ")";
 			Content = new StackLayout { Children = { title, restTime, unitTime, term, remark } };
 		}
 	}
