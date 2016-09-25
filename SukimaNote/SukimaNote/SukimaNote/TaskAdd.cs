@@ -29,6 +29,8 @@ namespace SukimaNote
 
 		public TaskAddPage()
 		{
+			// TODO: TaskDataとinputのデータバインディングをする
+
 			Title = "タスク追加";
 			// NavigationBarを非表示に
 			NavigationPage.SetHasNavigationBar(this, false);
@@ -38,7 +40,7 @@ namespace SukimaNote
 
 			// タスクのデータ入力部分
 			// タイトル入力
-			var titleEntry = new Entry { Keyboard = Keyboard.Text, BackgroundColor = Color.Green, HeightRequest = inputSize, FontSize = 30};
+			var titleEntry = new Entry { Keyboard = Keyboard.Text, BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize, FontSize = 30};
 			var titleSupplementary = new Label { Text = "予定にわかり易い名前をつけてください", FontSize = fontSize, IsVisible = false };
 			var titleTGR = new TapGestureRecognizer();
 			titleTGR.Tapped += (sender, e) =>
@@ -69,7 +71,7 @@ namespace SukimaNote
 			};
 
 			// 予想残り時間入力
-			var restTimePicker = new Picker { BackgroundColor = Color.Green, HeightRequest = inputSize };
+			var restTimePicker = new Picker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
 			foreach (var a in ar) { restTimePicker.Items.Add(a); }
 			var restTimeSupplementary = new Label { Text = "作業完了に必要な時間を入力してください", FontSize = fontSize, IsVisible = false };
 			var restTimeTGR = new TapGestureRecognizer();
@@ -101,7 +103,8 @@ namespace SukimaNote
 			};
 
 			// 期限入力
-			var termDatePicker = new DatePicker { Format = "D", BackgroundColor = Color.Green, HeightRequest = inputSize };
+			var termDatePicker = new DatePicker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize, HorizontalOptions = LayoutOptions.FillAndExpand };
+			var termTimePicker = new TimePicker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize, HorizontalOptions = LayoutOptions.FillAndExpand };
 			var termSupplementary = new Label { Text = "作業の期限を入力してください", FontSize = fontSize, IsVisible = false };
 			var termTGR = new TapGestureRecognizer();
 			termTGR.Tapped += (sender, e) =>
@@ -127,12 +130,17 @@ namespace SukimaNote
 							termSupplementary
 						}
 					},
-					termDatePicker
+					new StackLayout
+					{
+						Spacing = 7,
+						Orientation = StackOrientation.Horizontal,
+						Children = { termDatePicker, termTimePicker }
+					}
 				}
 			};
 
 			// 最低単位作業時間入力
-			var unitTimePicker = new Picker { BackgroundColor = Color.Green, HeightRequest = inputSize };
+			var unitTimePicker = new Picker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
 			foreach (var a in ar) { unitTimePicker.Items.Add(a); }
 			var unitTimeSupplementary = new Label { Text = "少なくとも作業実行に必要な時間を入力してください", FontSize = fontSize, IsVisible = false };
 			var unitTimeTGR = new TapGestureRecognizer();
@@ -165,7 +173,7 @@ namespace SukimaNote
 
 			// 備考入力
 			// 高さを直接数値指定ではなくFillのように指定する方法がわからない
-			var remarkEditor = new Editor { BackgroundColor = Color.Green, HeightRequest = 400, FontSize = fontSize };
+			var remarkEditor = new Editor { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = 500, FontSize = fontSize };
 			var remarkSupplementary = new Label { Text = "メモとして記録しておきたいことを入力してください", FontSize = fontSize,IsVisible = false };
 			var remarkTGR = new TapGestureRecognizer();
 			remarkTGR.Tapped += (sender, e) =>
@@ -198,21 +206,11 @@ namespace SukimaNote
 			// それぞれの初期値
 			titleEntry.Text = "Task";
 			restTimePicker.SelectedIndex = 9;   // インデックスで指定
-			termDatePicker.Date = new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay);  // 次の日
+			termDatePicker.Date = new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay);		// 次の日
+			termTimePicker.Time = new TimeSpan(DateTime.Now.Ticks - DateTime.Now.Date.Ticks);	// 時刻は同じ
 			unitTimePicker.SelectedIndex = 9;
 			remarkEditor.Text = "";
-
-			var minimumLabel = new Label { Text = "基本設定", FontSize = 30, HorizontalOptions = LayoutOptions.Start, BackgroundColor = Color.White, TextColor = Color.Black };
-			var optionLabel = new Label { Text = "追加設定", FontSize = 30, HorizontalOptions = LayoutOptions.Start, BackgroundColor = Color.White, TextColor = Color.Black };
-			var minimum = new StackLayout
-			{
-				Children = { minimumLabel, title, restTime, term }
-			};
-
-			var option = new StackLayout
-			{
-				Children = { optionLabel, unitTime, remark }
-			};
+	
 
 			// 「一時保存」ボタンを追加する。properties dictionaryに保存
 			// タスクを追加しないで戻る
@@ -226,8 +224,8 @@ namespace SukimaNote
 				var saveButton = new Button
 				{
 					Text = "Save",
-					FontSize = 30,
-					BackgroundColor = Color.Aqua,
+					FontSize = 40,
+					BackgroundColor = Color.FromHex(MyColor.MainColor1),
 				};
 				saveButton.Clicked += async (sender, e) =>
 				{
@@ -235,16 +233,21 @@ namespace SukimaNote
 					{
 						await DisplayAlert("エラー", "タイトルを入力てください", "OK");
 					}
+					// TODO: これもバインディングをして書き直す compareメソッドを使いたい
+					else if (termDatePicker.Date.Ticks + termTimePicker.Time.Ticks < DateTime.Now.Ticks)
+					{
+						await DisplayAlert("エラー", "期限が過去に設定されています", "OK");
+					}
 					else
 					{
 						IFile file = await rootFolder.CreateFileAsync(titleEntry.Text + ".txt", CreationCollisionOption.GenerateUniqueName);
 						await file.WriteAllTextAsync(titleEntry.Text + ':' +
 													 restTimePicker.SelectedIndex + ':' +
 													 unitTimePicker.SelectedIndex + ':' +
-													 termDatePicker.Date.Ticks.ToString() + ':' +       // long型のTicksをstringにして保存
+													 (termDatePicker.Date.Ticks + termTimePicker.Time.Ticks).ToString() + ':' +       // long型のTicksをstringにして保存。バインディングをしていないためとりあえずこの書き方で行く
 													 remarkEditor.Text + ':');
+						await DisplayAlert("Save", titleEntry.Text + "が保存されました。", "OK");
 					}
-					await DisplayAlert("Save", titleEntry.Text + "が保存されました。", "OK");
 				};
 				var save = new StackLayout
 				{
@@ -255,13 +258,31 @@ namespace SukimaNote
 				saveArray[i] = save;
 			}
 
+			// 以下配置
+			var minimumLabel = new Label { Text = "基本設定", FontSize = 30, HorizontalOptions = LayoutOptions.Fill, BackgroundColor = Color.FromHex(MyColor.MainColor3), TextColor = Color.White };
+			var optionLabel = new Label { Text = "追加設定", FontSize = 30, HorizontalOptions = LayoutOptions.Fill, BackgroundColor = Color.FromHex(MyColor.MainColor3), TextColor = Color.White };
+			var minimum = new StackLayout
+			{
+				BackgroundColor = Color.FromHex(MyColor.MainColor2),
+				Padding = new Thickness(0, 0, 0, 40),
+				Children = { minimumLabel, title, restTime, term, saveArray[0] }
+			};
+
+			var option = new StackLayout
+			{
+				BackgroundColor = Color.FromHex(MyColor.MainColor2),
+				Padding = new Thickness(0, 0, 0, 40),
+				Children = { optionLabel, unitTime, remark, saveArray[1] }
+			};
+
 			Content = new ScrollView
 			{
+				BackgroundColor = Color.FromHex(MyColor.MainColor2),
 				Content = new StackLayout
 				{
 					// iOSのみ上部に空白を取る。Navigationだから必要ない?
 					//Padding = new Thickness(0, Device.OnPlatform(20, 0, 0), 0, 0),
-					Children = { minimum, saveArray[0], option, saveArray[1] }
+					Children = { minimum, option }
 				}
 			};
 		}

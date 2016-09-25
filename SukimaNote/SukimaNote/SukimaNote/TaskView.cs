@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using Xamarin.Forms;
 using PCLStorage;
 using System.Threading.Tasks;
@@ -11,36 +12,60 @@ namespace SukimaNote
 	// タスクのListViewを作成
 	public class TaskListView : ListView
 	{
+		// listが正常に作成されたかのフラグ
+		// Dispose処理がうまく行けば必要ないと思う
+		public bool SuccessFlag { get; set; }
+
 		public TaskListView()
 		{
-			// Listが返るまで待機
-			// TODO: 待つ時間を指定して、何かあったときにフリーズしないようにする
-			ItemsSource = MakeTaskListDataAsync().Result;
+			// 待つ時間を指定して、何かあったときにフリーズしないようにする
+			var task = MakeTaskListDataAsync();
+			if (task.Wait(1000) == true)
+			{
+				ItemsSource = MakeTaskListDataAsync().Result;
+				SuccessFlag = true;
+			}
+			else
+			{
+				ItemsSource = new List<TaskData>();
+				SuccessFlag = false;
+			}
 
 			var cell = new DataTemplate(typeof(TextCell));
 			cell.SetBinding(TextCell.TextProperty, "Title");
-
+			cell.SetBinding(TextCell.DetailProperty, "Term");
+			
 			ItemTemplate = cell;
 		}
 
 		// 非同期メソッドで実装するしかなかった。
 		// ConfigureAwait(false)で移行の処理をワーカースレッドに行わせることで、デッドロックを回避
 		// UIの処理はメインスレッドしかできないようなので、ここではビジネスロジックのみを実行
-		// staticにしてアプリ起動時にTaskListを作成し、タスクの削除・追加をした時のみに更新するべきか？
+		// usingを使うためにstreamを使用
 		private async static Task<List<TaskData>> MakeTaskListDataAsync()
 		{
 			IFolder rootFolder = FileSystem.Current.LocalStorage;
 			IList<IFile> files = await rootFolder.GetFilesAsync().ConfigureAwait(false);
 			var taskDataArray = await Task.WhenAll(files.Select(async file => {
-				var allText = await file.ReadAllTextAsync();
-				var propertyArray = allText.Split(':');
-				return new TaskData { Title = propertyArray[0],
-									  RestTime = int.Parse(propertyArray[1]),
-									  UnitTime = int.Parse(propertyArray[2]),
-									  Term = new DateTime(long.Parse(propertyArray[3])),
-									  Remark = propertyArray[4],
-									};
+				using (Stream stream = await file.OpenAsync(FileAccess.Read))
+				using (StreamReader sr = new StreamReader(stream))
+				{
+					string allText = sr.ReadToEnd();
+					string[] propertyArray = allText.Split(':');
+					return new TaskData
+					{
+						Title = propertyArray[0],
+						RestTime = int.Parse(propertyArray[1]),
+						UnitTime = int.Parse(propertyArray[2]),
+						Term = new DateTime(long.Parse(propertyArray[3])),
+						Remark = propertyArray[4],
+					};
+				}
 			})).ConfigureAwait(false);
+
+			// リソースを開放する。Disposeが実装されていないためGCにやってもらうしかない
+			//GC.Collect();
+
 			return taskDataArray.ToList();
 		}
 	}
@@ -98,10 +123,22 @@ namespace SukimaNote
 				}
 			};
 
-			Content = new StackLayout
+			if (listView.SuccessFlag)
 			{
-				Children = { listView, allDeleteButton, shiftButton	}
-			};
+				Content = new StackLayout
+				{
+					Children = { listView, allDeleteButton, shiftButton }
+				};
+			}
+			else
+			{
+				Content = new StackLayout
+				{
+					Children = { new Label { Text = "読み込みに失敗しました", FontSize = 20, HorizontalOptions = LayoutOptions.FillAndExpand, VerticalOptions = LayoutOptions.FillAndExpand },
+								 allDeleteButton,
+								 shiftButton }
+				};
+			}
 		}
 	}
 
