@@ -13,9 +13,11 @@ namespace SukimaNote
 			MainPage = new RootPage();
 		}
 
-		protected override void OnStart()
+		protected async override void OnStart()
 		{
 			// Handle when your app starts
+			// アプリ起動時にtaskListを読み込んでおく
+			await TaskListView.MakeTaskDataListAsync();
 		}
 
 		protected override void OnSleep()
@@ -42,7 +44,7 @@ namespace SukimaNote
 			// 最初のページのセット。選択されたことにしてイベントを呼び出す
 			menuPage.Menu.SelectedItem = new MenuItem
 			{
-				TargetType = typeof(TaskAddPage),
+				TargetType = typeof(TopPage),
 			};
 		}
 
@@ -135,13 +137,13 @@ namespace SukimaNote
 		{
 			this.Add(new MenuItem()
 			{
-				Title = "タスク一覧",
-				TargetType = typeof(TaskListPage),
+				Title = "トップページ",
+				TargetType = typeof(TopPage),
 			});
 			this.Add(new MenuItem()
 			{
-				Title = "タスク追加",
-				TargetType = typeof(TaskAddPage),
+				Title = "タスク一覧",
+				TargetType = typeof(TaskListPage),
 			});
 			this.Add(new MenuItem()
 			{

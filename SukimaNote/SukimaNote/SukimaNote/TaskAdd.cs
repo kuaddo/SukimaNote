@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Xamarin.Forms;
 using PCLStorage;
+using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 namespace SukimaNote
 {
@@ -23,7 +25,6 @@ namespace SukimaNote
 	// タスクの追加の設定ページ
 	public class TaskAddPage : ContentPage
 	{
-		IFolder rootFolder = FileSystem.Current.LocalStorage;
 		const int fontSize = 20;
 		const int inputSize = 50;
 
@@ -33,7 +34,7 @@ namespace SukimaNote
 
 			Title = "タスク追加";
 			// NavigationBarを非表示に
-			NavigationPage.SetHasNavigationBar(this, false);
+			//NavigationPage.SetHasNavigationBar(this, false);
 
 			// 1~60分までのリストの作成
 			var ar = Enumerable.Range(1, 60).Select(n => string.Format("{0}分", n)).ToList();
@@ -204,17 +205,13 @@ namespace SukimaNote
 			};
 
 			// それぞれの初期値
-			titleEntry.Text = "Task";
-			restTimePicker.SelectedIndex = 9;   // インデックスで指定
+			titleEntry.Text = "Task";															// 初期値はいらない？
+			restTimePicker.SelectedIndex = 9;													// インデックスで指定
 			termDatePicker.Date = new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay);		// 次の日
 			termTimePicker.Time = new TimeSpan(DateTime.Now.Ticks - DateTime.Now.Date.Ticks);	// 時刻は同じ
 			unitTimePicker.SelectedIndex = 9;
 			remarkEditor.Text = "";
 	
-
-			// 「一時保存」ボタンを追加する。properties dictionaryに保存
-			// タスクを追加しないで戻る
-
 			// varで作ったインスタンスをコピーする方法がわからない
 			// もう少しスマートな書き方があると思う
 			var saveArray = new StackLayout[2];
@@ -233,20 +230,33 @@ namespace SukimaNote
 					{
 						await DisplayAlert("エラー", "タイトルを入力てください", "OK");
 					}
-					// TODO: これもバインディングをして書き直す compareメソッドを使いたい
 					else if (termDatePicker.Date.Ticks + termTimePicker.Time.Ticks < DateTime.Now.Ticks)
 					{
 						await DisplayAlert("エラー", "期限が過去に設定されています", "OK");
 					}
 					else
 					{
+						IFolder rootFolder = FileSystem.Current.LocalStorage;
 						IFile file = await rootFolder.CreateFileAsync(titleEntry.Text + ".txt", CreationCollisionOption.GenerateUniqueName);
 						await file.WriteAllTextAsync(titleEntry.Text + ':' +
 													 restTimePicker.SelectedIndex + ':' +
+													 (termDatePicker.Date.Ticks + termTimePicker.Time.Ticks).ToString() + ':' +       // long型のTicksの和ををstringにして保存。
 													 unitTimePicker.SelectedIndex + ':' +
-													 (termDatePicker.Date.Ticks + termTimePicker.Time.Ticks).ToString() + ':' +       // long型のTicksをstringにして保存。バインディングをしていないためとりあえずこの書き方で行く
 													 remarkEditor.Text + ':');
+						// 全く同じ要素が追加されるときにはAddによる更新ができないバグ(または仕様)がある
+						// ページの再読込時に表示されるため(引っ張って更新では表示されない)、Listに追加はされていると思う
+						// 更新できていないリストをタップするとフリーズする
+						TaskListView.taskList.Add(new TaskData
+						{
+							Title = titleEntry.Text,
+							RestTime = restTimePicker.SelectedIndex,
+							Term = new DateTime(termDatePicker.Date.Ticks + termTimePicker.Time.Ticks),
+							UnitTime = unitTimePicker.SelectedIndex,
+							Remark = remarkEditor.Text,
+						});
 						await DisplayAlert("Save", titleEntry.Text + "が保存されました。", "OK");
+						// 元の画面に戻す
+						//await Navigation.PopAsync();
 					}
 				};
 				var save = new StackLayout

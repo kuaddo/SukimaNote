@@ -6,30 +6,22 @@ using System.IO;
 using Xamarin.Forms;
 using PCLStorage;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 namespace SukimaNote
 {
-	// タスクのListViewを作成
+	// タスクのListViewを作成。アクセスレベルが全てpublicだけど仕方ない
 	public class TaskListView : ListView
 	{
-		// listが正常に作成されたかのフラグ
-		// Dispose処理がうまく行けば必要ないと思う
-		public bool SuccessFlag { get; set; }
+		//　タスクのリストを静的に保持。ObservableCollectionを使うとAddした時に自動更新ができる
+		public static ObservableCollection<TaskData> taskList = new ObservableCollection<TaskData>();
 
 		public TaskListView()
 		{
-			// 待つ時間を指定して、何かあったときにフリーズしないようにする
-			var task = MakeTaskListDataAsync();
-			if (task.Wait(1000) == true)
-			{
-				ItemsSource = MakeTaskListDataAsync().Result;
-				SuccessFlag = true;
-			}
-			else
-			{
-				ItemsSource = new List<TaskData>();
-				SuccessFlag = false;
-			}
+			// 引っ張って更新を可能にする
+			// IsPullToRefreshEnabled = true;
+
+			ItemsSource = taskList;
 
 			var cell = new DataTemplate(typeof(TextCell));
 			cell.SetBinding(TextCell.TextProperty, "Title");
@@ -41,8 +33,8 @@ namespace SukimaNote
 		// 非同期メソッドで実装するしかなかった。
 		// ConfigureAwait(false)で移行の処理をワーカースレッドに行わせることで、デッドロックを回避
 		// UIの処理はメインスレッドしかできないようなので、ここではビジネスロジックのみを実行
-		// usingを使うためにstreamを使用
-		private async static Task<List<TaskData>> MakeTaskListDataAsync()
+		// usingでリソースを開放するためにstreamを使用
+		public async static Task MakeTaskDataListAsync()
 		{
 			IFolder rootFolder = FileSystem.Current.LocalStorage;
 			IList<IFile> files = await rootFolder.GetFilesAsync().ConfigureAwait(false);
@@ -56,29 +48,32 @@ namespace SukimaNote
 					{
 						Title = propertyArray[0],
 						RestTime = int.Parse(propertyArray[1]),
-						UnitTime = int.Parse(propertyArray[2]),
-						Term = new DateTime(long.Parse(propertyArray[3])),
+						Term = new DateTime(long.Parse(propertyArray[2])),
+						UnitTime = int.Parse(propertyArray[3]),
 						Remark = propertyArray[4],
 					};
 				}
 			})).ConfigureAwait(false);
 
-			// リソースを開放する。Disposeが実装されていないためGCにやってもらうしかない
-			//GC.Collect();
-
-			return taskDataArray.ToList();
+			taskList = new ObservableCollection<TaskData>(taskDataArray);
 		}
 	}
 
 	// タスクの一覧を描画するページ
 	public class TaskListPage : ContentPage
 	{
-		IFolder rootFolder = FileSystem.Current.LocalStorage;
-
 		public TaskListPage()
 		{
 			Title = "タスク一覧";
 			var listView = new TaskListView();
+			// 引っ張って更新の処理。必要無くなったが残しておく
+			/*listView.Refreshing += async (sender, e) =>
+			{
+				//await TaskListView.MakeTaskDataListAsync();
+				listView.ItemsSource = TaskListView.taskList;
+				listView.EndRefresh();
+			};*/
+
 			// 詳細ページに移行
 			listView.ItemSelected += (sender, e) =>
 			{
@@ -86,12 +81,12 @@ namespace SukimaNote
 				var newPage = new TaskDetailPage();
 				newPage.title.Text += taskData.Title;
 				newPage.restTime.Text += newPage.ar[taskData.RestTime];
-				newPage.unitTime.Text += newPage.ar[taskData.UnitTime];
 				newPage.term.Text += taskData.Term.ToString();
+				newPage.unitTime.Text += newPage.ar[taskData.UnitTime];
 				newPage.remark.Text += taskData.Remark;
 				Navigation.PushAsync(newPage);
 			};
-		
+	
 			// TaskAddPageへ遷移するボタン
 			var shiftButton = new Button
 			{
@@ -112,33 +107,31 @@ namespace SukimaNote
 				FontSize = 30,
 				BackgroundColor = Color.Aqua,
 			};
-			// 全て削除。タスク一覧のページで部分的に削除する機能を実装する
+			// 全て削除。
+			// TODO: タスク一覧のページで部分的に削除する機能を実装する
 			allDeleteButton.Clicked += async (sender, e) =>
 			{
-				// 一つづつ削除
-				IList<IFile> deletefiles = await rootFolder.GetFilesAsync();
-				foreach (var delete in deletefiles)
+				if (TaskListView.taskList.Count == 0)
 				{
-					await delete.DeleteAsync();
+					await DisplayAlert("Error", "タスクが存在しません", "OK");
+				}
+				else if (await DisplayAlert("Caution", "タスクを全て削除しますか?", "YES", "NO"))
+				{
+					// 一つづつ削除
+					IFolder rootFolder = FileSystem.Current.LocalStorage;
+					IList<IFile> deletefiles = await rootFolder.GetFilesAsync();
+					await Task.WhenAll(deletefiles.Select(async file => await file.DeleteAsync()));
+					// Clearメソッドを利用するとその下の行の代入が出来なくなる
+					TaskListView.taskList = new ObservableCollection<TaskData>();
+					listView.ItemsSource = TaskListView.taskList;
+					await DisplayAlert("Deleted", "削除しました", "OK");
 				}
 			};
 
-			if (listView.SuccessFlag)
+			Content = new StackLayout
 			{
-				Content = new StackLayout
-				{
-					Children = { listView, allDeleteButton, shiftButton }
-				};
-			}
-			else
-			{
-				Content = new StackLayout
-				{
-					Children = { new Label { Text = "読み込みに失敗しました", FontSize = 20, HorizontalOptions = LayoutOptions.FillAndExpand, VerticalOptions = LayoutOptions.FillAndExpand },
-								 allDeleteButton,
-								 shiftButton }
-				};
-			}
+				Children = { listView, allDeleteButton, shiftButton }
+			};
 		}
 	}
 
@@ -159,7 +152,7 @@ namespace SukimaNote
 		{
 			// プロパティを参照すれば正しく表示される
 			Title = "タスク詳細(" + this.title.Text + ")";
-			Content = new StackLayout { Children = { title, restTime, unitTime, term, remark } };
+			Content = new StackLayout { Children = { title, restTime, term, unitTime, remark } };
 		}
 	}
 }
