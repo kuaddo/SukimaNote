@@ -21,7 +21,7 @@ namespace SukimaNote
 			// アプリ起動時にtaskListを読み込んでおく
 			await TaskListView.MakeTaskDataListAsync();
 			// taskList読み込み後に5秒待つ
-			await Task.Delay(5000);
+			//await Task.Delay(5000);
 			// リスト生成後にRootPageをMainPageに
 			MainPage = new RootPage();
 		}
