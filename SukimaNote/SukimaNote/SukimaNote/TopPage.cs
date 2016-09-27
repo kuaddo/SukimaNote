@@ -13,7 +13,7 @@ namespace SukimaNote
 			Title = "トップページ";
 			Content = new Label
 			{
-				Text = "タスクの提案をするよ",
+				Text = "Now Loading",
 				FontSize = 60,
 				BackgroundColor = Color.White,
 				TextColor = Color.Black,

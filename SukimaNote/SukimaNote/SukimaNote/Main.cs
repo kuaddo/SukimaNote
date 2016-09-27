@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Xamarin.Forms;
+using System.Threading.Tasks;
 
 namespace SukimaNote
 {
@@ -10,7 +11,8 @@ namespace SukimaNote
 	{
 		public Main()
 		{
-			MainPage = new RootPage();
+			// タスク読み込みに時間がかかることを考慮して、ローディングページを最初に読み込ませておく
+			MainPage = new LoadingPage();
 		}
 
 		protected async override void OnStart()
@@ -18,6 +20,10 @@ namespace SukimaNote
 			// Handle when your app starts
 			// アプリ起動時にtaskListを読み込んでおく
 			await TaskListView.MakeTaskDataListAsync();
+			// taskList読み込み後に5秒待つ
+			await Task.Delay(5000);
+			// リスト生成後にRootPageをMainPageに
+			MainPage = new RootPage();
 		}
 
 		protected override void OnSleep()
@@ -44,7 +50,7 @@ namespace SukimaNote
 			// 最初のページのセット。選択されたことにしてイベントを呼び出す
 			menuPage.Menu.SelectedItem = new MenuItem
 			{
-				TargetType = typeof(TopPage),
+				TargetType = typeof(TaskListPage),
 			};
 		}
 
@@ -155,6 +161,27 @@ namespace SukimaNote
 				Title = "スケジュール設定",
 				TargetType = typeof(SchedulePage),
 			});
+		}
+	}
+
+	public class LoadingPage : ContentPage
+	{
+		public LoadingPage()
+		{
+			Content = new StackLayout
+			{
+				Children =
+				{
+					new Label
+					{
+						Text = "Now Loading...",
+						FontSize = 50,
+						HorizontalOptions = LayoutOptions.CenterAndExpand,
+						VerticalOptions = LayoutOptions.CenterAndExpand
+					},
+					new ActivityIndicator()
+				}
+			};
 		}
 	}
 }
