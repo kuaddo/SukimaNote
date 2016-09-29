@@ -80,9 +80,9 @@ namespace SukimaNote
 				TaskData taskData = e.SelectedItem as TaskData;
 				var newPage = new TaskDetailPage();
 				newPage.title.Text += taskData.Title;
-				newPage.restTime.Text += newPage.ar[taskData.RestTime];
+				newPage.restTime.Text += TaskData.timeList[taskData.RestTime];
 				newPage.term.Text += taskData.Term.ToString();
-				newPage.unitTime.Text += newPage.ar[taskData.UnitTime];
+				newPage.unitTime.Text += TaskData.timeList[taskData.UnitTime];
 				newPage.remark.Text += taskData.Remark;
 				Navigation.PushAsync(newPage);
 			};
@@ -138,8 +138,6 @@ namespace SukimaNote
 	// タスクの詳細画面を描画するページ
 	public class TaskDetailPage : ContentPage
 	{
-		public List<string> ar = Enumerable.Range(1, 60).Select(n => string.Format("{0}分", n)).ToList();
-
 		// 形式はTaskAddPageと同様
 		// TODO: TaskDataプロパティを使いデータを受け取り、Labelはコンストラクタに記述する
 		public Label title = new Label { Text = "Title: ", FontSize = 20 };

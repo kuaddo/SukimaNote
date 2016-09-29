@@ -19,7 +19,10 @@ namespace SukimaNote
 
 		// 追加オプション
 		public int UnitTime { get; set; }       // 最低単位作業時間(インデックスで保存)	
-		public string Remark { get; set; }		// 備考
+		public string Remark { get; set; }      // 備考
+
+		// Pickerで使う時間のリスト
+		public static List<string> timeList = Enumerable.Range(1, 60).Select(n => string.Format("{0}分", n)).ToList();
 	}
 
 	// タスクの追加の設定ページ
@@ -35,9 +38,6 @@ namespace SukimaNote
 			Title = "タスク追加";
 			// NavigationBarを非表示に
 			//NavigationPage.SetHasNavigationBar(this, false);
-
-			// 1~60分までのリストの作成
-			var ar = Enumerable.Range(1, 60).Select(n => string.Format("{0}分", n)).ToList();
 
 			// タスクのデータ入力部分
 			// タイトル入力
@@ -73,7 +73,7 @@ namespace SukimaNote
 
 			// 予想残り時間入力
 			var restTimePicker = new Picker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
-			foreach (var a in ar) { restTimePicker.Items.Add(a); }
+			foreach (var time in TaskData.timeList) { restTimePicker.Items.Add(time); }
 			var restTimeSupplementary = new Label { Text = "作業完了に必要な時間を入力してください", FontSize = fontSize, IsVisible = false };
 			var restTimeTGR = new TapGestureRecognizer();
 			restTimeTGR.Tapped += (sender, e) =>
@@ -142,7 +142,7 @@ namespace SukimaNote
 
 			// 最低単位作業時間入力
 			var unitTimePicker = new Picker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
-			foreach (var a in ar) { unitTimePicker.Items.Add(a); }
+			foreach (var time in TaskData.timeList) { unitTimePicker.Items.Add(time); }
 			var unitTimeSupplementary = new Label { Text = "少なくとも作業実行に必要な時間を入力してください", FontSize = fontSize, IsVisible = false };
 			var unitTimeTGR = new TapGestureRecognizer();
 			unitTimeTGR.Tapped += (sender, e) =>

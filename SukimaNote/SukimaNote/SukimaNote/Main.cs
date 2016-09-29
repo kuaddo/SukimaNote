@@ -50,7 +50,7 @@ namespace SukimaNote
 			// 最初のページのセット。選択されたことにしてイベントを呼び出す
 			menuPage.Menu.SelectedItem = new MenuItem
 			{
-				TargetType = typeof(TaskListPage),
+				TargetType = typeof(TopPage),
 			};
 		}
 
