@@ -17,11 +17,8 @@ namespace SukimaNote
 
 		protected async override void OnStart()
 		{
-			// Handle when your app starts
 			// アプリ起動時にtaskListを読み込んでおく
-			await TaskListView.MakeTaskDataListAsync();
-			// taskList読み込み後に5秒待つ
-			//await Task.Delay(5000);
+			await SharedData.MakeTaskDataListAsync();
 			// リスト生成後にRootPageをMainPageに
 			MainPage = new RootPage();
 		}
@@ -65,7 +62,6 @@ namespace SukimaNote
 			{
 				BarBackgroundColor = Color.FromHex("3498DB"),
 				BarTextColor = Color.White,
-				//Icon = "icon.png",
 			};
 
 			IsPresented = false;
@@ -156,11 +152,6 @@ namespace SukimaNote
 				Title = "本体設定",
 				TargetType = typeof(SettingPage),
 			});
-			this.Add(new MenuItem()
-			{
-				Title = "スケジュール設定",
-				TargetType = typeof(SchedulePage),
-			});
 		}
 	}
 
@@ -184,80 +175,4 @@ namespace SukimaNote
 			};
 		}
 	}
-
-	// ページ内のイベントでページを作り直さずにViewの中身を変えられるかのテスト。一応残しておく
-	/*public class TestPage : ContentPage
-	{
-		int[] array = new int[] { 1, 2, 3, 4, 5 };
-		Button next = new Button { Text = "NEXT", IsEnabled = true };
-		Button back = new Button { Text = "BACK", IsEnabled = false };
-		Label label1 = new Label { BackgroundColor = Color.White, TextColor = Color.Black, FontSize = 100, HorizontalOptions = LayoutOptions.CenterAndExpand };
-		Label label2 = new Label { BackgroundColor = Color.Black, TextColor = Color.White, FontSize = 100, HorizontalOptions = LayoutOptions.CenterAndExpand };
-		StackLayout sl = new StackLayout { Orientation = StackOrientation.Horizontal, HorizontalOptions = LayoutOptions.CenterAndExpand };
-
-
-		public TestPage()
-		{
-			int page = 0;
-			sl.Children.Add(label1);
-			sl.Children.Add(label2);
-			buttonSetting(page);
-			changeLabel(page);
-
-			next.Clicked += (sender, e) =>
-			{
-				page++;
-				changeLabel(page);
-				buttonSetting(page);
-			};
-			back.Clicked += (sender, e) =>
-			{
-				page--;
-				changeLabel(page);
-				buttonSetting(page);
-			};
-
-			Content = new StackLayout
-			{
-				VerticalOptions = LayoutOptions.CenterAndExpand,
-				Children =
-				{
-					sl,
-					new StackLayout
-					{
-						Spacing = 60,
-						HorizontalOptions = LayoutOptions.Center,
-						Orientation = StackOrientation.Horizontal,
-						Children = { back, next }
-					}
-				}
-			};
-		}
-
-		private void buttonSetting(int page)
-		{
-			switch (page)
-			{
-				case 0:
-					next.IsEnabled = true;
-					back.IsEnabled = false;
-					break;
-				case 4:
-					next.IsEnabled = false;
-					back.IsEnabled = true;
-					break;
-				default:
-					next.IsEnabled = true;
-					back.IsEnabled = true;
-					break;
-
-			}
-		}
-
-		private void changeLabel(int page)
-		{
-			label1.Text = array[page].ToString();
-			label2.Text = (array[page] * 100).ToString();
-		}
-	}*/
 }

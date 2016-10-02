@@ -9,22 +9,6 @@ using System.Collections.ObjectModel;
 
 namespace SukimaNote
 {
-	// タスクの設定項目のプロパティのクラス
-	public class TaskData
-	{
-		// 最低限
-		public string Title { get; set; }		// タイトル
-		public int RestTime { get; set; }       // 予想残り時間(インデックスで保存)	
-		public DateTime Term { get; set; }      // 期限
-
-		// 追加オプション
-		public int UnitTime { get; set; }       // 最低単位作業時間(インデックスで保存)	
-		public string Remark { get; set; }      // 備考
-
-		// Pickerで使う時間のリスト
-		public static List<string> timeList = Enumerable.Range(1, 60).Select(n => string.Format("{0}分", n)).ToList();
-	}
-
 	// タスクの追加の設定ページ
 	public class TaskAddPage : ContentPage
 	{
@@ -71,38 +55,6 @@ namespace SukimaNote
 				}
 			};
 
-			// 予想残り時間入力
-			var restTimePicker = new Picker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
-			foreach (var time in TaskData.timeList) { restTimePicker.Items.Add(time); }
-			var restTimeSupplementary = new Label { Text = "作業完了に必要な時間を入力してください", FontSize = fontSize, IsVisible = false };
-			var restTimeTGR = new TapGestureRecognizer();
-			restTimeTGR.Tapped += (sender, e) =>
-			{
-				restTimeSupplementary.IsVisible = !restTimeSupplementary.IsVisible;
-			};
-			var restTimeImage = new Image { Source = "question.png", WidthRequest = fontSize, HeightRequest = fontSize };
-			restTimeImage.GestureRecognizers.Add(restTimeTGR);
-
-			var restTime = new StackLayout
-			{
-				Children =
-				{
-					new StackLayout
-					{
-						Padding = new Thickness(5, 0, 0, 0),
-						Spacing = 7,
-						Orientation = StackOrientation.Horizontal,
-						Children =
-						{
-							new Label { Text = "予想残り時間　　　　", FontSize = fontSize},
-							restTimeImage,
-							restTimeSupplementary
-						}
-					},
-					restTimePicker
-				}
-			};
-
 			// 期限入力
 			var termDatePicker = new DatePicker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize, HorizontalOptions = LayoutOptions.FillAndExpand };
 			var termTimePicker = new TimePicker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize, HorizontalOptions = LayoutOptions.FillAndExpand };
@@ -140,9 +92,41 @@ namespace SukimaNote
 				}
 			};
 
+			// 予想残り時間入力
+			var restTimePicker = new Picker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
+			foreach (var time in SharedData.restTimeList) { restTimePicker.Items.Add(time); }
+			var restTimeSupplementary = new Label { Text = "作業完了に必要な時間を入力してください", FontSize = fontSize, IsVisible = false };
+			var restTimeTGR = new TapGestureRecognizer();
+			restTimeTGR.Tapped += (sender, e) =>
+			{
+				restTimeSupplementary.IsVisible = !restTimeSupplementary.IsVisible;
+			};
+			var restTimeImage = new Image { Source = "question.png", WidthRequest = fontSize, HeightRequest = fontSize };
+			restTimeImage.GestureRecognizers.Add(restTimeTGR);
+
+			var restTime = new StackLayout
+			{
+				Children =
+				{
+					new StackLayout
+					{
+						Padding = new Thickness(5, 0, 0, 0),
+						Spacing = 7,
+						Orientation = StackOrientation.Horizontal,
+						Children =
+						{
+							new Label { Text = "予想残り時間　　　　", FontSize = fontSize},
+							restTimeImage,
+							restTimeSupplementary
+						}
+					},
+					restTimePicker
+				}
+			};
+
 			// 最低単位作業時間入力
 			var unitTimePicker = new Picker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
-			foreach (var time in TaskData.timeList) { unitTimePicker.Items.Add(time); }
+			foreach (var time in SharedData.unitTimeList) { unitTimePicker.Items.Add(time); }
 			var unitTimeSupplementary = new Label { Text = "少なくとも作業実行に必要な時間を入力してください", FontSize = fontSize, IsVisible = false };
 			var unitTimeTGR = new TapGestureRecognizer();
 			unitTimeTGR.Tapped += (sender, e) =>
@@ -172,8 +156,13 @@ namespace SukimaNote
 				}
 			};
 
+			// 場所
+
+
+			// 優先度
+
+
 			// 備考入力
-			// 高さを直接数値指定ではなくFillのように指定する方法がわからない
 			var remarkEditor = new Editor { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = 500, FontSize = fontSize };
 			var remarkSupplementary = new Label { Text = "メモとして記録しておきたいことを入力してください", FontSize = fontSize,IsVisible = false };
 			var remarkTGR = new TapGestureRecognizer();
@@ -206,10 +195,10 @@ namespace SukimaNote
 
 			// それぞれの初期値
 			titleEntry.Text = "Task";															// 初期値はいらない？
-			restTimePicker.SelectedIndex = 9;													// インデックスで指定
+			restTimePicker.SelectedIndex = 3;													// インデックスで指定
 			termDatePicker.Date = new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay);		// 次の日
 			termTimePicker.Time = new TimeSpan(DateTime.Now.Ticks - DateTime.Now.Date.Ticks);	// 時刻は同じ
-			unitTimePicker.SelectedIndex = 9;
+			unitTimePicker.SelectedIndex = 0;
 			remarkEditor.Text = "";
 	
 			// varで作ったインスタンスをコピーする方法がわからない
@@ -228,33 +217,38 @@ namespace SukimaNote
 				{
 					if (titleEntry.Text == "")
 					{
-						await DisplayAlert("エラー", "タイトルを入力てください", "OK");
+						await DisplayAlert("Error", "タイトルを入力てください", "OK");
+					}
+					else if (titleEntry.Text.IndexOf(":") >= 0)
+					{
+						await DisplayAlert("Error", "タイトルに半角のセミコロン : は使えません", "OK");
+					}
+					else if (remarkEditor.Text.IndexOf(":") >= 0)
+					{
+						await DisplayAlert("Error", "備考に半角のセミコロン : は使えません", "OK");
 					}
 					else if (termDatePicker.Date.Ticks + termTimePicker.Time.Ticks < DateTime.Now.Ticks)
 					{
-						await DisplayAlert("エラー", "期限が過去に設定されています", "OK");
+						await DisplayAlert("Error", "期限が過去に設定されています", "OK");
 					}
 					else
 					{
 						IFolder rootFolder = FileSystem.Current.LocalStorage;
 						IFile file = await rootFolder.CreateFileAsync(titleEntry.Text + ".txt", CreationCollisionOption.GenerateUniqueName);
 						await file.WriteAllTextAsync(titleEntry.Text + ':' +
-													 restTimePicker.SelectedIndex + ':' +
 													 (termDatePicker.Date.Ticks + termTimePicker.Time.Ticks).ToString() + ':' +       // long型のTicksの和ををstringにして保存。
+													 restTimePicker.SelectedIndex + ':' +
 													 unitTimePicker.SelectedIndex + ':' +
 													 remarkEditor.Text + ':');
-						// 全く同じ要素が追加されるときにはAddによる更新ができないバグ(または仕様)がある
-						// ページの再読込時に表示されるため(引っ張って更新では表示されない)、Listに追加はされていると思う
-						// 更新できていないリストをタップするとフリーズする
-						TaskListView.taskList.Add(new TaskData
+						SharedData.taskList.Add(new TaskData
 						{
 							Title = titleEntry.Text,
-							RestTime = restTimePicker.SelectedIndex,
 							Term = new DateTime(termDatePicker.Date.Ticks + termTimePicker.Time.Ticks),
+							RestTime = restTimePicker.SelectedIndex,
 							UnitTime = unitTimePicker.SelectedIndex,
 							Remark = remarkEditor.Text,
 						});
-						await DisplayAlert("Save", titleEntry.Text + "が保存されました。", "OK");
+						await DisplayAlert("Saved", titleEntry.Text + "が保存されました。", "OK");
 						// 元の画面に戻す
 						//await Navigation.PopAsync();
 					}
@@ -269,13 +263,15 @@ namespace SukimaNote
 			}
 
 			// 以下配置
-			var minimumLabel = new Label { Text = "基本設定", FontSize = 30, HorizontalOptions = LayoutOptions.Fill, BackgroundColor = Color.FromHex(MyColor.MainColor3), TextColor = Color.White };
-			var optionLabel = new Label { Text = "追加設定", FontSize = 30, HorizontalOptions = LayoutOptions.Fill, BackgroundColor = Color.FromHex(MyColor.MainColor3), TextColor = Color.White };
+			var minimumLabel = new Label { Text = "基本設定", FontSize = 30, HorizontalOptions = LayoutOptions.Fill,
+				BackgroundColor = Color.FromHex(MyColor.MainColor3), TextColor = Color.White };
+			var optionLabel = new Label { Text = "追加設定", FontSize = 30, HorizontalOptions = LayoutOptions.Fill,
+				BackgroundColor = Color.FromHex(MyColor.MainColor3), TextColor = Color.White };
 			var minimum = new StackLayout
 			{
 				BackgroundColor = Color.FromHex(MyColor.MainColor2),
 				Padding = new Thickness(0, 0, 0, 40),
-				Children = { minimumLabel, title, restTime, term, saveArray[0] }
+				Children = { minimumLabel, title, term, restTime, saveArray[0] }
 			};
 
 			var option = new StackLayout
