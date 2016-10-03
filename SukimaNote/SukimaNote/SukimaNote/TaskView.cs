@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 
 namespace SukimaNote
 {
-	// タスクのListViewを作成。アクセスレベルが全てpublicだけど仕方ない
+	// タスクのListViewを作成
 	public class TaskListView : ListView
 	{
 		public TaskListView()
@@ -36,13 +36,7 @@ namespace SukimaNote
 			// 詳細ページに移行
 			listView.ItemSelected += (sender, e) =>
 			{
-				TaskData taskData = e.SelectedItem as TaskData;
-				var newPage = new TaskDetailPage();
-				newPage.title.Text += taskData.Title;
-				newPage.term.Text += taskData.Term.ToString();
-				newPage.restTime.Text += SharedData.restTimeList[taskData.RestTime];
-				newPage.unitTime.Text += SharedData.unitTimeList[taskData.UnitTime];
-				newPage.remark.Text += taskData.Remark;
+				var newPage = new TaskDetailPage(e.SelectedItem as TaskData);
 				Navigation.PushAsync(newPage);
 			};
 	
@@ -93,20 +87,126 @@ namespace SukimaNote
 	}
 
 	// タスクの詳細画面を描画するページ
-	public class TaskDetailPage : ContentPage
+	public class TaskDetailPage : BasicTaskShowPage
 	{
-		public Label title = new Label { Text = "Title: ", FontSize = 20 };
-		public Label term = new Label { Text = "Term: ", FontSize = 20 };
-		public Label restTime = new Label { Text = "RestTime: ", FontSize = 20 };
-		public Label unitTime = new Label { Text = "UnitTime: ", FontSize = 20 };
-		public Label remark = new Label { Text = "Remark: ", FontSize = 20 };
-
-		// TODO: TaskDataを受け取ってViewを変化させるようにする。TopPageに流用する
-		public TaskDetailPage()
+		public TaskDetailPage(TaskData taskData)
 		{
-			// プロパティを参照すれば正しく表示される
-			Title = "タスク詳細(" + this.title.Text + ")";
-			Content = new StackLayout { Children = { title, term, restTime, unitTime, remark } };
+			Title = "タスク詳細:" + taskData.Title;
+			Initialize(taskData);
+		}
+	}
+
+	// TopPage DetailPageでのレイアウトの基本となるページ。そのまま使うことは多分ない
+	public class BasicTaskShowPage : ContentPage
+	{
+		public Label title	  = new Label { FontSize = 60 };
+		public Label term     = new Label { FontSize = 35 };
+		public Label restTime = new Label { FontSize = 25 };
+		public Label unitTime = new Label { FontSize = 25 };
+		public Label place	  = new Label { FontSize = 25 };
+		public Label priority = new Label { FontSize = 25 };
+		public Label remark   = new Label { FontSize = 10 };
+		public Frame frame    = new Frame();
+
+		public BasicTaskShowPage()
+		{
+			// 期限
+			var sl1 = new StackLayout
+			{
+				Spacing = 10,
+				Orientation = StackOrientation.Horizontal,
+				Children =
+				{
+					new Label { Text = "期限:" },
+					term
+				}
+			};
+
+			// 予想残り時間
+			var sl2 = new StackLayout
+			{
+				Children =
+				{
+					new Label { Text = "予想残り時間" },
+					restTime
+				}
+			};
+
+			// 最低単位作業時間
+			var sl3 = new StackLayout
+			{
+				Children =
+				{
+					new Label { Text = "最低単位作業時間" },
+					unitTime
+				}
+			};
+
+			// 場所
+			var sl4 = new StackLayout
+			{
+				Children =
+				{
+					new Label { Text = "場所" },
+					place
+				}
+			};
+
+			// 優先度
+			var sl5 = new StackLayout
+			{
+				Children =
+				{
+					new Label { Text = "優先度" },
+					priority
+				}
+			};
+
+			// 備考
+			var sl6 = new StackLayout
+			{
+				Children =
+				{
+					new Label { Text = "備考" },
+					remark
+				}
+			};
+
+			frame = new Frame
+			{
+				OutlineColor = Color.Silver,
+				HasShadow = true,
+				Padding = new Thickness(30, 30, 30, 30),
+				Content = new StackLayout
+				{
+					Padding = new Thickness(10, 0, 0, 0),
+					HorizontalOptions = LayoutOptions.FillAndExpand,
+					VerticalOptions = LayoutOptions.FillAndExpand,
+					Children =
+					{
+						title,
+						sl1,
+						new StackLayout { Orientation = StackOrientation.Horizontal, Spacing = 30, Children = { sl2, sl3 } },
+						sl4,
+						sl5,
+						sl6
+					}
+				}
+			};
+
+			Content = frame;
+		}
+
+		// Labelの初期化をする
+		public void Initialize(TaskData taskData)
+		{
+			title.Text = taskData.Title;
+			term.Text = taskData.Term.ToString("F");
+			restTime.Text = SharedData.restTimeList[taskData.RestTime];
+			unitTime.Text = SharedData.unitTimeList[taskData.UnitTime];
+			place.Text = taskData.Place;
+			priority.Text = SharedData.priorityString[taskData.Priority];
+			remark.Text = taskData.Remark;
 		}
 	}
 }

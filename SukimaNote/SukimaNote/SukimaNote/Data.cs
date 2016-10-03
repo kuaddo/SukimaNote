@@ -29,14 +29,15 @@ namespace SukimaNote
 	{
 		// RestTimeで使う時間のリスト
 		public static List<string> restTimeList = new List<string>
-			{ "5分", "10分", "15分", "20分", "30分", "45分", "1時間", "1.5時間", "2時間", "2.5時間", "3時間", "4時間", "5時間", "6時間"};
+			{ "5分", "10分", "15分", "20分", "30分", "45分", "1時間", "1.5時間", "2時間", "2.5時間", "3時間", "4時間", "5時間", "6時間", "6時間以上"};
 		// RestTimeで使う時間のリスト
 		public static List<string> unitTimeList = new List<string>
 			{ "指定無し", "5分", "10分", "15分", "20分", "30分", "45分", "60分", "90分" };
 		// 場所で使うList
 		public static ObservableCollection<string> placeList;
 		// 優先度で使うenum
-		enum priority { low, middle, high };
+		public enum			   priority						 {  low  , middle,  high   };
+		public static string[] priorityString = new string[] { "低い", "普通", "高い" };
 
 		// 静的に保持したタスクのリスト。ObservableCollectionを使うとAddした時に自動更新ができる
 		public static ObservableCollection<TaskData> taskList = new ObservableCollection<TaskData>();

@@ -17,11 +17,7 @@ namespace SukimaNote
 
 		public TaskAddPage()
 		{
-			// TODO: TaskDataとinputのデータバインディングをする
-
 			Title = "タスク追加";
-			// NavigationBarを非表示に
-			//NavigationPage.SetHasNavigationBar(this, false);
 
 			// タスクのデータ入力部分
 			// タイトル入力
@@ -195,10 +191,12 @@ namespace SukimaNote
 
 			// それぞれの初期値
 			titleEntry.Text = "Task";															// 初期値はいらない？
-			restTimePicker.SelectedIndex = 3;													// インデックスで指定
 			termDatePicker.Date = new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay);		// 次の日
-			termTimePicker.Time = new TimeSpan(DateTime.Now.Ticks - DateTime.Now.Date.Ticks);	// 時刻は同じ
+			termTimePicker.Time = new TimeSpan(DateTime.Now.Ticks - DateTime.Now.Date.Ticks);   // 時刻は同じ
+			restTimePicker.SelectedIndex = 1;                                                   // インデックスで指定
 			unitTimePicker.SelectedIndex = 0;
+			// 場所
+			// 優先度
 			remarkEditor.Text = "";
 	
 			// varで作ったインスタンスをコピーする方法がわからない
