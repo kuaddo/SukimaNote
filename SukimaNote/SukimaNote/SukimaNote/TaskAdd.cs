@@ -88,19 +88,19 @@ namespace SukimaNote
 				}
 			};
 
-			// 予想残り時間入力
-			var restTimePicker = new Picker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
-			foreach (var time in SharedData.restTimeList) { restTimePicker.Items.Add(time); }
-			var restTimeSupplementary = new Label { Text = "作業完了に必要な時間を入力してください", FontSize = fontSize, IsVisible = false };
-			var restTimeTGR = new TapGestureRecognizer();
-			restTimeTGR.Tapped += (sender, e) =>
+			// 予想作業時間入力
+			var timeToFinishPicker = new Picker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
+			foreach (var time in SharedData.timeToFinishList) { timeToFinishPicker.Items.Add(time); }
+			var timeToFinishSupplementary = new Label { Text = "作業完了に必要な時間を入力してください", FontSize = fontSize, IsVisible = false };
+			var timeToFinishTGR = new TapGestureRecognizer();
+			timeToFinishTGR.Tapped += (sender, e) =>
 			{
-				restTimeSupplementary.IsVisible = !restTimeSupplementary.IsVisible;
+				timeToFinishSupplementary.IsVisible = !timeToFinishSupplementary.IsVisible;
 			};
-			var restTimeImage = new Image { Source = "question.png", WidthRequest = fontSize, HeightRequest = fontSize };
-			restTimeImage.GestureRecognizers.Add(restTimeTGR);
+			var timeToFinishImage = new Image { Source = "question.png", WidthRequest = fontSize, HeightRequest = fontSize };
+			timeToFinishImage.GestureRecognizers.Add(timeToFinishTGR);
 
-			var restTime = new StackLayout
+			var timeToFinish = new StackLayout
 			{
 				Children =
 				{
@@ -111,52 +111,89 @@ namespace SukimaNote
 						Orientation = StackOrientation.Horizontal,
 						Children =
 						{
-							new Label { Text = "予想残り時間　　　　", FontSize = fontSize},
-							restTimeImage,
-							restTimeSupplementary
+							new Label { Text = "予想作業時間　　　　", FontSize = fontSize},
+							timeToFinishImage,
+							timeToFinishSupplementary
 						}
 					},
-					restTimePicker
-				}
-			};
-
-			// 最低単位作業時間入力
-			var unitTimePicker = new Picker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
-			foreach (var time in SharedData.unitTimeList) { unitTimePicker.Items.Add(time); }
-			var unitTimeSupplementary = new Label { Text = "少なくとも作業実行に必要な時間を入力してください", FontSize = fontSize, IsVisible = false };
-			var unitTimeTGR = new TapGestureRecognizer();
-			unitTimeTGR.Tapped += (sender, e) =>
-			{
-				unitTimeSupplementary.IsVisible = !unitTimeSupplementary.IsVisible;
-			};
-			var unitTimeImage = new Image { Source = "question.png", WidthRequest = fontSize, HeightRequest = fontSize };
-			unitTimeImage.GestureRecognizers.Add(unitTimeTGR);
-
-			var unitTime = new StackLayout
-			{
-				Children =
-				{
-					new StackLayout
-					{
-						Padding = new Thickness(5, 0, 0, 0),
-						Spacing = 7,
-						Orientation = StackOrientation.Horizontal,
-						Children =
-						{
-							new Label { Text = "最低単位作業時間　　", FontSize = fontSize},
-							unitTimeImage,
-							unitTimeSupplementary
-						}
-					},
-					unitTimePicker
+					timeToFinishPicker
 				}
 			};
 
 			// 場所
+			var placePicker = new Picker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
+			foreach (var p in SharedData.placeList) { placePicker.Items.Add(p); };
+			var placeSupplementary = new Label { Text = "作業できる場所を選択してください", FontSize = fontSize, IsVisible = false };
+			var placeTGR = new TapGestureRecognizer();
+			placeTGR.Tapped += (sender, e) =>
+			{
+				placeSupplementary.IsVisible = !placeSupplementary.IsVisible;
+			};
+			var placeImage = new Image { Source = "question.png", WidthRequest = fontSize, HeightRequest = fontSize };
+			placeImage.GestureRecognizers.Add(placeTGR);
 
+			var place = new StackLayout
+			{
+				Children =
+				{
+					new StackLayout
+					{
+						Padding = new Thickness(5, 0, 0, 0),
+						Spacing = 7,
+						Orientation = StackOrientation.Horizontal,
+						Children =
+						{
+							new Label { Text = "場所　　　　　　　　", FontSize = fontSize},
+							placeImage,
+							placeSupplementary
+						}
+					},
+					placePicker
+				}
+			};
 
 			// 優先度
+			var priorityButtonL = new Button { Text = "低い", BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
+			var priorityButtonM = new Button { Text = "普通", BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
+			var priorityButtonH = new Button { Text = "高い", BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
+			var priorityLabel = new Label { Text = "普通", HorizontalOptions = LayoutOptions.CenterAndExpand, FontSize = fontSize };
+			priorityButtonL.Clicked += (sender, e) => { priorityLabel.Text = "低い"; };
+			priorityButtonM.Clicked += (sender, e) => { priorityLabel.Text = "普通"; };
+			priorityButtonH.Clicked += (sender, e) => { priorityLabel.Text = "高い"; };
+			var prioritySupplementary = new Label { Text = "優先度を選択してください", FontSize = fontSize, IsVisible = false };
+			var priorityTGR = new TapGestureRecognizer();
+			priorityTGR.Tapped += (sender, e) =>
+			{
+				prioritySupplementary.IsVisible = !prioritySupplementary.IsVisible;
+			};
+			var priorityImage = new Image { Source = "question.png", WidthRequest = fontSize, HeightRequest = fontSize };
+			priorityImage.GestureRecognizers.Add(priorityTGR);
 
+			var priority = new StackLayout
+			{
+				Children =
+				{
+					new StackLayout
+					{
+						Padding = new Thickness(5, 0, 0, 0),
+						Spacing = 7,
+						Orientation = StackOrientation.Horizontal,
+						Children =
+						{
+							new Label { Text = "優先度　　　　　　　", FontSize = fontSize},
+							priorityImage,
+							prioritySupplementary
+						}
+					},
+					new StackLayout
+					{
+						Padding = new Thickness(30, 0, 0, 0),
+						Spacing = 10,
+						Orientation = StackOrientation.Horizontal,
+						Children = { priorityButtonL, priorityButtonM, priorityButtonH, priorityLabel}
+					}
+				}
+			};
 
 			// 備考入力
 			var remarkEditor = new Editor { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = 500, FontSize = fontSize };
@@ -193,11 +230,10 @@ namespace SukimaNote
 			titleEntry.Text = "Task";															// 初期値はいらない？
 			termDatePicker.Date = new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay);		// 次の日
 			termTimePicker.Time = new TimeSpan(DateTime.Now.Ticks - DateTime.Now.Date.Ticks);   // 時刻は同じ
-			restTimePicker.SelectedIndex = 1;                                                   // インデックスで指定
-			unitTimePicker.SelectedIndex = 0;
-			// 場所
+			timeToFinishPicker.SelectedIndex = 1;                                               // 10分を選択
+			placePicker.SelectedIndex = 0;														// 指定無しを選択
 			// 優先度
-			remarkEditor.Text = "";
+			remarkEditor.Text = "";																// 初期値は空白
 	
 			// varで作ったインスタンスをコピーする方法がわからない
 			// もう少しスマートな書き方があると思う
@@ -235,15 +271,19 @@ namespace SukimaNote
 						IFile file = await rootFolder.CreateFileAsync(titleEntry.Text + ".txt", CreationCollisionOption.GenerateUniqueName);
 						await file.WriteAllTextAsync(titleEntry.Text + ':' +
 													 (termDatePicker.Date.Ticks + termTimePicker.Time.Ticks).ToString() + ':' +       // long型のTicksの和ををstringにして保存。
-													 restTimePicker.SelectedIndex + ':' +
-													 unitTimePicker.SelectedIndex + ':' +
+													 timeToFinishPicker.SelectedIndex + ':' +
+													 placePicker.SelectedIndex + ':' +
+													 priorityLabel.Text + ':' +
+													 "0:" +																			  // 進捗度は0で保存
 													 remarkEditor.Text + ':');
 						SharedData.taskList.Add(new TaskData
 						{
 							Title = titleEntry.Text,
-							Term = new DateTime(termDatePicker.Date.Ticks + termTimePicker.Time.Ticks),
-							RestTime = restTimePicker.SelectedIndex,
-							UnitTime = unitTimePicker.SelectedIndex,
+							Deadline = new DateTime(termDatePicker.Date.Ticks + termTimePicker.Time.Ticks),
+							TimeToFinish = timeToFinishPicker.SelectedIndex,
+							Place = SharedData.placeList[placePicker.SelectedIndex],
+							Priority = SharedData.priority.普通,
+							Progress = 0,
 							Remark = remarkEditor.Text,
 						});
 						await DisplayAlert("Saved", titleEntry.Text + "が保存されました。", "OK");
@@ -269,14 +309,14 @@ namespace SukimaNote
 			{
 				BackgroundColor = Color.FromHex(MyColor.MainColor2),
 				Padding = new Thickness(0, 0, 0, 40),
-				Children = { minimumLabel, title, term, restTime, saveArray[0] }
+				Children = { minimumLabel, title, term, timeToFinish, saveArray[0] }
 			};
 
 			var option = new StackLayout
 			{
 				BackgroundColor = Color.FromHex(MyColor.MainColor2),
 				Padding = new Thickness(0, 0, 0, 40),
-				Children = { optionLabel, unitTime, remark, saveArray[1] }
+				Children = { optionLabel, place, priority, remark, saveArray[1] }
 			};
 
 			Content = new ScrollView

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+using Xamarin.Forms;
 using PCLStorage;
 
 namespace SukimaNote
@@ -13,33 +14,28 @@ namespace SukimaNote
 	public class TaskData
 	{
 		// 最低限
-		public string	Title    { get; set; }	// タイトル
-		public DateTime Term	 { get; set; }  // 期限
-		public int		RestTime { get; set; }  // 予想残り時間(インデックスで保存)	
+		public string	Title		 { get; set; }	// タイトル
+		public DateTime Deadline	 { get; set; }  // 期限
+		public int		TimeToFinish { get; set; }  // 予想作業時間(インデックスで保存)	
 
 		// 追加オプション
-		public int		UnitTime { get; set; }  // 最低単位作業時間(インデックスで保存)
-		public string	Place	 { get; set; }  // 場所
-		public int		Priority { get; set; }  // 優先度(SharedDataのenumを使用)
-		public string	Remark	 { get; set; }  // 備考
+		public string	Place		 { get; set; }  // 場所
+		public SharedData.priority		Priority	 { get; set; }  // 優先度(SharedDataのenumを使用)
+		public int		Progress	 { get; set; }  // 進捗度(0~100の整数値)
+		public string	Remark		 { get; set; }  // 備考
 	}
 
 	// アプリ内の様々な場所に使うTaskに関しての静的データ、メソッドのクラス
 	public static class SharedData
 	{
-		// RestTimeで使う時間のリスト
-		public static List<string> restTimeList = new List<string>
+		// 予想作業時間で使う時間のリスト
+		public static List<string> timeToFinishList = new List<string>
 			{ "5分", "10分", "15分", "20分", "30分", "45分", "1時間", "1.5時間", "2時間", "2.5時間", "3時間", "4時間", "5時間", "6時間", "6時間以上"};
-		// RestTimeで使う時間のリスト
-		public static List<string> unitTimeList = new List<string>
-			{ "指定無し", "5分", "10分", "15分", "20分", "30分", "45分", "60分", "90分" };
 		// 場所で使うList
-		public static ObservableCollection<string> placeList;
+		public static ObservableCollection<string> placeList = new ObservableCollection<string>{ "指定無し" };
 		// 優先度で使うenum
-		public enum			   priority						 {  low  , middle,  high   };
-		public static string[] priorityString = new string[] { "低い", "普通", "高い" };
-
-		// 静的に保持したタスクのリスト。ObservableCollectionを使うとAddした時に自動更新ができる
+		public enum	priority { 低い, 普通, 高い };
+		// タスクのリスト。ObservableCollectionを使うとAddした時に自動更新ができる
 		public static ObservableCollection<TaskData> taskList = new ObservableCollection<TaskData>();
 
 
@@ -60,15 +56,24 @@ namespace SukimaNote
 					return new TaskData
 					{
 						Title = propertyArray[0],
-						Term = new DateTime(long.Parse(propertyArray[1])),
-						RestTime = int.Parse(propertyArray[2]),
-						UnitTime = int.Parse(propertyArray[3]),
+						Deadline = new DateTime(long.Parse(propertyArray[1])),
+						TimeToFinish = int.Parse(propertyArray[2]),
+
 						Remark = propertyArray[4],
 					};
 				}
 			})).ConfigureAwait(false);
 
 			taskList = new ObservableCollection<TaskData>(taskDataArray);
+		}
+
+		// Properties Dictionaryから場所の設定データを読み込む
+		public static void MakePlaceList()
+		{
+			if (Application.Current.Properties.ContainsKey("PlaceList"))
+			{
+				placeList = Application.Current.Properties["PlaceList"] as ObservableCollection<string>;
+			}
 		}
 	}
 }

@@ -17,8 +17,9 @@ namespace SukimaNote
 
 		protected async override void OnStart()
 		{
-			// アプリ起動時にtaskListを読み込んでおく
+			// アプリ起動時にtaskListとplaceListを読み込んでおく
 			await SharedData.MakeTaskDataListAsync();
+			//SharedData.MakePlaceList();
 			// リスト生成後にRootPageをMainPageに
 			MainPage = new RootPage();
 		}

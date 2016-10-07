@@ -157,7 +157,7 @@ namespace SukimaNote
 		// けんたが書いたアルゴリズムをそのままここに入れる
 		private long CalculationOfPriority(TaskData taskData)
 		{
-			return taskData.Term.Ticks;
+			return taskData.Deadline.Ticks;
 		}
 	}
 }

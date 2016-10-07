@@ -6,7 +6,6 @@ using System.IO;
 using Xamarin.Forms;
 using PCLStorage;
 using System.Threading.Tasks;
-using System.Collections.ObjectModel;
 
 namespace SukimaNote
 {
@@ -19,7 +18,7 @@ namespace SukimaNote
 
 			var cell = new DataTemplate(typeof(TextCell));
 			cell.SetBinding(TextCell.TextProperty, "Title");
-			cell.SetBinding(TextCell.DetailProperty, "Term");
+			cell.SetBinding(TextCell.DetailProperty, "Deadline");
 			
 			ItemTemplate = cell;
 		}
@@ -99,14 +98,13 @@ namespace SukimaNote
 	// TopPage DetailPageでのレイアウトの基本となるページ。そのまま使うことは多分ない
 	public class BasicTaskShowPage : ContentPage
 	{
-		public Label title	  = new Label { FontSize = 60 };
-		public Label term     = new Label { FontSize = 35 };
-		public Label restTime = new Label { FontSize = 25 };
-		public Label unitTime = new Label { FontSize = 25 };
-		public Label place	  = new Label { FontSize = 25 };
-		public Label priority = new Label { FontSize = 25 };
-		public Label remark   = new Label { FontSize = 10 };
-		public Frame frame    = new Frame();
+		public Label title		  = new Label { FontSize = 60 };
+		public Label deadline	  = new Label { FontSize = 35 };
+		public Label timeToFinish = new Label { FontSize = 25 };
+		public Label place		  = new Label { FontSize = 25 };
+		public Label priority	  = new Label { FontSize = 25 };
+		public Label remark		  = new Label { FontSize = 10 };
+		public Frame frame		  = new Frame();
 
 		public BasicTaskShowPage()
 		{
@@ -118,7 +116,7 @@ namespace SukimaNote
 				Children =
 				{
 					new Label { Text = "期限:" },
-					term
+					deadline
 				}
 			};
 
@@ -128,17 +126,7 @@ namespace SukimaNote
 				Children =
 				{
 					new Label { Text = "予想残り時間" },
-					restTime
-				}
-			};
-
-			// 最低単位作業時間
-			var sl3 = new StackLayout
-			{
-				Children =
-				{
-					new Label { Text = "最低単位作業時間" },
-					unitTime
+					timeToFinish
 				}
 			};
 
@@ -186,7 +174,7 @@ namespace SukimaNote
 					{
 						title,
 						sl1,
-						new StackLayout { Orientation = StackOrientation.Horizontal, Spacing = 30, Children = { sl2, sl3 } },
+						new StackLayout { Orientation = StackOrientation.Horizontal, Spacing = 30, Children = { sl2} },
 						sl4,
 						sl5,
 						sl6
@@ -201,11 +189,10 @@ namespace SukimaNote
 		public void Initialize(TaskData taskData)
 		{
 			title.Text = taskData.Title;
-			term.Text = taskData.Term.ToString("F");
-			restTime.Text = SharedData.restTimeList[taskData.RestTime];
-			unitTime.Text = SharedData.unitTimeList[taskData.UnitTime];
+			deadline.Text = taskData.Deadline.ToString("F");
+			timeToFinish.Text = SharedData.timeToFinishList[taskData.TimeToFinish];
 			place.Text = taskData.Place;
-			priority.Text = SharedData.priorityString[taskData.Priority];
+			priority.Text = ((SharedData.priority)taskData.Priority).ToString();
 			remark.Text = taskData.Remark;
 		}
 	}
