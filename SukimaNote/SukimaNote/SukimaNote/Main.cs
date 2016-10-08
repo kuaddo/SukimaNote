@@ -18,8 +18,8 @@ namespace SukimaNote
 		protected async override void OnStart()
 		{
 			// アプリ起動時にtaskListとplaceListを読み込んでおく
-			await SharedData.MakeTaskDataListAsync();
 			//SharedData.MakePlaceList();
+			await SharedData.MakeTaskDataListAsync();
 			// リスト生成後にRootPageをMainPageに
 			MainPage = new RootPage();
 		}
@@ -48,7 +48,7 @@ namespace SukimaNote
 			// 最初のページのセット。選択されたことにしてイベントを呼び出す
 			menuPage.Menu.SelectedItem = new MenuItem
 			{
-				TargetType = typeof(BasicTaskShowPage),
+				TargetType = typeof(TopPage),
 			};
 		}
 

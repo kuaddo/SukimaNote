@@ -273,7 +273,7 @@ namespace SukimaNote
 													 (termDatePicker.Date.Ticks + termTimePicker.Time.Ticks).ToString() + ':' +       // long型のTicksの和ををstringにして保存。
 													 timeToFinishPicker.SelectedIndex + ':' +
 													 placePicker.SelectedIndex + ':' +
-													 priorityLabel.Text + ':' +
+													 SharedData.priorityList.IndexOf(priorityLabel.Text) + ':' +					  // TODO: 気持ち悪いから直す
 													 "0:" +																			  // 進捗度は0で保存
 													 remarkEditor.Text + ':');
 						SharedData.taskList.Add(new TaskData
@@ -281,8 +281,8 @@ namespace SukimaNote
 							Title = titleEntry.Text,
 							Deadline = new DateTime(termDatePicker.Date.Ticks + termTimePicker.Time.Ticks),
 							TimeToFinish = timeToFinishPicker.SelectedIndex,
-							Place = SharedData.placeList[placePicker.SelectedIndex],
-							Priority = SharedData.priority.普通,
+							Place = placePicker.SelectedIndex,
+							Priority = SharedData.priorityList.IndexOf(priorityLabel.Text),
 							Progress = 0,
 							Remark = remarkEditor.Text,
 						});

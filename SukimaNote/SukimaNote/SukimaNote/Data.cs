@@ -19,8 +19,8 @@ namespace SukimaNote
 		public int		TimeToFinish { get; set; }  // 予想作業時間(インデックスで保存)	
 
 		// 追加オプション
-		public string	Place		 { get; set; }  // 場所
-		public SharedData.priority		Priority	 { get; set; }  // 優先度(SharedDataのenumを使用)
+		public int  	Place		 { get; set; }  // 場所(インデックスで保存)	
+		public int		Priority	 { get; set; }  // 優先度(インデックスで保存)	
 		public int		Progress	 { get; set; }  // 進捗度(0~100の整数値)
 		public string	Remark		 { get; set; }  // 備考
 	}
@@ -33,8 +33,8 @@ namespace SukimaNote
 			{ "5分", "10分", "15分", "20分", "30分", "45分", "1時間", "1.5時間", "2時間", "2.5時間", "3時間", "4時間", "5時間", "6時間", "6時間以上"};
 		// 場所で使うList
 		public static ObservableCollection<string> placeList = new ObservableCollection<string>{ "指定無し" };
-		// 優先度で使うenum
-		public enum	priority { 低い, 普通, 高い };
+		// 優先度で使うList
+		public static List<string> priorityList = new List<string> { "低い", "普通", "高い" };
 		// タスクのリスト。ObservableCollectionを使うとAddした時に自動更新ができる
 		public static ObservableCollection<TaskData> taskList = new ObservableCollection<TaskData>();
 
@@ -58,8 +58,10 @@ namespace SukimaNote
 						Title = propertyArray[0],
 						Deadline = new DateTime(long.Parse(propertyArray[1])),
 						TimeToFinish = int.Parse(propertyArray[2]),
-
-						Remark = propertyArray[4],
+						Place = int.Parse(propertyArray[3]),
+						Priority = int.Parse(propertyArray[4]),
+						Progress = int.Parse(propertyArray[5]),
+						Remark = propertyArray[6],
 					};
 				}
 			})).ConfigureAwait(false);
