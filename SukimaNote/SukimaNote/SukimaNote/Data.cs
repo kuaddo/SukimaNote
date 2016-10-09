@@ -10,23 +10,104 @@ using PCLStorage;
 
 namespace SukimaNote
 {
-	// タスクの設定項目のプロパティのクラス
-	public class TaskData
-	{
-		// 最低限
-		public string	Title		 { get; set; }	// タイトル
-		public DateTime Deadline	 { get; set; }  // 期限
-		public int		TimeToFinish { get; set; }  // 予想作業時間(インデックスで保存)	
+    // タスクの情報一覧の実装すべきもの
+    interface ITaskData
+    {
+        string   Title           { get; set; }
+        DateTime Deadline        { get; set; } // 期限
+        int      TimeToFinish    { get; set; } // 予想作業時間（min）
+        int      Place           { get; set; }
+        int      Priority        { get; set; }
+        int      Progress        { get; set; } // 進捗度（0 ~ 100%）
+        int      RestMinutes     { get; }      // 作業の残り時間
+        int      HoursByDeadline { get; }      // このタスクの期限までの時間
+        string   Remark          { get; set; } // 備考
+    }
 
-		// 追加オプション
-		public int  	Place		 { get; set; }  // 場所(インデックスで保存)	
-		public int		Priority	 { get; set; }  // 優先度(インデックスで保存)	
-		public int		Progress	 { get; set; }  // 進捗度(0~100の整数値)
-		public string	Remark		 { get; set; }  // 備考
-	}
+    // タスクの設定項目のプロパティのクラス
+    public class TaskData : ITaskData
+    {
+        // 定数
+        private const int MaxProgress = 100;
+        private const int MinProgress = 0;
 
-	// アプリ内の様々な場所に使うTaskに関しての静的データ、メソッドのクラス
-	public static class SharedData
+        // 変数のデフォルトの値一覧
+        private int    place = int.Parse(SharedData.placeList[0]);
+        private int    priority = int.Parse(SharedData.priorityList[0]);
+        private int    progress = MinProgress;
+        private string remark = "特になし";
+
+        // ITaskDataで指定されたプロパティ
+        public string   Title { get; set; }
+        public DateTime Deadline { get; set; }
+        public int      TimeToFinish { get; set; }
+        public int      Place { get { return place; } set { place = value; } }
+        public int      Priority { get { return priority; } set { priority = value; } }
+        public int Progress
+        {
+            get { return progress; }
+            set
+            {
+                if (value > MinProgress && value <= MaxProgress)
+                {
+                    progress = value;
+                }
+                else
+                {
+                    progress = 0;
+                }
+            }
+        }
+        public int RestMinutes { get { return TimeToFinish * (MaxProgress - Progress) / 100; } }
+        public int HoursByDeadline
+        {
+            get
+            {
+                // 時間計測後、単位を合わせた値を返す
+                int hoursByDeadLine = (int)((Deadline.Ticks - DateTime.Now.Ticks) / (1000 * 1000 * 36));
+                return hoursByDeadLine / 1000;
+            }
+        }
+        public string Remark
+        {
+            get { return remark; }
+            set { remark = value; }
+        }
+    }
+    
+    // 評価得点に対するフラグの列挙
+    public enum TaskDataFlags
+    {
+        // 残り時間表示順序の昇降フラグ（フラグがたっていると昇順/そうでなければ降順）
+        RestTimeOrderByAscending = 1,
+
+        // 進捗度考慮フラグ（フラグがたっていれば進捗度 0 のものに倍率を掛ける）  
+        Progress = 2
+    }
+
+    // ユーザの入力・選択オプションでの実装すべきもの
+    interface IUserOption
+    {
+        // TaskDataに受け渡す項目
+        TaskDataFlags FlagsList       { get; set; }　// TaskDataに受け渡すフラグ
+        int           CurrentFreeTime { get; set; }  // ユーザの今使える時間
+        int           DesignatedPlace { get; set; }  // ユーザの指定場所：デフォルトでは"指定なし"
+    }
+
+    // ユーザの入力・選択オプション
+    public class UserOption : IUserOption
+    {
+        // 変数のデフォルト値
+        private int place = int.Parse(SharedData.placeList[0]);
+
+        // IUserOptionで指定されたプロパティ
+        public TaskDataFlags FlagsList       { get; set; }
+        public int           CurrentFreeTime { get; set; }
+        public int           DesignatedPlace { get { return place; } set { place = value; } }
+    }
+
+    // アプリ内の様々な場所に使うTaskに関しての静的データ、メソッドのクラス
+    public static class SharedData
 	{
 		// 予想作業時間で使う時間のリスト
 		public static List<string> timeToFinishList = new List<string>
