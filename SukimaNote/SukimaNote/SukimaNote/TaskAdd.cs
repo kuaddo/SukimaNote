@@ -270,7 +270,7 @@ namespace SukimaNote
 						IFolder rootFolder = FileSystem.Current.LocalStorage;
 						IFile file = await rootFolder.CreateFileAsync(titleEntry.Text + ".txt", CreationCollisionOption.GenerateUniqueName);
 						await file.WriteAllTextAsync(titleEntry.Text + ':' +
-													 (termDatePicker.Date.Ticks + termTimePicker.Time.Ticks).ToString() + ':' +       // long型のTicksの和ををstringにして保存。
+													 (termDatePicker.Date.Ticks + termTimePicker.Time.Ticks).ToString() + ':' +       // long型のTicksの和をstringにして保存。
 													 timeToFinishPicker.SelectedIndex + ':' +
 													 placePicker.SelectedIndex + ':' +
 													 SharedData.priorityList.IndexOf(priorityLabel.Text) + ':' +					  // TODO: 気持ち悪いから直す

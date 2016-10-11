@@ -19,7 +19,7 @@ namespace SukimaNote
 		{
 			// アプリ起動時にtaskListとplaceListを読み込んでおく
 			//SharedData.MakePlaceList();
-			await SharedData.MakeTaskDataListAsync();
+			//await SharedData.MakeTaskDataListAsync();
 			// リスト生成後にRootPageをMainPageに
 			MainPage = new RootPage();
 		}

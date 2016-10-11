@@ -149,7 +149,7 @@ namespace SukimaNote
 
 			if (taskCount < MaxShow) pickUpCount = taskCount;
 			orderedTaskList = new List<TaskData>(SharedData.taskList
-				.OrderBy(task => CalculationOfPriority(task, new UserOption { }))
+				.OrderBy(task => CalculationOfPriority(task, new UserOption()))
 				.Take(pickUpCount));
 		}
 
@@ -158,7 +158,7 @@ namespace SukimaNote
 		private int CalculationOfPriority(TaskData taskData, UserOption userOption)
 		{
             int evaluationPoints = DefaultPoint;
-
+			/*
             // 期限までの残り時間に対する評価
             if (taskData.HoursByDeadline <= HoursInThreeDays)
             {
@@ -179,10 +179,10 @@ namespace SukimaNote
             }
 
             // 同上の評価だがCurrentFreeTimeを考慮した評価
-            evaluationPoints *= EvaluateRestMinutesByFreeTime(taskData.RestMinutes, userOption.CurrentFreeTime);
+            //evaluationPoints *= EvaluateRestMinutesByFreeTime(taskData.RestMinutes, userOption.CurrentFreeTime);
 
             // 優先度での評価
-            evaluationPoints *= taskData.Priority;
+            //evaluationPoints *= taskData.Priority;
 
             // 進捗度での評価
             if (userOption.FlagsList.HasFlag(TaskDataFlags.Progress))
@@ -201,7 +201,7 @@ namespace SukimaNote
             }
 
             //Console.WriteLine($"{taskData.Title} の評価値：{evaluationPoints}");
-
+			*/
             return evaluationPoints;
         }
 

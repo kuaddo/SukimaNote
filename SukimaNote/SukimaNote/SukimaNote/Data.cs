@@ -32,61 +32,37 @@ namespace SukimaNote
         private const int MinProgress = 0;
 
         // 変数のデフォルトの値一覧
-        private int    place = int.Parse(SharedData.placeList[0]);
-        private int    priority = int.Parse(SharedData.priorityList[0]);
-        private int    progress = MinProgress;
-        private string remark = "特になし";
+        private int    _progress = MinProgress;
 
         // ITaskDataで指定されたプロパティ
-        public string   Title { get; set; }
-        public DateTime Deadline { get; set; }
+        public string   Title		 { get; set; }
+        public DateTime Deadline	 { get; set; }
         public int      TimeToFinish { get; set; }
-        public int      Place { get { return place; } set { place = value; } }
-        public int      Priority { get { return priority; } set { priority = value; } }
-        public int Progress
+        public int      Place		 { get; set; } = int.Parse(SharedData.placeList[0]);
+		public int      Priority	 { get; set; } = int.Parse(SharedData.priorityList[0]);
+		public int		Progress
         {
-            get { return progress; }
-            set
-            {
-                if (value > MinProgress && value <= MaxProgress)
-                {
-                    progress = value;
-                }
-                else
-                {
-                    progress = 0;
-                }
-            }
+            get { return _progress; }
+            set { _progress = (value > MinProgress && value <= MaxProgress) ? value : 0; }					// 0~100のみ受け付ける
         }
-        public int RestMinutes { get { return TimeToFinish * (MaxProgress - Progress) / 100; } }
-        public int HoursByDeadline
-        {
-            get
-            {
-                // 時間計測後、単位を合わせた値を返す
-                int hoursByDeadLine = (int)((Deadline.Ticks - DateTime.Now.Ticks) / (1000 * 1000 * 36));
-                return hoursByDeadLine / 1000;
-            }
-        }
-        public string Remark
-        {
-            get { return remark; }
-            set { remark = value; }
-        }
-    }
+        public int		RestMinutes		=> TimeToFinish * (MaxProgress - Progress) / 100;
+		public int		HoursByDeadline	=> (int) new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalHours;	// int型にキャスト
+        public string	Remark			{ get; set; } = "特になし";
+	}
     
     // 評価得点に対するフラグの列挙
+	[Flags]	// ２進数リテラルが使えない。C#7.0ではないのだろうか？
     public enum TaskDataFlags
     {
         // 残り時間表示順序の昇降フラグ（フラグがたっていると昇順/そうでなければ降順）
         RestTimeOrderByAscending = 1,
 
-        // 進捗度考慮フラグ（フラグがたっていれば進捗度 0 のものに倍率を掛ける）  
-        Progress = 2
+		// 進捗度考慮フラグ（フラグがたっていれば進捗度 0 のものに倍率を掛ける）  
+		Progress = 2,
     }
 
-    // ユーザの入力・選択オプションでの実装すべきもの
-    interface IUserOption
+	// ユーザの入力・選択オプションでの実装すべきもの
+	interface IUserOption
     {
         // TaskDataに受け渡す項目
         TaskDataFlags FlagsList       { get; set; }　// TaskDataに受け渡すフラグ
@@ -97,14 +73,11 @@ namespace SukimaNote
     // ユーザの入力・選択オプション
     public class UserOption : IUserOption
     {
-        // 変数のデフォルト値
-        private int place = int.Parse(SharedData.placeList[0]);
-
         // IUserOptionで指定されたプロパティ
-        public TaskDataFlags FlagsList       { get; set; }
-        public int           CurrentFreeTime { get; set; }
-        public int           DesignatedPlace { get { return place; } set { place = value; } }
-    }
+        public TaskDataFlags FlagsList       { get; set; } = TaskDataFlags.RestTimeOrderByAscending | TaskDataFlags.Progress;
+		public int           CurrentFreeTime { get; set; }
+        public int           DesignatedPlace { get; set; } = int.Parse(SharedData.placeList[0]);
+	}
 
     // アプリ内の様々な場所に使うTaskに関しての静的データ、メソッドのクラス
     public static class SharedData
