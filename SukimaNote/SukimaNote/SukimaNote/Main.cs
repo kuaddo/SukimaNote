@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Xamarin.Forms;
 using System.Threading.Tasks;
+using PCLStorage;
 
 namespace SukimaNote
 {
@@ -11,16 +12,16 @@ namespace SukimaNote
 	{
 		public Main()
 		{
-			// ƒ^ƒXƒN“Ç‚İ‚İ‚ÉŠÔ‚ª‚©‚©‚é‚±‚Æ‚ğl—¶‚µ‚ÄAƒ[ƒfƒBƒ“ƒOƒy[ƒW‚ğÅ‰‚É“Ç‚İ‚Ü‚¹‚Ä‚¨‚­
+			// ã‚¿ã‚¹ã‚¯èª­ã¿è¾¼ã¿ã«æ™‚é–“ãŒã‹ã‹ã‚‹ã“ã¨ã‚’è€ƒæ…®ã—ã¦ã€ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ãƒšãƒ¼ã‚¸ã‚’æœ€åˆã«èª­ã¿è¾¼ã¾ã›ã¦ãŠã
 			MainPage = new LoadingPage();
 		}
 
 		protected async override void OnStart()
 		{
-			// ƒAƒvƒŠ‹N“®‚ÉtaskList‚ÆplaceList‚ğ“Ç‚İ‚ñ‚Å‚¨‚­
+			// ã‚¢ãƒ—ãƒªèµ·å‹•æ™‚ã«taskListã¨placeListã‚’èª­ã¿è¾¼ã‚“ã§ãŠã
 			//SharedData.MakePlaceList();
-			//await SharedData.MakeTaskDataListAsync();
-			// ƒŠƒXƒg¶¬Œã‚ÉRootPage‚ğMainPage‚É
+			await SharedData.MakeTaskDataListAsync();
+			// ãƒªã‚¹ãƒˆç”Ÿæˆå¾Œã«RootPageã‚’MainPageã«
 			MainPage = new RootPage();
 		}
 
@@ -40,25 +41,25 @@ namespace SukimaNote
 		public RootPage()
 		{
 			var menuPage = new MenuPage();
-			// ListView Menu‚ğ‘I‘ğ‚µ‚½‚ÉNavigateToƒƒ\ƒbƒh‚ÉSelectedItem‚ğ“n‚·BMenuItem‚ÉƒLƒƒƒXƒg‚µ‚Ä‚¢‚é
+			// ListView Menuã‚’é¸æŠã—ãŸæ™‚ã«NavigateToãƒ¡ã‚½ãƒƒãƒ‰ã«SelectedItemã‚’æ¸¡ã™ã€‚MenuItemã«ã‚­ãƒ£ã‚¹ãƒˆã—ã¦ã„ã‚‹
 			menuPage.Menu.ItemSelected += (sender, e) => NavigateTo(e.SelectedItem as MenuItem);
 
 			Master = menuPage;
 
-			// Å‰‚Ìƒy[ƒW‚ÌƒZƒbƒgB‘I‘ğ‚³‚ê‚½‚±‚Æ‚É‚µ‚ÄƒCƒxƒ“ƒg‚ğŒÄ‚Ño‚·
+			// æœ€åˆã®ãƒšãƒ¼ã‚¸ã®ã‚»ãƒƒãƒˆã€‚é¸æŠã•ã‚ŒãŸã“ã¨ã«ã—ã¦ã‚¤ãƒ™ãƒ³ãƒˆã‚’å‘¼ã³å‡ºã™
 			menuPage.Menu.SelectedItem = new MenuItem
 			{
 				TargetType = typeof(TopPage),
 			};
 		}
 
-		// ƒy[ƒW‘JˆÚ‚Ìƒƒ\ƒbƒh
+		// ãƒšãƒ¼ã‚¸é·ç§»ã®ãƒ¡ã‚½ãƒƒãƒ‰
 		void NavigateTo(MenuItem menu)
 		{
-			// menuPage‚ÌList<MenuItem>‚Ì‘I‘ğˆ‚ğMenuItem‚Åó‚¯æ‚éBƒCƒ“ƒXƒ^ƒ“ƒX¶¬?
+			// menuPageã®List<MenuItem>ã®é¸æŠè‚¢ã‚’MenuItemã§å—ã‘å–ã‚‹ã€‚ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç”Ÿæˆ?
 			ContentPage displayPage = (ContentPage)Activator.CreateInstance(menu.TargetType);
 
-			// Šeƒy[ƒW‚ÉˆÚ“®‚·‚é‚Æ‚«‚Éƒo[‚ÌF‚ğÄİ’è‚·‚é
+			// å„ãƒšãƒ¼ã‚¸ã«ç§»å‹•ã™ã‚‹ã¨ãã«ãƒãƒ¼ã®è‰²ã‚’å†è¨­å®šã™ã‚‹
 			Detail = new NavigationPage(displayPage)
 			{
 				BarBackgroundColor = Color.FromHex("3498DB"),
@@ -69,17 +70,17 @@ namespace SukimaNote
 		}
 	}
 
-	// ¶‘¤‚Ìƒƒjƒ…[ƒy[ƒW
+	// å·¦å´ã®ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒšãƒ¼ã‚¸
 	public class MenuPage : ContentPage
 	{
 		public ListView Menu { get; set; }
 
 		public MenuPage()
 		{
-			Title = "Menu";     // •K{
+			Title = "Menu";     // å¿…é ˆ
 			BackgroundColor = Color.Gray;
 
-			// ListViewİ’è
+			// ListViewè¨­å®š
 			Menu = new MenuListView();
 
 			var menuLabel = new ContentView
@@ -93,7 +94,7 @@ namespace SukimaNote
 				}
 			};
 
-			// ƒ^ƒCƒgƒ‹‚ÌmenuLabel‚ÆListView‚ğ•À‚×‚Ä‚¢‚é
+			// ã‚¿ã‚¤ãƒˆãƒ«ã®menuLabelã¨ListViewã‚’ä¸¦ã¹ã¦ã„ã‚‹
 			var layout = new StackLayout
 			{
 				Spacing = 0,
@@ -105,18 +106,18 @@ namespace SukimaNote
 		}
 	}
 
-	// ƒƒjƒ…[‚Ég‚¤BListView‚ğŒp³‚µ‚½ƒNƒ‰ƒX
+	// ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã«ä½¿ã†ã€‚ListViewã‚’ç¶™æ‰¿ã—ãŸã‚¯ãƒ©ã‚¹
 	public class MenuListView : ListView
 	{
 		public MenuListView()
 		{
-			// ƒCƒ“ƒXƒ^ƒ“ƒX‰»‚µ‚ÄItemsSource‚Æ‚µ‚Äw’è‚·‚é
+			// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹åŒ–ã—ã¦ItemsSourceã¨ã—ã¦æŒ‡å®šã™ã‚‹
 			List<MenuItem> data = new MenuListData();
 			ItemsSource = data;
 			VerticalOptions = LayoutOptions.FillAndExpand;
 			BackgroundColor = Color.Transparent;
 
-			// TextCell‚Ìg—p
+			// TextCellã®ä½¿ç”¨
 			var cell = new DataTemplate(typeof(TextCell));
 			cell.SetBinding(TextCell.TextProperty, "Title");
 
@@ -124,33 +125,33 @@ namespace SukimaNote
 		}
 	}
 
-	// ListView‚Ìƒf[ƒ^—p‚ÌƒNƒ‰ƒXBTargetType‚É‘JˆÚæƒy[ƒW‚ğw’è‚·‚é
+	// ListViewã®ãƒ‡ãƒ¼ã‚¿ç”¨ã®ã‚¯ãƒ©ã‚¹ã€‚TargetTypeã«é·ç§»å…ˆãƒšãƒ¼ã‚¸ã‚’æŒ‡å®šã™ã‚‹
 	public class MenuItem
 	{
 		public string Title { get; set; }
-		// ƒy[ƒWƒNƒ‰ƒX‚Ìw’è‚ğ‚µ‚Ä‚¢‚é
+		// ãƒšãƒ¼ã‚¸ã‚¯ãƒ©ã‚¹ã®æŒ‡å®šã‚’ã—ã¦ã„ã‚‹
 		public Type TargetType { get; set; }
 	}
 
 
-	// ListView‚Ìƒf[ƒ^ƒNƒ‰ƒXBMaster‚Ég‚¤ƒy[ƒW‚ğ“o˜^‚·‚é
+	// ListViewã®ãƒ‡ãƒ¼ã‚¿ã‚¯ãƒ©ã‚¹ã€‚Masterã«ä½¿ã†ãƒšãƒ¼ã‚¸ã‚’ç™»éŒ²ã™ã‚‹
 	public class MenuListData : List<MenuItem>
 	{
 		public MenuListData()
 		{
 			this.Add(new MenuItem()
 			{
-				Title = "ƒgƒbƒvƒy[ƒW",
+				Title = "ãƒˆãƒƒãƒ—ãƒšãƒ¼ã‚¸",
 				TargetType = typeof(TopPage),
 			});
 			this.Add(new MenuItem()
 			{
-				Title = "ƒ^ƒXƒNˆê——",
+				Title = "ã‚¿ã‚¹ã‚¯ä¸€è¦§",
 				TargetType = typeof(TaskListPage),
 			});
 			this.Add(new MenuItem()
 			{
-				Title = "–{‘Ìİ’è",
+				Title = "æœ¬ä½“è¨­å®š",
 				TargetType = typeof(SettingPage),
 			});
 		}

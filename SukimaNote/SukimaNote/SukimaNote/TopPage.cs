@@ -149,13 +149,13 @@ namespace SukimaNote
 
 			if (taskCount < MaxShow) pickUpCount = taskCount;
 			orderedTaskList = new List<TaskData>(SharedData.taskList
-				.OrderBy(task => CalculationOfPriority(task, new UserOption()))
+				.OrderBy(task => CalculationOfPriority(task))
 				.Take(pickUpCount));
 		}
 
 		// 優先度を計算するメソッド。優先度が大きいタスクほど数値が大きくなるようにする
 		// けんたが書いたアルゴリズムをそのままここに入れる
-		private int CalculationOfPriority(TaskData taskData, UserOption userOption)
+		private int CalculationOfPriority(TaskData taskData)
 		{
             int evaluationPoints = DefaultPoint;
 			/*

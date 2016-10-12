@@ -38,16 +38,16 @@ namespace SukimaNote
         public string   Title		 { get; set; }
         public DateTime Deadline	 { get; set; }
         public int      TimeToFinish { get; set; }
-        public int      Place		 { get; set; } = int.Parse(SharedData.placeList[0]);
-		public int      Priority	 { get; set; } = int.Parse(SharedData.priorityList[0]);
+		public int		Place		 { get; set; }
+		public int      Priority	 { get; set; }
 		public int		Progress
         {
             get { return _progress; }
             set { _progress = (value > MinProgress && value <= MaxProgress) ? value : 0; }					// 0~100のみ受け付ける
         }
         public int		RestMinutes		=> TimeToFinish * (MaxProgress - Progress) / 100;
-		public int		HoursByDeadline	=> (int) new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalHours;	// int型にキャスト
-        public string	Remark			{ get; set; } = "特になし";
+		public int		HoursByDeadline	=> (int) new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalHours;  // int型にキャスト
+		public string	Remark		 { get; set; }
 	}
     
     // 評価得点に対するフラグの列挙
