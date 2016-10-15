@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 using Xamarin.Forms;
 using PCLStorage;
@@ -19,40 +20,119 @@ namespace SukimaNote
         int      Place           { get; set; }
         int      Priority        { get; set; }
         int      Progress        { get; set; } // 進捗度（0 ~ 100%）
-        int      RestMinutes     { get; }      // 作業の残り時間
-        int      HoursByDeadline { get; }      // このタスクの期限までの時間
         string   Remark          { get; set; } // 備考
-    }
+		bool	 Closed			 { get; set; } // タスクが終了済みかどうか
+		int		 RestMinutes	 { get; }      // 作業の残り時間
+		int		 HoursByDeadline { get; }      // このタスクの期限までの時間
+	}
 
     // タスクの設定項目のプロパティのクラス
-    public class TaskData : ITaskData
-    {
+    public class TaskData : ITaskData, INotifyPropertyChanged
+	{
         // 定数
         private const int MaxProgress = 100;
         private const int MinProgress = 0;
 
-        // 変数のデフォルトの値一覧
-        private int    _progress = MinProgress;
+		// プロパティに用いる変数
+		private string	 title;
+		private DateTime deadline;
+		private int		 timeToFinish;
+		private int		 place		  = 0;
+		private int		 priority	  = 1;
+		private int		 progress	  = MinProgress;
+		private string	 remark		  = "特になし";
+		private bool	 closed;
 
-        // ITaskDataで指定されたプロパティ
-        public string   Title		 { get; set; }
-        public DateTime Deadline	 { get; set; }
-        public int      TimeToFinish { get; set; }
-		public int		Place		 { get; set; }
-		public int      Priority	 { get; set; }
+		// プロパティの変更時のイベントハンドラ
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		// ITaskDataで指定されたプロパティ
+		public string	Title
+		{
+			get { return this.title; }
+			set
+			{
+				if (this.title == value) { return; }
+				this.title = value;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Title)));
+			}
+		}
+		public DateTime Deadline
+		{
+			get { return this.deadline; }
+			set
+			{
+				if (this.deadline == value) { return; }
+				this.deadline = value;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Deadline)));
+			}
+		}
+		public int		TimeToFinish
+		{
+			get { return this.timeToFinish; }
+			set
+			{
+				if (this.timeToFinish == value) { return; }
+				this.timeToFinish = value;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TimeToFinish)));
+			}
+		}
+		public int		Place
+		{
+			get { return this.place; }
+			set
+			{
+				if (this.place == value) { return; }
+				this.place = value;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Place)));
+			}
+		}
+		public int		Priority
+		{
+			get { return this.priority; }
+			set
+			{
+				if (this.priority == value) { return; }
+				this.priority = value;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Priority)));
+			}
+		}
 		public int		Progress
-        {
-            get { return _progress; }
-            set { _progress = (value > MinProgress && value <= MaxProgress) ? value : 0; }					// 0~100のみ受け付ける
-        }
-        public int		RestMinutes		=> TimeToFinish * (MaxProgress - Progress) / 100;
-		public int		HoursByDeadline	=> (int) new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalHours;  // int型にキャスト
-		public string	Remark		 { get; set; }
+		{
+			get { return this.progress; }
+			set
+			{
+				if (this.progress == value) { return; }
+				this.progress = (value > MinProgress && value <= MaxProgress) ? value : 0;  // 0~100のみ受け付ける
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Progress)));
+			}
+		}
+		public string	Remark
+		{
+			get { return this.remark; }
+			set
+			{
+				if (this.remark == value) { return; }
+				this.remark = value;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Remark)));
+			}
+		}
+		public bool		Closed
+		{
+			get { return this.closed; }
+			set
+			{
+				if (this.closed == value) { return; }
+				this.closed = value;
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Closed)));
+			}
+		}
+		public int		RestMinutes => TimeToFinish * (MaxProgress - Progress) / 100;
+		public int		HoursByDeadline => (int)new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalHours;  // int型にキャスト
 	}
-    
-    // 評価得点に対するフラグの列挙
-	[Flags]	// ２進数リテラルが使えない。C#7.0ではないのだろうか？
-    public enum TaskDataFlags
+
+	// 評価得点に対するフラグの列挙
+	public enum TaskDataFlags
     {
         // 残り時間表示順序の昇降フラグ（フラグがたっていると昇順/そうでなければ降順）
         RestTimeOrderByAscending = 1,
@@ -76,7 +156,7 @@ namespace SukimaNote
         // IUserOptionで指定されたプロパティ
         public TaskDataFlags FlagsList       { get; set; } = TaskDataFlags.RestTimeOrderByAscending | TaskDataFlags.Progress;
 		public int           CurrentFreeTime { get; set; }
-        public int           DesignatedPlace { get; set; } = int.Parse(SharedData.placeList[0]);
+        public int           DesignatedPlace { get; set; } = 0;
 	}
 
     // アプリ内の様々な場所に使うTaskに関しての静的データ、メソッドのクラス
