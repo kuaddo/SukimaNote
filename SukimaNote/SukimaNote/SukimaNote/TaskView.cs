@@ -90,7 +90,7 @@ namespace SukimaNote
 	{
 		public TaskDetailPage(TaskData taskData)
 		{
-			Title = "タスク詳細:" + taskData.Title;
+			Title = taskData.Title;
 			Initialize(taskData);
 		}
 	}
@@ -99,24 +99,32 @@ namespace SukimaNote
 	// 縦向き7/10程度の大きさで丁度いいレイアウトになる
 	public class BasicTaskShowPage : ContentPage
 	{
-		public Label title		  = new Label { FontSize = 60 };
-		public Label restTime	  = new Label { FontSize = 60, Text = "restTime" ,HorizontalOptions = LayoutOptions.End, VerticalOptions = LayoutOptions.Center};
-		public Label deadline	  = new Label { FontSize = 35 };
-		public Label timeToFinish = new Label { FontSize = 25 };
-		public Label place		  = new Label { FontSize = 25 };
-		public Label priority	  = new Label { FontSize = 25 };
-		public Label progress	  = new Label { FontSize = 25 };
-		public Label remark		  = new Label { FontSize = 10 };
-		public Frame frame		  = new Frame { OutlineColor = Color.Silver, HasShadow = true };
+		protected Label title		 = new Label { FontSize = 55, HorizontalOptions = LayoutOptions.Start,  VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label restTime	 = new Label { FontSize = 35, HorizontalOptions = LayoutOptions.FillAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand, BackgroundColor = Color.Red};
+		protected Label deadline	 = new Label { FontSize = 35, HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label timeToFinish = new Label { FontSize = 45, VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label place		 = new Label { FontSize = 40, HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label priority	 = new Label { FontSize = 40, HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label progress	 = new Label { FontSize = 45 };
+		protected Label remark		 = new Label { FontSize = 30 };
+		protected Frame frame		 = new Frame { OutlineColor = Color.Silver, HasShadow = true };
 
 		public BasicTaskShowPage()
 		{
 			// タイトルと残り時間
+			var grid1 = new Grid { BackgroundColor = Color.Pink };
+			grid1.Children.Add(title   , 0, 3, 0, 1);
+			grid1.Children.Add(restTime, 3, 4, 0, 1);
+			grid1.Padding = new Thickness(20, 0, 0, 0);
+
+			// 期限
 			var sl1 = new StackLayout
 			{
-				BackgroundColor = Color.Pink,
-				Orientation = StackOrientation.Horizontal,
-				Children = { title, restTime }
+				Children =
+				{
+					new Label { Text = "期限:", FontSize = 20 },
+					deadline
+				}
 			};
 
 			// 場所
@@ -125,7 +133,7 @@ namespace SukimaNote
 				BackgroundColor = Color.Olive,
 				Children =
 				{
-					new Label { Text = "場所:" },
+					new Label { Text = "場所:", FontSize = 20 },
 					place
 				}
 			};
@@ -134,10 +142,9 @@ namespace SukimaNote
 			var sl3 = new StackLayout
 			{
 				BackgroundColor = Color.Lime,
-				Orientation = StackOrientation.Horizontal,
 				Children =
 				{
-					new Label { Text = "優先度:", FontSize = 50, VerticalOptions = LayoutOptions.Center },
+					new Label { Text = "優先度:", FontSize = 20 },
 					priority
 				}
 			};
@@ -159,14 +166,14 @@ namespace SukimaNote
 				BackgroundColor = Color.Aqua,
 				Children =
 				{
-					new Label { Text = "備考" },
+					new Label { Text = "備考:", FontSize = 20},
 					new ScrollView { Content = remark }
 				}
 			};
 
 			var grid = new Grid();
-			grid.Children.Add(sl1, 0, 10, 0, 3);
-			grid.Children.Add(deadline, 0,  6, 3, 5);
+			grid.Children.Add(grid1, 0, 10, 0, 3);
+			grid.Children.Add(sl1, 0,  6, 3, 5);
 			grid.Children.Add(sl2, 0,  6, 5, 7);
 			grid.Children.Add(sl3, 0, 6, 7, 9);
 			grid.Children.Add(sl4, 6, 10, 3, 9);
@@ -178,18 +185,20 @@ namespace SukimaNote
 		}
 
 		// Labelの初期化をする
-		public void Initialize(TaskData taskData)
+		protected void Initialize(TaskData taskData)
 		{
-			title.Text = taskData.Title;
-			if (taskData.Deadline < DateTime.Now) { restTime.Text = "期限を過ぎています"; }
-			else if (taskData.Deadline.Date == DateTime.Now.Date) { restTime.Text = "残り" + taskData.Deadline.TimeOfDay.Hours + "時間です"; }
-			else { restTime.Text = "残り" + (taskData.Deadline.Date - DateTime.Now.Date) + "日です"; }
-			deadline.Text = taskData.Deadline.ToString("F");
+			title.Text		  = taskData.Title;
+			if		(taskData.Closed == true)		   { restTime.Text = "終了" + Environment.NewLine + "済み"; }
+			else if (taskData.Deadline < DateTime.Now) { restTime.Text = ""; }
+			else if (taskData.MinutesByDeadline < 60)  { restTime.Text = "残り" + Environment.NewLine + taskData.MinutesByDeadline + "分"; }
+			else if (taskData.HoursByDeadline < 24)	   { restTime.Text = "残り" + Environment.NewLine + taskData.HoursByDeadline   + "時間"; }
+			else									   { restTime.Text = "残り" + Environment.NewLine + taskData.DaysByDeadline    + "日"; }
+			deadline.Text	  = taskData.Deadline.ToString("F");
 			timeToFinish.Text = SharedData.timeToFinishList[taskData.TimeToFinish];
-			place.Text = SharedData.placeList[taskData.Place];
-			priority.Text = SharedData.priorityList[taskData.Priority];
-			progress.Text = taskData.Progress.ToString() + "%";
-			remark.Text = taskData.Remark;
+			place.Text		  = SharedData.placeList[taskData.Place];
+			priority.Text	  = SharedData.priorityList[taskData.Priority];
+			progress.Text	  = taskData.Progress.ToString() + "%";
+			remark.Text		  = taskData.Remark;
 		}
 	}
 }

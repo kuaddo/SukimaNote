@@ -18,15 +18,15 @@ namespace SukimaNote
 		private Label taskCountLabel = new Label { HorizontalOptions = LayoutOptions.Center };
 
 		// 基本的には最大5件表示。TODO: 設定で変えられるようにする(1~10)。場所を移すかも
-		private int _maxShow = 5;
+		private int maxShow = 5;
 		public int MaxShow
 		{
-			get { return _maxShow; }
+			get { return maxShow; }
 			set
 			{
 				if (value >= 1 && value <= 10)
 				{
-					_maxShow = value;
+					maxShow = value;
 				}
 			}
 		}

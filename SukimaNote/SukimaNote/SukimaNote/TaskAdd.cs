@@ -19,7 +19,7 @@ namespace SukimaNote
 		private Picker	   priorityPicker	  = new Picker	   { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
 		private Editor	   remarkEditor		  = new Editor	   { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = 500, FontSize = fontSize };
 
-		TaskData taskData;
+		private TaskData taskData;
 
 		public TaskAddPage()
 		{

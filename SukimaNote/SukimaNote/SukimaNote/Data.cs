@@ -15,16 +15,19 @@ namespace SukimaNote
     // タスクの情報一覧の実装すべきもの
     interface ITaskData
     {
-        string   Title           { get; set; }
-        DateTime Deadline        { get; set; } // 期限
-        int      TimeToFinish    { get; set; } // 予想作業時間（min）
-        int      Place           { get; set; }
-        int      Priority        { get; set; }
-        int      Progress        { get; set; } // 進捗度（0 ~ 100%）
-        string   Remark          { get; set; } // 備考
-		bool	 Closed			 { get; set; } // タスクが終了済みかどうか
-		int		 RestMinutes	 { get; }      // 作業の残り時間
-		int		 HoursByDeadline { get; }      // このタスクの期限までの時間
+        string   Title             { get; set; } // タスクのタイトル
+        DateTime Deadline          { get; set; } // 期限
+        int      TimeToFinish      { get; set; } // 予想作業時間(index)
+        int      Place             { get; set; } // (index)
+		int      Priority          { get; set; } // (index)
+		int      Progress          { get; set; } // 進捗度（0 ~ 100%）
+        string   Remark            { get; set; } // 備考
+		bool	 Closed			   { get; set; } // タスクが終了済みかどうか
+
+		int		 RestMinutes	   { get; }      // 進捗度を考慮した作業の残り時間
+		int		 DaysByDeadline	   { get; }
+		int		 HoursByDeadline   { get; }
+		int		 MinutesByDeadline { get; }
 	}
 
     // タスクの設定項目のプロパティのクラス
@@ -102,8 +105,11 @@ namespace SukimaNote
 			get { return closed; }
 			set { SetProperty(ref closed, value); }
 		}
-		public int		RestMinutes => TimeToFinish * (MaxProgress - Progress) / 100;
-		public int		HoursByDeadline => (int)new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalHours;  // int型にキャスト
+
+		public int		RestMinutes		  => TimeToFinish * (MaxProgress - Progress) / 100;
+		public int		DaysByDeadline	  => (int)new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalDays;
+		public int		HoursByDeadline	  => (int)new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalHours;
+		public int		MinutesByDeadline => (int)new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalMinutes;
 
 		// ジェネリックで全ての型に対応。refで呼び出し元に反映させる
 		private void SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
