@@ -33,18 +33,22 @@ namespace SukimaNote
         private const int MaxProgress = 100;
         private const int MinProgress = 0;
 
-		// プロパティに用いる変数
-		private string	 title;
+		// プロパティに用いる変数。
+		private string	 title		  = "Task";
 		private DateTime deadline;
-		private int		 timeToFinish;
+		private int		 timeToFinish = 1;
 		private int		 place		  = 0;
 		private int		 priority	  = 1;
 		private int		 progress	  = MinProgress;
-		private string	 remark		  = "特になし";
-		private bool	 closed;
+		private string	 remark		  = "";		// stringのデフォルト値はnullになってしまうため
+		private bool	 closed		  = false;
 
 		// プロパティの変更時のイベントハンドラ
 		public event PropertyChangedEventHandler PropertyChanged;
+		protected virtual void OnPropertyChanged(string propertyName)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		}
 
 		// ITaskDataで指定されたプロパティ
 		public string	Title
@@ -52,9 +56,11 @@ namespace SukimaNote
 			get { return this.title; }
 			set
 			{
-				if (this.title == value) { return; }
-				this.title = value;
-				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Title)));
+				if (this.title != value)
+				{
+					this.title = value;
+					OnPropertyChanged(nameof(Title));
+				}
 			}
 		}
 		public DateTime Deadline
@@ -62,9 +68,11 @@ namespace SukimaNote
 			get { return this.deadline; }
 			set
 			{
-				if (this.deadline == value) { return; }
-				this.deadline = value;
-				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Deadline)));
+				if (this.deadline != value)
+				{
+					this.deadline = value;
+					OnPropertyChanged(nameof(Deadline));
+				}
 			}
 		}
 		public int		TimeToFinish
@@ -72,9 +80,11 @@ namespace SukimaNote
 			get { return this.timeToFinish; }
 			set
 			{
-				if (this.timeToFinish == value) { return; }
-				this.timeToFinish = value;
-				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TimeToFinish)));
+				if (this.timeToFinish != value)
+				{
+					this.timeToFinish = value;
+					OnPropertyChanged(nameof(TimeToFinish));
+				}
 			}
 		}
 		public int		Place
@@ -82,9 +92,11 @@ namespace SukimaNote
 			get { return this.place; }
 			set
 			{
-				if (this.place == value) { return; }
-				this.place = value;
-				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Place)));
+				if (this.place != value)
+				{
+					this.place = value;
+					OnPropertyChanged(nameof(Place));
+				}
 			}
 		}
 		public int		Priority
@@ -92,9 +104,11 @@ namespace SukimaNote
 			get { return this.priority; }
 			set
 			{
-				if (this.priority == value) { return; }
-				this.priority = value;
-				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Priority)));
+				if (this.priority != value)
+				{
+					this.priority = value;
+					OnPropertyChanged(nameof(Priority));
+				}
 			}
 		}
 		public int		Progress
@@ -102,9 +116,11 @@ namespace SukimaNote
 			get { return this.progress; }
 			set
 			{
-				if (this.progress == value) { return; }
-				this.progress = (value > MinProgress && value <= MaxProgress) ? value : 0;  // 0~100のみ受け付ける
-				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Progress)));
+				if (this.progress != value)
+				{
+					this.progress = (value > MinProgress && value <= MaxProgress) ? value : 0;  // 0~100のみ受け付ける
+					OnPropertyChanged(nameof(Progress));
+				}
 			}
 		}
 		public string	Remark
@@ -112,9 +128,11 @@ namespace SukimaNote
 			get { return this.remark; }
 			set
 			{
-				if (this.remark == value) { return; }
-				this.remark = value;
-				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Remark)));
+				if (this.remark != value)
+				{
+					this.remark = value;
+					OnPropertyChanged(nameof(Remark));
+				}
 			}
 		}
 		public bool		Closed
@@ -122,9 +140,11 @@ namespace SukimaNote
 			get { return this.closed; }
 			set
 			{
-				if (this.closed == value) { return; }
-				this.closed = value;
-				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Closed)));
+				if (this.closed != value)
+				{
+					this.closed = value;
+					OnPropertyChanged(nameof(Closed));
+				}
 			}
 		}
 		public int		RestMinutes => TimeToFinish * (MaxProgress - Progress) / 100;
@@ -189,13 +209,14 @@ namespace SukimaNote
 					string[] propertyArray = allText.Split(':');
 					return new TaskData
 					{
-						Title = propertyArray[0],
-						Deadline = new DateTime(long.Parse(propertyArray[1])),
+						Title		 = propertyArray[0],
+						Deadline	 = new DateTime(long.Parse(propertyArray[1])),
 						TimeToFinish = int.Parse(propertyArray[2]),
-						Place = int.Parse(propertyArray[3]),
-						Priority = int.Parse(propertyArray[4]),
-						Progress = int.Parse(propertyArray[5]),
-						Remark = propertyArray[6],
+						Place		 = int.Parse(propertyArray[3]),
+						Priority	 = int.Parse(propertyArray[4]),
+						Progress	 = int.Parse(propertyArray[5]),
+						Remark		 = propertyArray[6],
+						Closed		 = Convert.ToBoolean(propertyArray[7])
 					};
 				}
 			})).ConfigureAwait(false);

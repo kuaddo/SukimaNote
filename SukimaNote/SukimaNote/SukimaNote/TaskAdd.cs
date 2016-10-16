@@ -1,27 +1,90 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 using PCLStorage;
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
 
 namespace SukimaNote
 {
 	// タスクの追加の設定ページ
 	public class TaskAddPage : ContentPage
 	{
-		const int fontSize = 20;
-		const int inputSize = 50;
+		private const int fontSize = 20;
+		private const int inputSize = 50;
+
+		private Entry	   titleEntry		  = new Entry	   { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize, Keyboard = Keyboard.Text, FontSize = 30 };
+		private DatePicker deadlineDatePicker = new DatePicker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize, HorizontalOptions = LayoutOptions.FillAndExpand };
+		private TimePicker deadlineTimePicker = new TimePicker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize, HorizontalOptions = LayoutOptions.FillAndExpand };
+		private Picker	   timeToFinishPicker = new Picker	   { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
+		private Picker	   placePicker		  = new Picker	   { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
+		private Picker	   priorityPicker	  = new Picker	   { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
+		private Editor	   remarkEditor		  = new Editor	   { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = 500, FontSize = fontSize };
+
+		TaskData taskData;
 
 		public TaskAddPage()
 		{
 			Title = "タスク追加";
 
 			// タスクのデータ入力部分
-			// タイトル入力
-			var titleEntry = new Entry { Keyboard = Keyboard.Text, BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize, FontSize = 30};
+			var title		 = makeTitleStackLayout();
+			var deadline	 = makeDeadlineStackLayout();
+			var timeToFinish = makeTimeToFinishStackLayout();
+			var place		 = makePlaceStackLayout();
+			var priority	 = makePriorityStackLayout();
+			var remark		 = makeRemarkStackLayout();
+
+			taskData = new TaskData();
+			BindingContext = taskData;
+
+			// 日にちと時刻設定以外をバインディング
+			titleEntry		  .SetBinding(Entry.TextProperty,			nameof(taskData.Title));
+			timeToFinishPicker.SetBinding(Picker.SelectedIndexProperty, nameof(taskData.TimeToFinish));
+			placePicker		  .SetBinding(Picker.SelectedIndexProperty, nameof(taskData.Place));
+			priorityPicker	  .SetBinding(Picker.SelectedIndexProperty, nameof(taskData.Priority));
+			remarkEditor	  .SetBinding(Editor.TextProperty,			nameof(taskData.Remark));
+
+			// Deadlineの初期値
+			deadlineDatePicker.Date = new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay);		// 次の日
+			deadlineTimePicker.Time = new TimeSpan(DateTime.Now.Ticks - DateTime.Now.Date.Ticks);   // 時刻は同じ
+
+			// セーブのスタックレイアウト
+			var save1 = makeSaveStackLayout();
+			var save2 = makeSaveStackLayout();
+
+			// 基本設定、追加設定を分けて配置
+			var minimumLabel = new Label { Text = "基本設定", FontSize = 30, HorizontalOptions = LayoutOptions.Fill,
+				BackgroundColor = Color.FromHex(MyColor.MainColor3), TextColor = Color.White };
+			var optionLabel = new Label { Text = "追加設定", FontSize = 30, HorizontalOptions = LayoutOptions.Fill,
+				BackgroundColor = Color.FromHex(MyColor.MainColor3), TextColor = Color.White };
+
+			var minimum = new StackLayout
+			{
+				BackgroundColor = Color.FromHex(MyColor.MainColor2),
+				Padding = new Thickness(0, 0, 0, 40),
+				Children = { minimumLabel, title, deadline, timeToFinish, save1 }
+			};
+			var option = new StackLayout
+			{
+				BackgroundColor = Color.FromHex(MyColor.MainColor2),
+				Padding = new Thickness(0, 0, 0, 40),
+				Children = { optionLabel, place, priority, remark, save2 }
+			};
+
+			Content = new ScrollView
+			{
+				BackgroundColor = Color.FromHex(MyColor.MainColor2),
+				Content = new StackLayout
+				{
+					// iOSのみ上部に空白を取る。Navigationだから必要ない?
+					//Padding = new Thickness(0, Device.OnPlatform(20, 0, 0), 0, 0),
+					Children = { minimum, option }
+				}
+			};
+		}
+
+		// ページに配置するスタックレイアウトを作成するメソッド
+		private StackLayout makeTitleStackLayout()
+		{
 			var titleSupplementary = new Label { Text = "予定にわかり易い名前をつけてください", FontSize = fontSize, IsVisible = false };
 			var titleTGR = new TapGestureRecognizer();
 			titleTGR.Tapped += (sender, e) =>
@@ -31,7 +94,7 @@ namespace SukimaNote
 			var titleImage = new Image { Source = "question.png", WidthRequest = fontSize, HeightRequest = fontSize };
 			titleImage.GestureRecognizers.Add(titleTGR);
 
-			var title = new StackLayout
+			return new StackLayout
 			{
 				Children =
 				{
@@ -50,20 +113,19 @@ namespace SukimaNote
 					titleEntry
 				}
 			};
-
-			// 期限入力
-			var termDatePicker = new DatePicker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize, HorizontalOptions = LayoutOptions.FillAndExpand };
-			var termTimePicker = new TimePicker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize, HorizontalOptions = LayoutOptions.FillAndExpand };
-			var termSupplementary = new Label { Text = "作業の期限を入力してください", FontSize = fontSize, IsVisible = false };
-			var termTGR = new TapGestureRecognizer();
-			termTGR.Tapped += (sender, e) =>
+		}
+		private StackLayout makeDeadlineStackLayout()
+		{
+			var deadlineSupplementary = new Label { Text = "作業の期限を入力してください", FontSize = fontSize, IsVisible = false };
+			var deadlineTGR = new TapGestureRecognizer();
+			deadlineTGR.Tapped += (sender, e) =>
 			{
-				termSupplementary.IsVisible = !termSupplementary.IsVisible;
+				deadlineSupplementary.IsVisible = !deadlineSupplementary.IsVisible;
 			};
-			var termImage = new Image { Source = "question.png", WidthRequest = fontSize, HeightRequest = fontSize };
-			termImage.GestureRecognizers.Add(termTGR);
+			var deadlineImage = new Image { Source = "question.png", WidthRequest = fontSize, HeightRequest = fontSize };
+			deadlineImage.GestureRecognizers.Add(deadlineTGR);
 
-			var term = new StackLayout
+			return new StackLayout
 			{
 				Children =
 				{
@@ -75,21 +137,21 @@ namespace SukimaNote
 						Children =
 						{
 							new Label { Text = "期限　　　　　　　　", FontSize = fontSize},
-							termImage,
-							termSupplementary
+							deadlineImage,
+							deadlineSupplementary
 						}
 					},
 					new StackLayout
 					{
 						Spacing = 7,
 						Orientation = StackOrientation.Horizontal,
-						Children = { termDatePicker, termTimePicker }
+						Children = { deadlineDatePicker, deadlineTimePicker }
 					}
 				}
 			};
-
-			// 予想作業時間入力
-			var timeToFinishPicker = new Picker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
+		}
+		private StackLayout makeTimeToFinishStackLayout()
+		{
 			foreach (var time in SharedData.timeToFinishList) { timeToFinishPicker.Items.Add(time); }
 			var timeToFinishSupplementary = new Label { Text = "作業完了に必要な時間を入力してください", FontSize = fontSize, IsVisible = false };
 			var timeToFinishTGR = new TapGestureRecognizer();
@@ -100,7 +162,7 @@ namespace SukimaNote
 			var timeToFinishImage = new Image { Source = "question.png", WidthRequest = fontSize, HeightRequest = fontSize };
 			timeToFinishImage.GestureRecognizers.Add(timeToFinishTGR);
 
-			var timeToFinish = new StackLayout
+			return new StackLayout
 			{
 				Children =
 				{
@@ -119,9 +181,9 @@ namespace SukimaNote
 					timeToFinishPicker
 				}
 			};
-
-			// 場所
-			var placePicker = new Picker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
+		}
+		private StackLayout makePlaceStackLayout()
+		{
 			foreach (var p in SharedData.placeList) { placePicker.Items.Add(p); };
 			var placeSupplementary = new Label { Text = "作業できる場所を選択してください", FontSize = fontSize, IsVisible = false };
 			var placeTGR = new TapGestureRecognizer();
@@ -132,7 +194,7 @@ namespace SukimaNote
 			var placeImage = new Image { Source = "question.png", WidthRequest = fontSize, HeightRequest = fontSize };
 			placeImage.GestureRecognizers.Add(placeTGR);
 
-			var place = new StackLayout
+			return new StackLayout
 			{
 				Children =
 				{
@@ -151,15 +213,10 @@ namespace SukimaNote
 					placePicker
 				}
 			};
-
-			// 優先度
-			var priorityButtonL = new Button { Text = "低い", BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
-			var priorityButtonM = new Button { Text = "普通", BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
-			var priorityButtonH = new Button { Text = "高い", BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = inputSize };
-			var priorityLabel = new Label { Text = "普通", HorizontalOptions = LayoutOptions.CenterAndExpand, FontSize = fontSize };
-			priorityButtonL.Clicked += (sender, e) => { priorityLabel.Text = "低い"; };
-			priorityButtonM.Clicked += (sender, e) => { priorityLabel.Text = "普通"; };
-			priorityButtonH.Clicked += (sender, e) => { priorityLabel.Text = "高い"; };
+		}
+		private StackLayout makePriorityStackLayout()
+		{
+			foreach (var p in SharedData.priorityList) { priorityPicker.Items.Add(p); };
 			var prioritySupplementary = new Label { Text = "優先度を選択してください", FontSize = fontSize, IsVisible = false };
 			var priorityTGR = new TapGestureRecognizer();
 			priorityTGR.Tapped += (sender, e) =>
@@ -169,7 +226,7 @@ namespace SukimaNote
 			var priorityImage = new Image { Source = "question.png", WidthRequest = fontSize, HeightRequest = fontSize };
 			priorityImage.GestureRecognizers.Add(priorityTGR);
 
-			var priority = new StackLayout
+			return new StackLayout
 			{
 				Children =
 				{
@@ -185,19 +242,13 @@ namespace SukimaNote
 							prioritySupplementary
 						}
 					},
-					new StackLayout
-					{
-						Padding = new Thickness(30, 0, 0, 0),
-						Spacing = 10,
-						Orientation = StackOrientation.Horizontal,
-						Children = { priorityButtonL, priorityButtonM, priorityButtonH, priorityLabel}
-					}
+					priorityPicker
 				}
 			};
-
-			// 備考入力
-			var remarkEditor = new Editor { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = 500, FontSize = fontSize };
-			var remarkSupplementary = new Label { Text = "メモとして記録しておきたいことを入力してください", FontSize = fontSize,IsVisible = false };
+		}
+		private StackLayout makeRemarkStackLayout()
+		{
+			var remarkSupplementary = new Label { Text = "メモとして記録しておきたいことを入力してください", FontSize = fontSize, IsVisible = false };
 			var remarkTGR = new TapGestureRecognizer();
 			remarkTGR.Tapped += (sender, e) =>
 			{
@@ -205,8 +256,8 @@ namespace SukimaNote
 			};
 			var remarkImage = new Image { Source = "question.png", WidthRequest = fontSize, HeightRequest = fontSize };
 			remarkImage.GestureRecognizers.Add(remarkTGR);
-			
-			var remark = new StackLayout
+
+			return new StackLayout
 			{
 				Children =
 				{
@@ -225,110 +276,64 @@ namespace SukimaNote
 					remarkEditor
 				}
 			};
-
-			// それぞれの初期値
-			titleEntry.Text = "Task";															// 初期値はいらない？
-			termDatePicker.Date = new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay);		// 次の日
-			termTimePicker.Time = new TimeSpan(DateTime.Now.Ticks - DateTime.Now.Date.Ticks);   // 時刻は同じ
-			timeToFinishPicker.SelectedIndex = 1;                                               // 10分を選択
-			placePicker.SelectedIndex = 0;														// 指定無しを選択
-			// 優先度
-			remarkEditor.Text = "";																// 初期値は空白
-	
-			// varで作ったインスタンスをコピーする方法がわからない
-			// もう少しスマートな書き方があると思う
-			var saveArray = new StackLayout[2];
-			for (int i = 0; i < 2; i++)
+		}
+		private StackLayout makeSaveStackLayout()
+		{
+			// 「完了」ボタン。データの保存をする
+			var saveButton = new Button
 			{
-				// 「完了」ボタン。データの保存をする
-				var saveButton = new Button
-				{
-					Text = "Save",
-					FontSize = 40,
-					BackgroundColor = Color.FromHex(MyColor.MainColor1),
-				};
-				saveButton.Clicked += async (sender, e) =>
-				{
-					if (titleEntry.Text == "")
-					{
-						await DisplayAlert("Error", "タイトルを入力てください", "OK");
-					}
-					else if (titleEntry.Text.IndexOf(":") >= 0)
-					{
-						await DisplayAlert("Error", "タイトルに半角のセミコロン : は使えません", "OK");
-					}
-					else if (remarkEditor.Text.IndexOf(":") >= 0)
-					{
-						await DisplayAlert("Error", "備考に半角のセミコロン : は使えません", "OK");
-					}
-					else if (termDatePicker.Date.Ticks + termTimePicker.Time.Ticks < DateTime.Now.Ticks)
-					{
-						await DisplayAlert("Error", "期限が過去に設定されています", "OK");
-					}
-					else
-					{
-						IFolder rootFolder = FileSystem.Current.LocalStorage;
-						IFile file = await rootFolder.CreateFileAsync(titleEntry.Text + ".txt", CreationCollisionOption.GenerateUniqueName);
-						await file.WriteAllTextAsync(titleEntry.Text + ':' +
-													 (termDatePicker.Date.Ticks + termTimePicker.Time.Ticks).ToString() + ':' +       // long型のTicksの和をstringにして保存。
-													 timeToFinishPicker.SelectedIndex + ':' +
-													 placePicker.SelectedIndex + ':' +
-													 SharedData.priorityList.IndexOf(priorityLabel.Text) + ':' +					  // TODO: 気持ち悪いから直す
-													 "0:" +																			  // 進捗度は0で保存
-													 remarkEditor.Text + ':');
-						SharedData.taskList.Add(new TaskData
-						{
-							Title = titleEntry.Text,
-							Deadline = new DateTime(termDatePicker.Date.Ticks + termTimePicker.Time.Ticks),
-							TimeToFinish = timeToFinishPicker.SelectedIndex,
-							Place = placePicker.SelectedIndex,
-							Priority = SharedData.priorityList.IndexOf(priorityLabel.Text),
-							Progress = 0,
-							Remark = remarkEditor.Text,
-						});
-						await DisplayAlert("Saved", titleEntry.Text + "が保存されました。", "OK");
-						// 元の画面に戻す
-						//await Navigation.PopAsync();
-					}
-				};
-				var save = new StackLayout
-				{
-					Orientation = StackOrientation.Horizontal,
-					Children = { new Label { HorizontalOptions = LayoutOptions.FillAndExpand }, saveButton }
-				};
-
-				saveArray[i] = save;
-			}
-
-			// 以下配置
-			var minimumLabel = new Label { Text = "基本設定", FontSize = 30, HorizontalOptions = LayoutOptions.Fill,
-				BackgroundColor = Color.FromHex(MyColor.MainColor3), TextColor = Color.White };
-			var optionLabel = new Label { Text = "追加設定", FontSize = 30, HorizontalOptions = LayoutOptions.Fill,
-				BackgroundColor = Color.FromHex(MyColor.MainColor3), TextColor = Color.White };
-			var minimum = new StackLayout
-			{
-				BackgroundColor = Color.FromHex(MyColor.MainColor2),
-				Padding = new Thickness(0, 0, 0, 40),
-				Children = { minimumLabel, title, term, timeToFinish, saveArray[0] }
+				Text = "Save",
+				FontSize = 40,
+				BackgroundColor = Color.FromHex(MyColor.MainColor1),
 			};
-
-			var option = new StackLayout
+			saveButton.Clicked += async (sender, e) =>
 			{
-				BackgroundColor = Color.FromHex(MyColor.MainColor2),
-				Padding = new Thickness(0, 0, 0, 40),
-				Children = { optionLabel, place, priority, remark, saveArray[1] }
-			};
-
-			Content = new ScrollView
-			{
-				BackgroundColor = Color.FromHex(MyColor.MainColor2),
-				Content = new StackLayout
+				if (titleEntry.Text == "")
 				{
-					// iOSのみ上部に空白を取る。Navigationだから必要ない?
-					//Padding = new Thickness(0, Device.OnPlatform(20, 0, 0), 0, 0),
-					Children = { minimum, option }
+					await DisplayAlert("Error", "タイトルを入力てください", "OK");
+				}
+				else if (titleEntry.Text.IndexOf(":") >= 0)
+				{
+					await DisplayAlert("Error", "タイトルに半角のセミコロン : は使えません", "OK");
+				}
+				else if (remarkEditor.Text.IndexOf(":") >= 0)
+				{
+					await DisplayAlert("Error", "備考に半角のセミコロン : は使えません", "OK");
+				}
+				else if (deadlineDatePicker.Date.Ticks + deadlineTimePicker.Time.Ticks < DateTime.Now.Ticks)
+				{
+					await DisplayAlert("Error", "期限が過去に設定されています", "OK");
+				}
+				else
+				{
+					taskData.Deadline = new DateTime(deadlineDatePicker.Date.Ticks + deadlineTimePicker.Time.Ticks);
+					await saveTaskAsync(taskData);
+					// 元の画面に戻す
+					//await Navigation.PopAsync();
 				}
 			};
+			return new StackLayout
+			{
+				Orientation = StackOrientation.Horizontal,
+				Children = { new Label { HorizontalOptions = LayoutOptions.FillAndExpand }, saveButton }
+			};
+		}
+
+		// 与えられたTaskDataをファイルに保存して、taskListに追加するメソッド。makeSaveStackLayoutに使う
+		private async Task saveTaskAsync(TaskData taskData)
+		{
+			IFolder rootFolder = FileSystem.Current.LocalStorage;
+			IFile file = await rootFolder.CreateFileAsync(taskData.Title + ".txt", CreationCollisionOption.GenerateUniqueName);
+			await file.WriteAllTextAsync(taskData.Title + ':' +
+										 taskData.Deadline.Ticks.ToString() + ':' +
+										 taskData.TimeToFinish.ToString() + ':' +
+										 taskData.Place.ToString() + ':' +
+										 taskData.Priority.ToString() + ':' +
+										 taskData.Progress.ToString() + ':' +
+										 taskData.Remark + ':' +
+										 taskData.Closed.ToString() + ':');
+			SharedData.taskList.Add(taskData);
+			await DisplayAlert("Saved", taskData.Title + "が保存されました。", "OK");
 		}
 	}
 }
