@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 using Xamarin.Forms;
 using PCLStorage;
@@ -40,115 +41,79 @@ namespace SukimaNote
 		private int		 place		  = 0;
 		private int		 priority	  = 1;
 		private int		 progress	  = MinProgress;
-		private string	 remark		  = "";		// stringのデフォルト値はnullになってしまうため
+		private string	 remark		  = "";				// stringのデフォルト値はnullになってしまうため
 		private bool	 closed		  = false;
 
-		// プロパティの変更時のイベントハンドラ
+		// プロパティの変更時に呼び出される
 		public event PropertyChangedEventHandler PropertyChanged;
-		protected virtual void OnPropertyChanged(string propertyName)
-		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-		}
+		private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+			=> PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 		// ITaskDataで指定されたプロパティ
 		public string	Title
 		{
-			get { return this.title; }
-			set
-			{
-				if (this.title != value)
-				{
-					this.title = value;
-					OnPropertyChanged(nameof(Title));
-				}
-			}
+			get { return title; }
+			set { SetProperty(ref title, value); }
 		}
 		public DateTime Deadline
 		{
-			get { return this.deadline; }
+			get { return deadline; }
 			set
 			{
-				if (this.deadline != value)
-				{
-					this.deadline = value;
-					OnPropertyChanged(nameof(Deadline));
-				}
+				SetProperty(ref deadline, value);
+				OnPropertyChanged(nameof(HoursByDeadline));
 			}
 		}
 		public int		TimeToFinish
 		{
-			get { return this.timeToFinish; }
+			get { return timeToFinish; }
 			set
 			{
-				if (this.timeToFinish != value)
-				{
-					this.timeToFinish = value;
-					OnPropertyChanged(nameof(TimeToFinish));
-				}
+				SetProperty(ref timeToFinish, value);
+				OnPropertyChanged(nameof(RestMinutes));
 			}
 		}
 		public int		Place
 		{
-			get { return this.place; }
-			set
-			{
-				if (this.place != value)
-				{
-					this.place = value;
-					OnPropertyChanged(nameof(Place));
-				}
-			}
+			get { return place; }
+			set { SetProperty(ref place, value); }
 		}
 		public int		Priority
 		{
-			get { return this.priority; }
-			set
-			{
-				if (this.priority != value)
-				{
-					this.priority = value;
-					OnPropertyChanged(nameof(Priority));
-				}
-			}
+			get { return priority; }
+			set { SetProperty(ref priority, value); }
 		}
 		public int		Progress
 		{
-			get { return this.progress; }
+			get { return progress; }
 			set
 			{
-				if (this.progress != value)
-				{
-					this.progress = (value > MinProgress && value <= MaxProgress) ? value : 0;  // 0~100のみ受け付ける
-					OnPropertyChanged(nameof(Progress));
-				}
+				SetProperty(ref progress, value);
+				OnPropertyChanged(nameof(RestMinutes));
 			}
 		}
 		public string	Remark
 		{
-			get { return this.remark; }
-			set
-			{
-				if (this.remark != value)
-				{
-					this.remark = value;
-					OnPropertyChanged(nameof(Remark));
-				}
-			}
+			get { return remark; }
+			set { SetProperty(ref remark, value); }
 		}
 		public bool		Closed
 		{
-			get { return this.closed; }
-			set
-			{
-				if (this.closed != value)
-				{
-					this.closed = value;
-					OnPropertyChanged(nameof(Closed));
-				}
-			}
+			get { return closed; }
+			set { SetProperty(ref closed, value); }
 		}
 		public int		RestMinutes => TimeToFinish * (MaxProgress - Progress) / 100;
 		public int		HoursByDeadline => (int)new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalHours;  // int型にキャスト
+
+		// ジェネリックで全ての型に対応。refで呼び出し元に反映させる
+		private void SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+		{
+			if (!Equals(storage, value))
+			{
+				storage = value;
+				OnPropertyChanged(propertyName);
+			}
+		}
 	}
 
 	// 評価得点に対するフラグの列挙
