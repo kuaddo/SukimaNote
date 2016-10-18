@@ -28,6 +28,9 @@ namespace SukimaNote
 		int		 DaysByDeadline	   { get; }
 		int		 HoursByDeadline   { get; }
 		int		 MinutesByDeadline { get; }
+
+		// TaskViewPageのCellに使用
+		
 	}
 
     // タスクの設定項目のプロパティのクラス

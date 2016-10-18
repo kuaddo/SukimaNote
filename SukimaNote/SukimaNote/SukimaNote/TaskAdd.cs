@@ -24,7 +24,7 @@ namespace SukimaNote
 		public TaskAddPage()
 		{
 			Title = "タスク追加";
-
+			
 			// タスクのデータ入力部分
 			var title		 = makeTitleStackLayout();
 			var deadline	 = makeDeadlineStackLayout();

@@ -37,6 +37,7 @@
   <ItemGroup>
     <Compile Include="Color.cs" />
     <Compile Include="Data.cs" />
+    <Compile Include="ExpandedView.cs" />
     <Compile Include="TaskAdd.cs" />
     <Compile Include="DetailPage.cs" />
     <Compile Include="Main.cs" />

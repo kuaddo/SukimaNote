@@ -15,12 +15,41 @@ namespace SukimaNote
 		public TaskListView()
 		{
 			ItemsSource = SharedData.taskList;
+			ItemTemplate = makeDataTemplate();
+		}
 
-			var cell = new DataTemplate(typeof(TextCell));
-			cell.SetBinding(TextCell.TextProperty, "Title");
-			cell.SetBinding(TextCell.DetailProperty, "Deadline");
-			
-			ItemTemplate = cell;
+		private DataTemplate makeDataTemplate()
+		{
+			return new DataTemplate(() =>
+			{
+				var checkBox = new CheckBoxImage { IsClosed = true };
+				checkBox.SetBinding(CheckBoxImage.IsClosedProperty, nameof(TaskData.Closed), BindingMode.TwoWay);
+				var checkTGR = new TapGestureRecognizer();
+				checkTGR.Tapped += (sender, e) =>
+				{
+					checkBox.IsClosed = !checkBox.IsClosed;
+				};
+				checkBox.GestureRecognizers.Add(checkTGR);
+				var title = new Label();
+				title.SetBinding(Label.TextProperty, nameof(TaskData.Title));
+				var deadline = new Label();
+				deadline.SetBinding(Label.TextProperty, nameof(TaskData.Deadline));
+				var progress = new Label();
+				progress.SetBinding(Label.TextProperty, nameof(TaskData.Progress));
+				var view = new StackLayout
+				{
+					Orientation = StackOrientation.Horizontal,
+					Spacing = 20,
+					Padding = new Thickness(10, 0, 0, 0),
+					Children =
+					{
+						checkBox,
+						new StackLayout { Children = { title, deadline } },
+						progress
+					}
+				};
+				return new ViewCell { View = view };
+			});
 		}
 	}
 
