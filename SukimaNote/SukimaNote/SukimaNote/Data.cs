@@ -30,15 +30,17 @@ namespace SukimaNote
 		int		 MinutesByDeadline { get; }
 
 		// TaskViewPageのCellに使用
-		
+		string	 DeadlineString    { get; }		 // フォーマット"F"の日付表示
+		string	 ProgressString	   { get; }		 // '%'を末尾につけたProgress
+		Color	 PriorityColor	   { get; }		 // Priorityに対応した色
 	}
 
     // タスクの設定項目のプロパティのクラス
     public class TaskData : ITaskData, INotifyPropertyChanged
 	{
         // 定数
-        private const int MaxProgress = 100;
-        private const int MinProgress = 0;
+        private const int MinProgress = 0, MaxProgress = 100;
+        private const int MinPriority = 0, MaxPriority = 2;
 
 		// プロパティに用いる変数。
 		private string	 title		  = "Task";
@@ -87,15 +89,18 @@ namespace SukimaNote
 		public int		Priority
 		{
 			get { return priority; }
-			set { SetProperty(ref priority, value); }
+			set { if (value >= MinPriority && value <= MaxPriority) SetProperty(ref priority, value); }
 		}
 		public int		Progress
 		{
 			get { return progress; }
 			set
 			{
-				SetProperty(ref progress, value);
-				OnPropertyChanged(nameof(RestMinutes));
+				if (value >= MinProgress && value <= MaxProgress)
+				{
+					SetProperty(ref progress, value);
+					OnPropertyChanged(nameof(RestMinutes));
+				}
 			}
 		}
 		public string	Remark
@@ -113,6 +118,18 @@ namespace SukimaNote
 		public int		DaysByDeadline	  => (int)new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalDays;
 		public int		HoursByDeadline	  => (int)new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalHours;
 		public int		MinutesByDeadline => (int)new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalMinutes;
+
+		public string	DeadlineString	  => Deadline.ToString("F");
+		public string	ProgressString	  => Progress.ToString() + "%";
+		public Color	PriorityColor { get {
+				switch (Priority)
+				{
+					case 0 : return Color.Blue;
+					case 1 : return Color.Yellow;
+					case 2 : return Color.Red;
+					default: return Color.White;
+				}		 
+			} }
 
 		// ジェネリックで全ての型に対応。refで呼び出し元に反映させる
 		private void SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)

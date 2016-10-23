@@ -33,9 +33,9 @@ namespace SukimaNote
 				var title = new Label();
 				title.SetBinding(Label.TextProperty, nameof(TaskData.Title));
 				var deadline = new Label();
-				deadline.SetBinding(Label.TextProperty, nameof(TaskData.Deadline));
+				deadline.SetBinding(Label.TextProperty, nameof(TaskData.DeadlineString));
 				var progress = new Label();
-				progress.SetBinding(Label.TextProperty, nameof(TaskData.Progress));
+				progress.SetBinding(Label.TextProperty, nameof(TaskData.ProgressString));
 				var view = new StackLayout
 				{
 					Orientation = StackOrientation.Horizontal,
