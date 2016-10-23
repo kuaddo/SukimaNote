@@ -99,7 +99,8 @@ namespace SukimaNote
 				{
 					// ローカルストレージ上の削除
 					IFolder rootFolder = FileSystem.Current.LocalStorage;
-					IList<IFile> deletefiles = await rootFolder.GetFilesAsync();
+					IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);    // 存在しなかったならば作成
+					IList<IFile> deletefiles = await taskDataFolder.GetFilesAsync();
 					await Task.WhenAll(deletefiles.Select(async file => await file.DeleteAsync()));
 					// 現在読み込まれているリストからの削除
 					SharedData.taskList.Clear();

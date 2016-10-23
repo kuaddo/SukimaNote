@@ -20,6 +20,7 @@ namespace SukimaNote
 		{
 			// アプリ起動時にtaskListとplaceListを読み込んでおく
 			//SharedData.MakePlaceList();
+			//await deleteTaskData();
 			await SharedData.MakeTaskDataListAsync();
 			// リスト生成後にRootPageをMainPageに
 			MainPage = new RootPage();
@@ -33,6 +34,15 @@ namespace SukimaNote
 		protected override void OnResume()
 		{
 			// Handle when your app resumes
+		}
+
+		// PCLStrageの内容を全て削除するメソッド。デバッグ用
+		private async Task deleteTaskData()
+		{
+			IFolder rootFolder = FileSystem.Current.LocalStorage;
+			IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);    // 存在しなかったならば作成
+			IList<IFile> deletefiles = await taskDataFolder.GetFilesAsync();
+			await Task.WhenAll(deletefiles.Select(async file => await file.DeleteAsync()));
 		}
 	}
 

@@ -174,7 +174,8 @@ namespace SukimaNote
 		public async static Task MakeTaskDataListAsync()
 		{
 			IFolder rootFolder = FileSystem.Current.LocalStorage;
-			IList<IFile> files = await rootFolder.GetFilesAsync().ConfigureAwait(false);
+			IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);    // 存在しなかったならば作成
+			IList<IFile> files = await taskDataFolder.GetFilesAsync().ConfigureAwait(false);
 			var taskDataArray = await Task.WhenAll(files.Select(async file => {
 				using (Stream stream = await file.OpenAsync(FileAccess.Read))
 				using (StreamReader sr = new StreamReader(stream))

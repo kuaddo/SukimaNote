@@ -166,7 +166,9 @@ namespace SukimaNote
 		private async Task saveTaskAsync(TaskData taskData)
 		{
 			IFolder rootFolder = FileSystem.Current.LocalStorage;
-			IFile file = await rootFolder.CreateFileAsync(taskData.Title + ".txt", CreationCollisionOption.GenerateUniqueName);
+			IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);	// 存在しなかったならば作成
+
+			IFile file = await taskDataFolder.CreateFileAsync(taskData.Title + ".txt", CreationCollisionOption.GenerateUniqueName);
 			await file.WriteAllTextAsync(taskData.Title + ':' +
 										 taskData.Deadline.Ticks.ToString() + ':' +
 										 taskData.TimeToFinish.ToString() + ':' +
