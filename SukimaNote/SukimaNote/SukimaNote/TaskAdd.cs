@@ -116,7 +116,7 @@ namespace SukimaNote
 		}
 		private StackLayout makeRemarkStackLayout()
 		{
-			var grid = makeSupplementaryGrid("備考", "メモとして記録しておきたいこと");
+			var grid = makeSupplementaryGrid("備考", "その他記録したいこと");
 			return new StackLayout { Children = { grid, remarkEditor } };
 		}
 		private StackLayout makeSaveStackLayout()
@@ -193,8 +193,8 @@ namespace SukimaNote
 			image.GestureRecognizers.Add(TGR);
 
 			var grid = new Grid { Padding = new Thickness(5, 0, 0, 0) };
-			grid.Children.Add(new Label { Text = title, FontSize = descriptionFontSize }, 0, 3, 0, 1);
-			grid.Children.Add(new StackLayout { Orientation = StackOrientation.Horizontal, Spacing = 7, Children = { image, supplementary } }, 3, 10, 0, 1);
+			grid.Children.Add(new Label { Text = title, FontSize = descriptionFontSize }, 0, 4, 0, 1);
+			grid.Children.Add(new StackLayout { Orientation = StackOrientation.Horizontal, Spacing = 7, Children = { image, supplementary } }, 4, 10, 0, 1);
 
 			return grid;
 		}
