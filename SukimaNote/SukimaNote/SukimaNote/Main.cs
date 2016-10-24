@@ -52,7 +52,7 @@ namespace SukimaNote
 		{
 			var menuPage = new MenuPage();
 			// ListView Menuを選択した時にNavigateToメソッドにSelectedItemを渡す。MenuItemにキャストしている
-			menuPage.Menu.ItemSelected += (sender, e) => NavigateTo(e.SelectedItem as MenuItem);
+			menuPage.Menu.ItemSelected += (sender, e) => { NavigateTo(e.SelectedItem as MenuItem); menuPage.Menu.SelectedItem = null; };
 
 			Master = menuPage;
 
@@ -66,17 +66,20 @@ namespace SukimaNote
 		// ページ遷移のメソッド
 		void NavigateTo(MenuItem menu)
 		{
-			// menuPageのList<MenuItem>の選択肢をMenuItemで受け取る。インスタンス生成?
-			ContentPage displayPage = (ContentPage)Activator.CreateInstance(menu.TargetType);
-
-			// 各ページに移動するときにバーの色を再設定する
-			Detail = new NavigationPage(displayPage)
+			if (menu != null)
 			{
-				BarBackgroundColor = Color.FromHex("3498DB"),
-				BarTextColor = Color.White,
-			};
+				// menuPageのList<MenuItem>の選択肢をMenuItemで受け取る。インスタンス生成?
+				ContentPage displayPage = (ContentPage)Activator.CreateInstance(menu.TargetType);
 
-			IsPresented = false;
+				// 各ページに移動するときにバーの色を再設定する
+				Detail = new NavigationPage(displayPage)
+				{
+					BarBackgroundColor = Color.FromHex("3498DB"),
+					BarTextColor = Color.White,
+				};
+
+				IsPresented = false;
+			}
 		}
 	}
 

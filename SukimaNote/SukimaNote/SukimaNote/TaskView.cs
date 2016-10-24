@@ -12,16 +12,22 @@ namespace SukimaNote
 	// タスクのListViewを作成
 	public class TaskListView : ListView
 	{
+		private const int fontSize = 25;
+
 		public TaskListView()
 		{
 			ItemsSource = SharedData.taskList;
 			ItemTemplate = makeDataTemplate();
+			RowHeight = fontSize * 2;
+
 		}
 
 		private DataTemplate makeDataTemplate()
 		{
 			return new DataTemplate(() =>
 			{
+				var priorityLabel = new Label { BackgroundColor = Color.Aqua };
+				priorityLabel.SetBinding(Label.BackgroundColorProperty, nameof(TaskData.PriorityColor));
 				var checkBox = new CheckBoxImage { IsClosed = true };
 				checkBox.SetBinding(CheckBoxImage.IsClosedProperty, nameof(TaskData.Closed), BindingMode.TwoWay);
 				var checkTGR = new TapGestureRecognizer();
@@ -30,24 +36,19 @@ namespace SukimaNote
 					checkBox.IsClosed = !checkBox.IsClosed;
 				};
 				checkBox.GestureRecognizers.Add(checkTGR);
-				var title = new Label();
+				var title = new Label { FontSize = fontSize, BackgroundColor = Color.White};
 				title.SetBinding(Label.TextProperty, nameof(TaskData.Title));
-				var deadline = new Label();
+				var deadline = new Label { FontSize = fontSize - 10, BackgroundColor = Color.Pink};
 				deadline.SetBinding(Label.TextProperty, nameof(TaskData.DeadlineString));
-				var progress = new Label();
+				var progress = new Label { FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, BackgroundColor = Color.Navy};
 				progress.SetBinding(Label.TextProperty, nameof(TaskData.ProgressString));
-				var view = new StackLayout
-				{
-					Orientation = StackOrientation.Horizontal,
-					Spacing = 20,
-					Padding = new Thickness(10, 0, 0, 0),
-					Children =
-					{
-						checkBox,
-						new StackLayout { Children = { title, deadline } },
-						progress
-					}
-				};
+
+				var view = new Grid();
+				view.Children.Add(priorityLabel, 0, 1, 0, 5);
+				view.Children.Add(checkBox, 1, 3, 1, 4);
+				view.Children.Add(new StackLayout { Children = { title, deadline }, Spacing = 0 }, 3, 20, 0, 5);
+				view.Children.Add(progress, 20, 25, 0, 5);
+
 				return new ViewCell { View = view };
 			});
 		}
@@ -64,8 +65,12 @@ namespace SukimaNote
 			// 詳細ページに移行
 			listView.ItemSelected += (sender, e) =>
 			{
-				var newPage = new TaskDetailPage(e.SelectedItem as TaskData);
-				Navigation.PushAsync(newPage);
+				if (e.SelectedItem != null)
+				{
+					var newPage = new TaskDetailPage(e.SelectedItem as TaskData);
+					listView.SelectedItem = null;	// nullにすることで同じアイテムを連続選択できる
+					Navigation.PushAsync(newPage);
+				}
 			};
 	
 			// TaskAddPageへ遷移するボタン
