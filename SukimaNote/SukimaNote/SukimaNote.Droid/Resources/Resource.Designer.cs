@@ -1497,6 +1497,7 @@ namespace SukimaNote.Droid
 			// aapt resource value: 0x7f040001
 			public const int abc_fade_out = 2130968577;
 			
+<<<<<<< Updated upstream
 			// aapt resource value: 0x7f040002
 			public const int abc_grow_fade_in_from_bottom = 2130968578;
 			
@@ -1505,6 +1506,22 @@ namespace SukimaNote.Droid
 			
 			// aapt resource value: 0x7f040004
 			public const int abc_popup_exit = 2130968580;
+=======
+			// aapt resource value: 0x7f020000
+			public const int checkA = 2130837504;
+			
+			// aapt resource value: 0x7f020001
+			public const int checkB = 2130837505;
+			
+			// aapt resource value: 0x7f020002
+			public const int icon = 2130837506;
+			
+			// aapt resource value: 0x7f020003
+			public const int plus = 2130837507;
+			
+			// aapt resource value: 0x7f020004
+			public const int question = 2130837508;
+>>>>>>> Stashed changes
 			
 			// aapt resource value: 0x7f040005
 			public const int abc_shrink_fade_out_from_bottom = 2130968581;
