@@ -52,19 +52,19 @@ namespace SukimaNote
 		{
 			var menuPage = new MenuPage();
 			// ListView Menuを選択した時にNavigateToメソッドにSelectedItemを渡す。MenuItemにキャストしている
-			menuPage.Menu.ItemSelected += (sender, e) => { NavigateTo(e.SelectedItem as MenuItem); menuPage.Menu.SelectedItem = null; };
+			menuPage.Menu.ItemSelected += (sender, e) => { NavigateTo(e.SelectedItem as MenuData); menuPage.Menu.SelectedItem = null; };
 
 			Master = menuPage;
 
 			// 最初のページのセット。選択されたことにしてイベントを呼び出す
-			menuPage.Menu.SelectedItem = new MenuItem
+			menuPage.Menu.SelectedItem = new MenuData
 			{
 				TargetType = typeof(TopPage),
 			};
 		}
 
 		// ページ遷移のメソッド
-		void NavigateTo(MenuItem menu)
+		void NavigateTo(MenuData menu)
 		{
 			if (menu != null)
 			{
@@ -125,7 +125,7 @@ namespace SukimaNote
 		public MenuListView()
 		{
 			// インスタンス化してItemsSourceとして指定する
-			List<MenuItem> data = new MenuListData();
+			List<MenuData> data = new MenuListData();
 			ItemsSource = data;
 			VerticalOptions = LayoutOptions.FillAndExpand;
 			BackgroundColor = Color.Transparent;
@@ -139,7 +139,7 @@ namespace SukimaNote
 	}
 
 	// ListViewのデータ用のクラス。TargetTypeに遷移先ページを指定する
-	public class MenuItem
+	public class MenuData
 	{
 		public string Title { get; set; }
 		// ページクラスの指定をしている
@@ -148,21 +148,21 @@ namespace SukimaNote
 
 
 	// ListViewのデータクラス。Masterに使うページを登録する
-	public class MenuListData : List<MenuItem>
+	public class MenuListData : List<MenuData>
 	{
 		public MenuListData()
 		{
-			this.Add(new MenuItem()
+			this.Add(new MenuData()
 			{
 				Title = "トップページ",
 				TargetType = typeof(TopPage),
 			});
-			this.Add(new MenuItem()
+			this.Add(new MenuData()
 			{
 				Title = "タスク一覧",
 				TargetType = typeof(TaskListPage),
 			});
-			this.Add(new MenuItem()
+			this.Add(new MenuData()
 			{
 				Title = "本体設定",
 				TargetType = typeof(SettingPage),

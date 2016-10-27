@@ -169,16 +169,21 @@ namespace SukimaNote
 			IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);	// 存在しなかったならば作成
 
 			IFile file = await taskDataFolder.CreateFileAsync(taskData.Title + ".txt", CreationCollisionOption.GenerateUniqueName);
-			await file.WriteAllTextAsync(taskData.Title + ':' +
-										 taskData.Deadline.Ticks.ToString() + ':' +
-										 taskData.TimeToFinish.ToString() + ':' +
-										 taskData.Place.ToString() + ':' +
-										 taskData.Priority.ToString() + ':' +
-										 taskData.Progress.ToString() + ':' +
-										 taskData.Remark + ':' +
-										 taskData.Closed.ToString() + ':');
+			await file.WriteAllTextAsync(makeSaveString(taskData));
 			SharedData.taskList.Add(taskData);
 			await DisplayAlert("Saved", taskData.Title + "が保存されました。", "OK");
+		}
+		// ファイルに保存する文字列を引数のTaskDataから生成する
+		public static string makeSaveString(TaskData task)
+		{
+			return task.Title + ':' +
+				   task.Deadline.Ticks.ToString() + ':' +
+				   task.TimeToFinish.ToString() + ':' +
+				   task.Place.ToString() + ':' +
+				   task.Priority.ToString() + ':' +
+				   task.Progress.ToString() + ':' +
+				   task.Remark + ':' +
+				   task.Closed.ToString() + ':';
 		}
 		// 補足説明のレイアウト作成
 		private Grid makeSupplementaryGrid(string title, string sup)

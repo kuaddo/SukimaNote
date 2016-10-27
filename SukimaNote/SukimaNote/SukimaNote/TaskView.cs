@@ -9,48 +9,54 @@ using System.Threading.Tasks;
 
 namespace SukimaNote
 {
-	// タスクのListViewを作成
-	public class TaskListView : ListView
+	// TaskListViewのCell
+	public class TaskListViewCell : ViewCell
 	{
-		private const int fontSize = 25;
+		public const int fontSize = 25;
 
-		public TaskListView()
+		public TaskListViewCell(TaskListPage taskListPage)
 		{
-			ItemsSource = SharedData.taskList;
-			ItemTemplate = makeDataTemplate();
-			RowHeight = fontSize * 2;
-
-		}
-
-		private DataTemplate makeDataTemplate()
-		{
-			return new DataTemplate(() =>
+			// Cellを構成するView
+			var priorityLabel = new Label { BackgroundColor = Color.Aqua };
+			var checkBox	  = new CheckBoxImage { IsClosed = true };
+			var title		  = new Label { FontSize = fontSize, BackgroundColor = Color.White };
+			var deadline	  = new Label { FontSize = fontSize - 10, BackgroundColor = Color.Pink };
+			var progress	  = new Label { FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, BackgroundColor = Color.Navy };
+			var checkTGR	  = new TapGestureRecognizer();
+			checkTGR.Tapped += (sender, e) => {	checkBox.IsClosed = !checkBox.IsClosed;	};
+			checkBox.GestureRecognizers.Add(checkTGR);
+			var actionDelete = new MenuItem
 			{
-				var priorityLabel = new Label { BackgroundColor = Color.Aqua };
-				priorityLabel.SetBinding(Label.BackgroundColorProperty, nameof(TaskData.PriorityColor));
-				var checkBox = new CheckBoxImage { IsClosed = true };
-				checkBox.SetBinding(CheckBoxImage.IsClosedProperty, nameof(TaskData.Closed), BindingMode.TwoWay);
-				var checkTGR = new TapGestureRecognizer();
-				checkTGR.Tapped += (sender, e) =>
-				{
-					checkBox.IsClosed = !checkBox.IsClosed;
-				};
-				checkBox.GestureRecognizers.Add(checkTGR);
-				var title = new Label { FontSize = fontSize, BackgroundColor = Color.White};
-				title.SetBinding(Label.TextProperty, nameof(TaskData.Title));
-				var deadline = new Label { FontSize = fontSize - 10, BackgroundColor = Color.Pink};
-				deadline.SetBinding(Label.TextProperty, nameof(TaskData.DeadlineString));
-				var progress = new Label { FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, BackgroundColor = Color.Navy};
-				progress.SetBinding(Label.TextProperty, nameof(TaskData.ProgressString));
+				Text = "Delete",
+				IsDestructive = true,	// iOSでメニューアイテムを赤色にする
+			};
+			actionDelete.Clicked += async (sender, e) =>
+			{
+				var taskData = (sender as MenuItem).CommandParameter as TaskData;
+				if (await taskListPage.DisplayAlert("Caution", taskData.Title + "を削除しますか?", "YES", "NO"))
+					taskListPage.deleteTask(taskData);
+			};
 
-				var view = new Grid();
-				view.Children.Add(priorityLabel, 0, 1, 0, 5);
-				view.Children.Add(checkBox, 1, 3, 1, 4);
-				view.Children.Add(new StackLayout { Children = { title, deadline }, Spacing = 0 }, 3, 20, 0, 5);
-				view.Children.Add(progress, 20, 25, 0, 5);
+			// ViewとTaskDataのバインディング
+			priorityLabel.SetBinding(Label.BackgroundColorProperty,  nameof(TaskData.PriorityColor));
+			checkBox	 .SetBinding(CheckBoxImage.IsClosedProperty, nameof(TaskData.Closed), BindingMode.TwoWay);
+			title		 .SetBinding(Label.TextProperty,			 nameof(TaskData.Title));
+			deadline	 .SetBinding(Label.TextProperty,			 nameof(TaskData.DeadlineString));
+			progress	 .SetBinding(Label.TextProperty,			 nameof(TaskData.ProgressString));
+			actionDelete .SetBinding(MenuItem.CommandParameterProperty, new Binding("."));
 
-				return new ViewCell { View = view };
-			});
+			// コンテキストアクションに追加
+			ContextActions.Add(actionDelete);
+
+			// レイアウト
+			var sl = new StackLayout { Children = { title, deadline }, Spacing = 0 };
+			var view = new Grid();  // 列0~25 行0~5
+			view.Children.Add(priorityLabel, 0,  1,  0, 5);
+			view.Children.Add(checkBox,		 1,  3,  1, 4);
+			view.Children.Add(sl,			 3,  20, 0, 5);
+			view.Children.Add(progress,		 20, 25, 0, 5);
+
+			View = view;
 		}
 	}
 
@@ -60,7 +66,12 @@ namespace SukimaNote
 		public TaskListPage()
 		{
 			Title = "タスク一覧";
-			var listView = new TaskListView();
+			var listView = new ListView
+			{
+				ItemsSource = SharedData.taskList,
+				ItemTemplate = new DataTemplate(() => new TaskListViewCell(this)),
+				RowHeight = TaskListViewCell.fontSize * 2
+			};
 
 			// 詳細ページに移行
 			listView.ItemSelected += (sender, e) =>
@@ -92,8 +103,6 @@ namespace SukimaNote
 				FontSize = 30,
 				BackgroundColor = Color.Aqua,
 			};
-			// 全て削除。
-			// TODO: タスク一覧のページで部分的に削除する機能を実装する
 			allDeleteButton.Clicked += async (sender, e) =>
 			{
 				if (SharedData.taskList.Count == 0)
@@ -117,6 +126,32 @@ namespace SukimaNote
 			{
 				Children = { listView, allDeleteButton, shiftButton }
 			};
+		}
+
+		// コンテキストアクションでタスクの削除時に呼ばれるメソッド
+		public void deleteTask(TaskData taskData)
+		{
+			SharedData.taskList.RemoveAt(SharedData.taskList.IndexOf(taskData));
+			deleteTaskFile(taskData);
+		}
+		// ファイルからタスクを探索して削除する。
+		private async void deleteTaskFile(TaskData taskData)
+		{
+			var text = TaskAddPage.makeSaveString(taskData);	// ファイルに保存する文字列を作成
+
+			IFolder rootFolder = FileSystem.Current.LocalStorage;
+			IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);        // 存在しなかったならば作成
+			IList<IFile> deletefiles = await taskDataFolder.GetFilesAsync();
+			foreach (var file in deletefiles)
+			{
+				if (!file.Name.Contains(taskData.Title)) continue;	// タイトルを見て、一致する可能性のないファイルを飛ばすことで処理を軽くする
+				var readText = await file.ReadAllTextAsync();
+				if (readText == text)	// 内容が完全に一致したファイルを削除
+				{
+					await file.DeleteAsync();
+					break;
+				}
+			}
 		}
 	}
 
