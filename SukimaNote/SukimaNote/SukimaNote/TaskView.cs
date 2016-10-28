@@ -21,6 +21,7 @@ namespace SukimaNote
 			var checkBox	  = new CheckBoxImage { IsClosed = true };
 			var title		  = new Label { FontSize = fontSize, BackgroundColor = Color.White };
 			var deadline	  = new Label { FontSize = fontSize - 10, BackgroundColor = Color.Pink };
+			//var progressBar = new ProgressBar { , HeightRequest = 20};
 			var progress	  = new Label { FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, BackgroundColor = Color.Navy };
 			var checkTGR	  = new TapGestureRecognizer();
 			checkTGR.Tapped += (sender, e) => {	checkBox.IsClosed = !checkBox.IsClosed;	};
@@ -129,29 +130,11 @@ namespace SukimaNote
 		}
 
 		// コンテキストアクションでタスクの削除時に呼ばれるメソッド
-		public void deleteTask(TaskData taskData)
+		public async void deleteTask(TaskData taskData)
 		{
 			SharedData.taskList.RemoveAt(SharedData.taskList.IndexOf(taskData));
-			deleteTaskFile(taskData);
-		}
-		// ファイルからタスクを探索して削除する。
-		private async void deleteTaskFile(TaskData taskData)
-		{
-			var text = TaskAddPage.makeSaveString(taskData);	// ファイルに保存する文字列を作成
-
-			IFolder rootFolder = FileSystem.Current.LocalStorage;
-			IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);        // 存在しなかったならば作成
-			IList<IFile> deletefiles = await taskDataFolder.GetFilesAsync();
-			foreach (var file in deletefiles)
-			{
-				if (!file.Name.Contains(taskData.Title)) continue;	// タイトルを見て、一致する可能性のないファイルを飛ばすことで処理を軽くする
-				var readText = await file.ReadAllTextAsync();
-				if (readText == text)	// 内容が完全に一致したファイルを削除
-				{
-					await file.DeleteAsync();
-					break;
-				}
-			}
+			var deleteFile = await SharedData.searchFileAsync(taskData);
+			await deleteFile.DeleteAsync();
 		}
 	}
 
@@ -162,6 +145,23 @@ namespace SukimaNote
 		{
 			Title = taskData.Title;
 			Initialize(taskData);
+
+			var progressSlider = new Slider
+			{
+				Minimum = 0,
+				Maximum = 100,
+			};
+			progressSlider.ValueChanged += (sender, e) =>
+			{
+				progress.Text = ((int)progressSlider.Value).ToString() + "%";
+			};
+
+			var progressSave = new Button { Text = "save" };
+
+			var grid = new Grid();
+			grid.Children.Add(frame, 0, 1, 0, 9);
+			grid.Children.Add(progressSlider, 0, 1, 9, 10);
+			Content = grid;
 		}
 	}
 

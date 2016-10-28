@@ -69,7 +69,10 @@ namespace SukimaNote
 			set
 			{
 				SetProperty(ref deadline, value);
+				OnPropertyChanged(nameof(DaysByDeadline));
 				OnPropertyChanged(nameof(HoursByDeadline));
+				OnPropertyChanged(nameof(MinutesByDeadline));
+				OnPropertyChanged(nameof(DeadlineString));
 			}
 		}
 		public int		TimeToFinish
@@ -89,7 +92,11 @@ namespace SukimaNote
 		public int		Priority
 		{
 			get { return priority; }
-			set { if (value >= MinPriority && value <= MaxPriority) SetProperty(ref priority, value); }
+			set { if (value >= MinPriority && value <= MaxPriority)
+				{
+					SetProperty(ref priority, value);
+					OnPropertyChanged(nameof(PriorityColor));
+				} }
 		}
 		public int		Progress
 		{
@@ -100,6 +107,7 @@ namespace SukimaNote
 				{
 					SetProperty(ref progress, value);
 					OnPropertyChanged(nameof(RestMinutes));
+					OnPropertyChanged(nameof(ProgressString));
 				}
 			}
 		}
@@ -216,6 +224,38 @@ namespace SukimaNote
 			taskList = new ObservableCollection<TaskData>(taskDataArray);
 		}
 
+		// ファイルに保存する文字列を引数のTaskDataから生成する
+		public static string makeSaveString(TaskData taskData)
+		{
+			return taskData.Title + ':' +
+				   taskData.Deadline.Ticks.ToString() + ':' +
+				   taskData.TimeToFinish.ToString() + ':' +
+				   taskData.Place.ToString() + ':' +
+				   taskData.Priority.ToString() + ':' +
+				   taskData.Progress.ToString() + ':' +
+				   taskData.Remark + ':' +
+				   taskData.Closed.ToString() + ':';
+		}
+		// TaskDataに対応するファイルを返す。見つからなかったならnull
+		public static async Task<IFile> searchFileAsync(TaskData taskData)
+		{
+			var taskText = makeSaveString(taskData); // ファイルと比較する文字列の生成
+
+			IFolder rootFolder = FileSystem.Current.LocalStorage;
+			IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);        // 存在しなかったならば作成
+			IList<IFile> files = await taskDataFolder.GetFilesAsync();
+			foreach (var file in files)
+			{
+				if (!file.Name.Contains(taskData.Title)) continue;  // タイトルを見て、一致する可能性のないファイルを飛ばすことで処理を軽くする
+				var readText = await file.ReadAllTextAsync();
+				if (readText == taskText)   // 内容が完全に一致したなら
+				{
+					return file;
+				}
+			}
+
+			return null;
+		}
 		// Properties Dictionaryから場所の設定データを読み込む
 		public static void MakePlaceList()
 		{
