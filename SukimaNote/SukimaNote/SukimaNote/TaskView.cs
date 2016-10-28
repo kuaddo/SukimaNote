@@ -154,6 +154,7 @@ namespace SukimaNote
 			progressSlider.ValueChanged += (sender, e) =>
 			{
 				progress.Text = ((int)progressSlider.Value).ToString() + "%";
+				roundProgressBar.Angle = (int)progressSlider.Value;
 			};
 
 			var progressSave = new Button { Text = "save" };
@@ -178,6 +179,9 @@ namespace SukimaNote
 		protected Label progress	 = new Label { FontSize = 45 };
 		protected Label remark		 = new Label { FontSize = 30 };
 		protected Frame frame		 = new Frame { OutlineColor = Color.Silver, HasShadow = true };
+
+		// 背景色で内側の円を消しているのでColorは必須
+		protected RoundProgressBar roundProgressBar = new RoundProgressBar { Color = Color.Red, StrokeColor = Color.White, StrokeWidth = 0.7f};
 
 		public BasicTaskShowPage()
 		{
@@ -225,6 +229,7 @@ namespace SukimaNote
 				BackgroundColor = Color.Maroon,
 				Children =
 				{
+					roundProgressBar,
 					progress,
 					timeToFinish
 				}
@@ -269,6 +274,8 @@ namespace SukimaNote
 			priority.Text	  = SharedData.priorityList[taskData.Priority];
 			progress.Text	  = taskData.Progress.ToString() + "%";
 			remark.Text		  = taskData.Remark;
+
+			roundProgressBar.Angle = taskData.Progress;
 		}
 	}
 }

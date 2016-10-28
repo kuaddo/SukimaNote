@@ -2,6 +2,7 @@
 
 namespace SukimaNote
 {
+	// チェックボックスに用いるView。タップで画像の切り替えができる。
 	public class CheckBoxImage : Image
 	{
 		// IsClosedのBindableProperty
@@ -36,6 +37,35 @@ namespace SukimaNote
 				image.Source = trueSource;
 			else
 				image.Source = falseSource;
+		}
+	}
+
+	// 進捗度を円形のプログレスバーで表示するView
+	public class RoundProgressBar : BoxView
+	{
+		public Color StrokeColor { get; set; }	// 線の色
+		public float StrokeWidth { get; set; }	// 線の幅(0(完全な円) ~ 1)
+
+		// 角度(0 ~ 100)。バインディング可能(変更される側のみ)
+		private int angle = 0;
+		public int Angle
+		{
+			get { return angle; }
+			set
+			{
+				angle = value;
+				base.OnPropertyChanged(nameof(Angle));
+			}
+		}
+
+		// コンストラクタ
+		public RoundProgressBar(int widthRequest = 100, int heightRequest = 100)
+		{
+			// デフォルト値でサイズとレイアウトを設定
+			WidthRequest = widthRequest;
+			HeightRequest = heightRequest;
+			HorizontalOptions = LayoutOptions.Center;
+			VerticalOptions = LayoutOptions.Center;
 		}
 	}
 }
