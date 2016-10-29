@@ -155,7 +155,7 @@ namespace SukimaNote
 			};
 			progressSlider.ValueChanged += (sender, e) =>
 			{
-				progress.Text = string.Format("{0, 3}%", (int)progressSlider.Value);
+				progress.Text = ((int)progressSlider.Value).ToString() + "%";
 				roundProgressBar.Angle = (int)progressSlider.Value;
 			};
 			progressSlider.Value = taskData.Progress;
@@ -181,13 +181,14 @@ namespace SukimaNote
 	// 縦向き7/10程度の大きさで丁度いいレイアウトになる
 	public class BasicTaskShowPage : ContentPage
 	{
-		protected Label title		 = new Label { FontSize = 55, HorizontalOptions = LayoutOptions.Start,  VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label restTime	 = new Label { FontSize = 35, HorizontalOptions = LayoutOptions.FillAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand, BackgroundColor = Color.Red};
+		protected Label title		 = new Label { FontSize = 55, HorizontalOptions = LayoutOptions.Start,			 VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label restTime	 = new Label { FontSize = 20, HorizontalOptions = LayoutOptions.FillAndExpand,   VerticalOptions = LayoutOptions.CenterAndExpand, BackgroundColor = Color.Red};
 		protected Label deadline	 = new Label { FontSize = 35, HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label timeToFinish = new Label { FontSize = 45, VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label timeToFinish = new Label { FontSize = 20, HorizontalOptions = LayoutOptions.Center };
 		protected Label place		 = new Label { FontSize = 40, HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
 		protected Label priority	 = new Label { FontSize = 40, HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label progress	 = new Label { FontSize = 45 };
+		protected Label progress	 = new Label { FontSize = 45, HorizontalOptions = LayoutOptions.Fill,			 VerticalOptions = LayoutOptions.Fill,
+																  HorizontalTextAlignment = TextAlignment.Center,	 VerticalTextAlignment = TextAlignment.Center,   TextColor = Color.Black };
 		protected Label remark		 = new Label { FontSize = 30 };
 		protected Frame frame		 = new Frame { OutlineColor = Color.Silver, HasShadow = true };
 
@@ -235,23 +236,21 @@ namespace SukimaNote
 			};
 
 			// 予想作業時間と進捗度
-			var al1 = new AbsoluteLayout();
-			al1.Children.Add(roundProgressBar);
-			
-			var rl1 = new RelativeLayout();
-			rl1.Children.Add(roundProgressBar,
-				Constraint.Constant(0),
-				Constraint.Constant(0));
-			rl1.Children.Add(progress,
-				Constraint.RelativeToView(roundProgressBar, (parent, sibling) => sibling.Width  / 2 - progress.Width  / 2),
-				Constraint.RelativeToView(roundProgressBar, (parent, sibling) => sibling.Height / 2 - progress.Height / 2));
+			var progressView = new ContentView
+			{
+				Content = new Grid	// Girdで重ねて表示
+				{
+					Children = {roundProgressBar, progress}
+				}
+			};
 			var sl4 = new StackLayout
 			{
 				BackgroundColor = Color.Maroon,
+				Padding = new Thickness(0, 7, 0, 0),
+				Spacing = 0,
 				Children =
 				{
-					roundProgressBar,
-					progress,
+					progressView,
 					timeToFinish
 				}
 			};
@@ -272,7 +271,7 @@ namespace SukimaNote
 			grid.Children.Add(sl1, 0,  6, 3, 5);
 			grid.Children.Add(sl2, 0,  6, 5, 7);
 			grid.Children.Add(sl3, 0, 6, 7, 9);
-			grid.Children.Add(rl1, 6, 10, 3, 9);
+			grid.Children.Add(sl4, 6, 10, 3, 9);
 			grid.Children.Add(sl5, 0, 10, 9, 14);
 
 			frame.Content = grid;
@@ -293,7 +292,7 @@ namespace SukimaNote
 			timeToFinish.Text = SharedData.timeToFinishList[taskData.TimeToFinish];
 			place.Text		  = SharedData.placeList[taskData.Place];
 			priority.Text	  = SharedData.priorityList[taskData.Priority];
-			progress.Text	  = string.Format("{0,3}%" ,taskData.Progress);
+			progress.Text	  = taskData.Progress.ToString() + "%";
 			remark.Text		  = taskData.Remark;
 
 			roundProgressBar.Angle = taskData.Progress;
