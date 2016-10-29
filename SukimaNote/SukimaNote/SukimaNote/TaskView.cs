@@ -21,8 +21,8 @@ namespace SukimaNote
 			var checkBox	  = new CheckBoxImage { IsClosed = true };
 			var title		  = new Label { FontSize = fontSize, BackgroundColor = Color.White };
 			var deadline	  = new Label { FontSize = fontSize - 10, BackgroundColor = Color.Pink };
-			//var progressBar = new ProgressBar { , HeightRequest = 20};
 			var progress	  = new Label { FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, BackgroundColor = Color.Navy };
+			var progressBar   = new TaskProgressBar { VerticalOptions = LayoutOptions.Center};
 			var checkTGR	  = new TapGestureRecognizer();
 			checkTGR.Tapped += (sender, e) => {	checkBox.IsClosed = !checkBox.IsClosed;	};
 			checkBox.GestureRecognizers.Add(checkTGR);
@@ -39,23 +39,25 @@ namespace SukimaNote
 			};
 
 			// ViewとTaskDataのバインディング
-			priorityLabel.SetBinding(Label.BackgroundColorProperty,  nameof(TaskData.PriorityColor));
-			checkBox	 .SetBinding(CheckBoxImage.IsClosedProperty, nameof(TaskData.Closed), BindingMode.TwoWay);
-			title		 .SetBinding(Label.TextProperty,			 nameof(TaskData.Title));
-			deadline	 .SetBinding(Label.TextProperty,			 nameof(TaskData.DeadlineString));
-			progress	 .SetBinding(Label.TextProperty,			 nameof(TaskData.ProgressString));
-			actionDelete .SetBinding(MenuItem.CommandParameterProperty, new Binding("."));
+			priorityLabel.SetBinding(Label.BackgroundColorProperty,			 nameof(TaskData.PriorityColor));
+			checkBox	 .SetBinding(CheckBoxImage.IsClosedProperty,		 nameof(TaskData.Closed), BindingMode.TwoWay);
+			title		 .SetBinding(Label.TextProperty,					 nameof(TaskData.Title));
+			deadline	 .SetBinding(Label.TextProperty,					 nameof(TaskData.DeadlineString));
+			progress	 .SetBinding(Label.TextProperty,					 nameof(TaskData.ProgressString));
+			progressBar  .SetBinding(TaskProgressBar.TaskProgressProperty,   nameof(TaskData.Progress));
 
 			// コンテキストアクションに追加
+			actionDelete.SetBinding(MenuItem.CommandParameterProperty, new Binding("."));
 			ContextActions.Add(actionDelete);
 
 			// レイアウト
 			var sl = new StackLayout { Children = { title, deadline }, Spacing = 0 };
 			var view = new Grid();  // 列0~25 行0~5
-			view.Children.Add(priorityLabel, 0,  1,  0, 5);
-			view.Children.Add(checkBox,		 1,  3,  1, 4);
-			view.Children.Add(sl,			 3,  20, 0, 5);
-			view.Children.Add(progress,		 20, 25, 0, 5);
+			view.Children.Add(priorityLabel, 0,  1,  0, 7);
+			view.Children.Add(checkBox,		 1,  3,  1, 6);
+			view.Children.Add(sl,			 3,  20, 0, 6);
+			view.Children.Add(progress,		 20, 27, 0, 6);
+			view.Children.Add(progressBar,   3,  27, 6, 7);
 
 			View = view;
 		}
@@ -71,7 +73,7 @@ namespace SukimaNote
 			{
 				ItemsSource = SharedData.taskList,
 				ItemTemplate = new DataTemplate(() => new TaskListViewCell(this)),
-				RowHeight = TaskListViewCell.fontSize * 2
+				RowHeight = (int)(TaskListViewCell.fontSize * 2.4)
 			};
 
 			// 詳細ページに移行
@@ -153,15 +155,24 @@ namespace SukimaNote
 			};
 			progressSlider.ValueChanged += (sender, e) =>
 			{
-				progress.Text = ((int)progressSlider.Value).ToString() + "%";
+				progress.Text = string.Format("{0, 3}%", (int)progressSlider.Value);
 				roundProgressBar.Angle = (int)progressSlider.Value;
 			};
-
-			var progressSave = new Button { Text = "save" };
+			progressSlider.Value = taskData.Progress;
+			var progressLabel = new Label { Text = "進捗", FontSize = 15 };
+			var progressSave = new Button { Text = "save", FontSize = 15 };
+			progressSave.Clicked += async (sender, e) =>
+			{
+				IFile updateFile = await SharedData.searchFileAsync(taskData);
+				taskData.Progress = (int)progressSlider.Value;
+				await updateFile.WriteAllTextAsync(SharedData.makeSaveString(taskData));
+			};
 
 			var grid = new Grid();
-			grid.Children.Add(frame, 0, 1, 0, 9);
-			grid.Children.Add(progressSlider, 0, 1, 9, 10);
+			grid.Children.Add(frame, 0, 10, 0, 9);
+			grid.Children.Add(progressLabel, 0, 2, 9, 10);
+			grid.Children.Add(progressSave, 8, 10, 9, 10);
+			grid.Children.Add(progressSlider, 2, 8, 9, 10);
 			Content = grid;
 		}
 	}
@@ -224,6 +235,16 @@ namespace SukimaNote
 			};
 
 			// 予想作業時間と進捗度
+			var al1 = new AbsoluteLayout();
+			al1.Children.Add(roundProgressBar);
+			
+			var rl1 = new RelativeLayout();
+			rl1.Children.Add(roundProgressBar,
+				Constraint.Constant(0),
+				Constraint.Constant(0));
+			rl1.Children.Add(progress,
+				Constraint.RelativeToView(roundProgressBar, (parent, sibling) => sibling.Width  / 2 - progress.Width  / 2),
+				Constraint.RelativeToView(roundProgressBar, (parent, sibling) => sibling.Height / 2 - progress.Height / 2));
 			var sl4 = new StackLayout
 			{
 				BackgroundColor = Color.Maroon,
@@ -251,7 +272,7 @@ namespace SukimaNote
 			grid.Children.Add(sl1, 0,  6, 3, 5);
 			grid.Children.Add(sl2, 0,  6, 5, 7);
 			grid.Children.Add(sl3, 0, 6, 7, 9);
-			grid.Children.Add(sl4, 6, 10, 3, 9);
+			grid.Children.Add(rl1, 6, 10, 3, 9);
 			grid.Children.Add(sl5, 0, 10, 9, 14);
 
 			frame.Content = grid;
@@ -272,7 +293,7 @@ namespace SukimaNote
 			timeToFinish.Text = SharedData.timeToFinishList[taskData.TimeToFinish];
 			place.Text		  = SharedData.placeList[taskData.Place];
 			priority.Text	  = SharedData.priorityList[taskData.Priority];
-			progress.Text	  = taskData.Progress.ToString() + "%";
+			progress.Text	  = string.Format("{0,3}%" ,taskData.Progress);
 			remark.Text		  = taskData.Remark;
 
 			roundProgressBar.Angle = taskData.Progress;

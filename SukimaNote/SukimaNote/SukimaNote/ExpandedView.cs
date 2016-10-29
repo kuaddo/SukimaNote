@@ -68,4 +68,33 @@ namespace SukimaNote
 			VerticalOptions = LayoutOptions.Center;
 		}
 	}
+
+	// 値の範囲が0~100のプログレスバー
+	public class TaskProgressBar : ProgressBar
+	{
+		// TaskProgressのBindableProperty
+		public readonly static BindableProperty TaskProgressProperty = BindableProperty.Create<TaskProgressBar, int>(
+			o => o.TaskProgress,        // getter
+			0,						    // 初期値
+			BindingMode.TwoWay,         // とりあえずTwoWay
+			null,
+			OnTaskProgressPropertyChanged); // プロパティ変更イベントハンドラ
+
+		// 追加で実装したプロパティ。
+		public int TaskProgress
+		{
+			get { return (int)GetValue(TaskProgressProperty); }
+			set { SetValue(TaskProgressProperty, value); }
+		}
+
+		// TaskProgress変更後イベントハンドラ
+		private static void OnTaskProgressPropertyChanged(BindableObject bindable, int oldValue, int newValue)
+		{
+			var taskProgressBar = bindable as TaskProgressBar;
+			if (taskProgressBar != null)
+			{
+				taskProgressBar.Progress = newValue / 100.0;
+			}
+		}
+	}
 }
