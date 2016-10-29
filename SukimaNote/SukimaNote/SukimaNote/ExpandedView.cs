@@ -40,35 +40,6 @@ namespace SukimaNote
 		}
 	}
 
-	// 進捗度を円形のプログレスバーで表示するView
-	public class RoundProgressBar : BoxView
-	{
-		public Color StrokeColor { get; set; }	// 線の色
-		public float StrokeWidth { get; set; }	// 線の幅(0(完全な円) ~ 1)
-
-		// 角度(0 ~ 100)。バインディング可能(変更される側のみ)
-		private int angle = 0;
-		public int Angle
-		{
-			get { return angle; }
-			set
-			{
-				angle = value;
-				base.OnPropertyChanged(nameof(Angle));
-			}
-		}
-
-		// コンストラクタ
-		public RoundProgressBar(int widthRequest = 100, int heightRequest = 100)
-		{
-			// デフォルト値でサイズとレイアウトを設定
-			WidthRequest = widthRequest;
-			HeightRequest = heightRequest;
-			HorizontalOptions = LayoutOptions.Center;
-			VerticalOptions = LayoutOptions.Center;
-		}
-	}
-
 	// 値の範囲が0~100のプログレスバー
 	public class TaskProgressBar : ProgressBar
 	{
@@ -95,6 +66,71 @@ namespace SukimaNote
 			{
 				taskProgressBar.Progress = newValue / 100.0;
 			}
+		}
+	}
+
+
+	// 進捗度を円形のプログレスバーで表示するView
+	public class RoundProgressBar : BoxView
+	{
+		public Color StrokeColor { get; set; }  // 線の色
+		public float StrokeWidth { get; set; }  // 線の幅(0(完全な円) ~ 1)
+
+		// 角度(0 ~ 100)。バインディング可能(変更される側のみ)
+		private int angle = 0;
+		public int Angle
+		{
+			get { return angle; }
+			set
+			{
+				angle = value;
+				base.OnPropertyChanged(nameof(Angle));
+			}
+		}
+
+		// コンストラクタ
+		public RoundProgressBar(int widthRequest = 100, int heightRequest = 100)
+		{
+			// デフォルト値でサイズとレイアウトを設定
+			WidthRequest = widthRequest;
+			HeightRequest = heightRequest;
+			HorizontalOptions = LayoutOptions.Center;
+			VerticalOptions = LayoutOptions.Center;
+		}
+	}
+
+	public class BicoloredBoxView : BoxView
+	{
+		private int ratio = 0;
+
+		public Color LeftColor { get; set; }
+		public Color RightColor { get; set; }
+		public int ShadowSize { get; set; }
+		/*
+		public int Ratio	// 0(RightColorのみ) ~ 100(LeftColorのみ)
+		{
+			get { return ratio; }
+			set
+			{
+				if (value >= 0 && value <= 100)
+				{
+					ratio = value;
+					OnPropertyChanged(nameof(Ratio));
+				}
+			}
+		}*/
+
+		public static readonly BindableProperty RatioProperty = BindableProperty.Create<BicoloredBoxView, int>(p => p.Ratio, 0);
+		public int Ratio
+		{
+			get { return (int)GetValue(RatioProperty); }
+			set { SetValue(RatioProperty, value); }
+		}
+
+		public BicoloredBoxView()
+		{
+			WidthRequest = 100;
+			HeightRequest = 100;
 		}
 	}
 }

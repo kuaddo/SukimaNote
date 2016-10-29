@@ -22,7 +22,7 @@ namespace SukimaNote
 			var title		  = new Label { FontSize = fontSize, BackgroundColor = Color.White };
 			var deadline	  = new Label { FontSize = fontSize - 10, BackgroundColor = Color.Pink };
 			var progress	  = new Label { FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, BackgroundColor = Color.Navy };
-			var progressBar   = new TaskProgressBar { VerticalOptions = LayoutOptions.Center};
+			var progressBar   = new BicoloredBoxView { LeftColor = Color.Navy, RightColor = Color.Aqua, HorizontalOptions = LayoutOptions.Fill, VerticalOptions = LayoutOptions.Fill };
 			var checkTGR	  = new TapGestureRecognizer();
 			checkTGR.Tapped += (sender, e) => {	checkBox.IsClosed = !checkBox.IsClosed;	};
 			checkBox.GestureRecognizers.Add(checkTGR);
@@ -39,12 +39,12 @@ namespace SukimaNote
 			};
 
 			// ViewとTaskDataのバインディング
-			priorityLabel.SetBinding(Label.BackgroundColorProperty,			 nameof(TaskData.PriorityColor));
-			checkBox	 .SetBinding(CheckBoxImage.IsClosedProperty,		 nameof(TaskData.Closed), BindingMode.TwoWay);
-			title		 .SetBinding(Label.TextProperty,					 nameof(TaskData.Title));
-			deadline	 .SetBinding(Label.TextProperty,					 nameof(TaskData.DeadlineString));
-			progress	 .SetBinding(Label.TextProperty,					 nameof(TaskData.ProgressString));
-			progressBar  .SetBinding(TaskProgressBar.TaskProgressProperty,   nameof(TaskData.Progress));
+			priorityLabel.SetBinding(Label.BackgroundColorProperty,	 nameof(TaskData.PriorityColor));
+			checkBox	 .SetBinding(CheckBoxImage.IsClosedProperty, nameof(TaskData.Closed), BindingMode.TwoWay);
+			title		 .SetBinding(Label.TextProperty,			 nameof(TaskData.Title));
+			deadline	 .SetBinding(Label.TextProperty,			 nameof(TaskData.DeadlineString));
+			progress	 .SetBinding(Label.TextProperty,			 nameof(TaskData.ProgressString));
+			progressBar  .SetBinding(BicoloredBoxView.RatioProperty, nameof(TaskData.Progress));
 
 			// コンテキストアクションに追加
 			actionDelete.SetBinding(MenuItem.CommandParameterProperty, new Binding("."));
@@ -53,11 +53,11 @@ namespace SukimaNote
 			// レイアウト
 			var sl = new StackLayout { Children = { title, deadline }, Spacing = 0 };
 			var view = new Grid();  // 列0~25 行0~5
-			view.Children.Add(priorityLabel, 0,  1,  0, 7);
-			view.Children.Add(checkBox,		 1,  3,  1, 6);
-			view.Children.Add(sl,			 3,  20, 0, 6);
-			view.Children.Add(progress,		 20, 27, 0, 6);
-			view.Children.Add(progressBar,   3,  27, 6, 7);
+			view.Children.Add(priorityLabel, 0,  1,  0, 5);
+			view.Children.Add(checkBox,		 1,  4,  1, 4);
+			//view.Children.Add(progressBar,   4,  28, 5, 6);
+			view.Children.Add(sl,			 4,  20, 0, 5);
+			view.Children.Add(progress,		 20, 28, 0, 5);
 
 			View = view;
 		}
