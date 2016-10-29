@@ -24,10 +24,14 @@ namespace SukimaNote.Droid
 
 				paint.AntiAlias = true;
 
-				// 影の描画（1）
+				// 影の描画
 				paint.Color = (Xamarin.Forms.Color.FromRgba(0, 0, 0, 112)).ToAndroid();
 				paint.SetMaskFilter(new BlurMaskFilter(blur, BlurMaskFilter.Blur.Normal));
-				var rectangle = new RectF(shadowSize, shadowSize, Width, Height);
+				RectF rectangle;
+				if (bicoloredBoxView.RightColor == Xamarin.Forms.Color.Default)
+					rectangle = new RectF(shadowSize, shadowSize, (float)Width * bicoloredBoxView.Ratio / 100, Height);
+				else
+					rectangle = new RectF(shadowSize, shadowSize, Width, Height);
 				canvas.DrawRect(rectangle, paint);
 
 				// RightColorの四角の描画

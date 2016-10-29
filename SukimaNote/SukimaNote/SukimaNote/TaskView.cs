@@ -19,10 +19,10 @@ namespace SukimaNote
 			// Cellを構成するView
 			var priorityLabel = new Label { BackgroundColor = Color.Aqua };
 			var checkBox	  = new CheckBoxImage { IsClosed = true };
-			var title		  = new Label { FontSize = fontSize, BackgroundColor = Color.White };
-			var deadline	  = new Label { FontSize = fontSize - 10, BackgroundColor = Color.Pink };
-			var progress	  = new Label { FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, BackgroundColor = Color.Navy };
-			var progressBar   = new BicoloredBoxView { LeftColor = Color.Navy, RightColor = Color.Aqua, HorizontalOptions = LayoutOptions.Fill, VerticalOptions = LayoutOptions.Fill };
+			var title		  = new Label { FontSize = fontSize };
+			var deadline	  = new Label { FontSize = fontSize - 10 };
+			var progress	  = new Label { FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
+			var progressBar   = new BicoloredBoxView { LeftColor = Color.Teal, ShadowSize = 10, HorizontalOptions = LayoutOptions.Fill, VerticalOptions = LayoutOptions.Fill };	// ShadwoSizeを1以上で設定しないとエラーが出る。よくわからん
 			var checkTGR	  = new TapGestureRecognizer();
 			checkTGR.Tapped += (sender, e) => {	checkBox.IsClosed = !checkBox.IsClosed;	};
 			checkBox.GestureRecognizers.Add(checkTGR);
@@ -44,7 +44,7 @@ namespace SukimaNote
 			title		 .SetBinding(Label.TextProperty,			 nameof(TaskData.Title));
 			deadline	 .SetBinding(Label.TextProperty,			 nameof(TaskData.DeadlineString));
 			progress	 .SetBinding(Label.TextProperty,			 nameof(TaskData.ProgressString));
-			progressBar  .SetBinding(BicoloredBoxView.RatioProperty, nameof(TaskData.Progress));
+			progressBar  .SetBinding(BicoloredBoxView.RatioProperty, nameof(TaskData.Progress), BindingMode.TwoWay);
 
 			// コンテキストアクションに追加
 			actionDelete.SetBinding(MenuItem.CommandParameterProperty, new Binding("."));
@@ -53,9 +53,9 @@ namespace SukimaNote
 			// レイアウト
 			var sl = new StackLayout { Children = { title, deadline }, Spacing = 0 };
 			var view = new Grid();  // 列0~25 行0~5
-			view.Children.Add(priorityLabel, 0,  1,  0, 5);
+			view.Children.Add(progressBar,   0, 28,  0, 5);
+			view.Children.Add(priorityLabel, 0,  1,  0, 2);
 			view.Children.Add(checkBox,		 1,  4,  1, 4);
-			//view.Children.Add(progressBar,   4,  28, 5, 6);
 			view.Children.Add(sl,			 4,  20, 0, 5);
 			view.Children.Add(progress,		 20, 28, 0, 5);
 
@@ -69,6 +69,7 @@ namespace SukimaNote
 		public TaskListPage()
 		{
 			Title = "タスク一覧";
+			BackgroundColor = Color.Gray;
 			var listView = new ListView
 			{
 				ItemsSource = SharedData.taskList,

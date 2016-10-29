@@ -101,25 +101,10 @@ namespace SukimaNote
 
 	public class BicoloredBoxView : BoxView
 	{
-		private int ratio = 0;
-
 		public Color LeftColor { get; set; }
 		public Color RightColor { get; set; }
 		public int ShadowSize { get; set; }
-		/*
-		public int Ratio	// 0(RightColorのみ) ~ 100(LeftColorのみ)
-		{
-			get { return ratio; }
-			set
-			{
-				if (value >= 0 && value <= 100)
-				{
-					ratio = value;
-					OnPropertyChanged(nameof(Ratio));
-				}
-			}
-		}*/
-
+		
 		public static readonly BindableProperty RatioProperty = BindableProperty.Create<BicoloredBoxView, int>(p => p.Ratio, 0);
 		public int Ratio
 		{
@@ -131,6 +116,7 @@ namespace SukimaNote
 		{
 			WidthRequest = 100;
 			HeightRequest = 100;
+			ShadowSize = 0;
 		}
 	}
 }
