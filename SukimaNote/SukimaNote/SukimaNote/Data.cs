@@ -33,6 +33,8 @@ namespace SukimaNote
 		string	 DeadlineString    { get; }		 // フォーマット"F"の日付表示
 		string	 ProgressString	   { get; }		 // '%'を末尾につけたProgress
 		Color	 PriorityColor	   { get; }		 // Priorityに対応した色
+
+		string   FileName		   { get; set; } // 保存されているファイル名。タスクをファイルに保存したとき、ファイルから読み出したときにsetされる。
 	}
 
     // タスクの設定項目のプロパティのクラス
@@ -92,11 +94,14 @@ namespace SukimaNote
 		public int		Priority
 		{
 			get { return priority; }
-			set { if (value >= MinPriority && value <= MaxPriority)
+			set
+			{
+				if (value >= MinPriority && value <= MaxPriority)
 				{
 					SetProperty(ref priority, value);
 					OnPropertyChanged(nameof(PriorityColor));
-				} }
+				}
+			}
 		}
 		public int		Progress
 		{
@@ -138,6 +143,8 @@ namespace SukimaNote
 					default: return Color.White;
 				}		 
 			} }
+
+		public string	FileName { get; set; }
 
 		// ジェネリックで全ての型に対応。refで呼び出し元に反映させる
 		private void SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
