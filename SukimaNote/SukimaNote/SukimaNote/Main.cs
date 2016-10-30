@@ -24,7 +24,6 @@ namespace SukimaNote
 			await SharedData.MakeTaskDataListAsync();
 			// リスト生成後にRootPageをMainPageに
 			MainPage = new RootPage();
-			//MainPage = new TestPage();
 		}
 
 		protected override void OnSleep()
@@ -46,48 +45,7 @@ namespace SukimaNote
 			await Task.WhenAll(deletefiles.Select(async file => await file.DeleteAsync()));
 		}
 	}
-	/*
-	public class TestPage : ContentPage
-	{
-		public TestPage()
-		{
-			BackgroundColor = Color.White;
 
-			var roundProgressBar = new RoundProgressBar
-			{
-				Color = Color.Purple,
-				StrokeColor = Color.White,
-				StrokeWidth = 0.5f
-			};
-			var angleSlider = new Slider { Maximum = 100, Minimum = 0, };
-			angleSlider.BindingContext = roundProgressBar;
-			angleSlider.SetBinding(Slider.ValueProperty, nameof(RoundProgressBar.Angle));
-
-			var bicoloredBoxView = new BicoloredBoxView
-			{
-				LeftColor = Color.Purple,
-				RightColor = Color.Silver,
-				ShadowSize = 10,
-				HorizontalOptions = LayoutOptions.Fill
-			};
-			var bicoloredSlider = new Slider { Minimum = 0, Maximum = 100 };
-			bicoloredBoxView.BindingContext = bicoloredSlider;
-			bicoloredBoxView.SetBinding(BicoloredBoxView.RatioProperty, nameof(Slider.Value), BindingMode.TwoWay);
-
-			Content = new StackLayout
-			{
-				Padding = new Thickness(0, Device.OnPlatform(20, 0, 0), 0, 0),
-				Children =
-				{
-					roundProgressBar,
-					angleSlider,
-					bicoloredBoxView,
-					bicoloredSlider,
-				}
-			};
-		}
-	}
-	*/
 	public class RootPage : MasterDetailPage
 	{
 		public RootPage()

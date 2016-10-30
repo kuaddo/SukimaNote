@@ -39,24 +39,66 @@ namespace SukimaNote
 			// 登録されたタスクが0個の時。時間が余ったらレイアウトを凝ったものにする
 			if (SharedData.taskList.Count == 0)
 			{
-				Content = new Label
+				// TODO: 別のページに遷移してからでないと、タスクが更新されない
+				var shiftButton = new Button
 				{
 					HorizontalOptions = LayoutOptions.Center,
 					VerticalOptions = LayoutOptions.Center,
-					Text = "NO TASK",
-					FontSize = 50,
+					Text = "タスクの追加",
+					FontSize = 40,
 				};
+				shiftButton.Clicked += async (sender, e) =>
+				{
+					await Navigation.PushAsync(new TaskAddPage(this));
+				};
+				/*
+				var updateItem = new ToolbarItem
+				{
+					Text = "更新",
+					Priority = 1,
+					Order = ToolbarItemOrder.Primary
+				};
+				updateItem.Clicked += (sender, e) =>
+				{
+					if (SharedData.taskList.Count == 0)
+						DisplayAlert("Caution", "タスクを追加してください", "OK");
+					else
+						Content = makeTopPageContent();
+				};
+				ToolbarItems.Add(updateItem);
+				*/
+				Content = shiftButton;
 				return;
 			}
 
+			Content = makeTopPageContent();
+		}
+
+		// TopPageが呼び出したPageから使いたいので、仕方なくpublic
+		public Grid makeTopPageContent()
+		{
+			// ツールバーアイテム
+			ToolbarItems.Clear();
+			var shiftItem = new ToolbarItem
+			{
+				Text = "タスクの追加",
+				Priority = 1,
+				Order = ToolbarItemOrder.Secondary
+			};
+			shiftItem.Clicked += async (sender, e) =>
+			{
+				await Navigation.PushAsync(new TaskAddPage(this));
+			};
+			ToolbarItems.Add(shiftItem);
+
 			// 初期化
 			pickUpList();
-			int taskCount = orderedTaskList.Count;	// タスクの最大ページ数
-			int page = 1;							// 現在のタスクのページ数
-			shiftSetting(page, taskCount);			// NEXT BACKボタンの初期化
+			int taskCount = orderedTaskList.Count;  // タスクの最大ページ数
+			int page = 1;                           // 現在のタスクのページ数
+			shiftSetting(page, taskCount);          // NEXT BACKボタンの初期化
 			Initialize(orderedTaskList[0]);
 
-		
+
 			// タスクの表示切り替えのUI。
 			next.Clicked += (sender, e) =>
 			{
@@ -103,13 +145,11 @@ namespace SukimaNote
 			// Gridでページの2/3がタスクの表示に使えるように調整
 			var grid = new Grid();
 
-			grid.Children.Add(frame	, 0, 1, 0, 7);
-			grid.Children.Add(shift , 0, 1, 7, 8);
+			grid.Children.Add(frame, 0, 1, 0, 7);
+			grid.Children.Add(shift, 0, 1, 7, 8);
 			grid.Children.Add(option, 0, 1, 8, 10);
-	
-			
 
-			Content = grid;
+			return grid;
 		}
 
 		// shiftのボタンとラベルの設定

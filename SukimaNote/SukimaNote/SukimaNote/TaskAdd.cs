@@ -18,6 +18,9 @@ namespace SukimaNote
 		private Picker	   priorityPicker	  = new Picker	   { BackgroundColor = Color.FromHex(MyColor.MainColor1) };
 		private Editor	   remarkEditor		  = new Editor	   { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = 180, FontSize = descriptionFontSize + 7 };
 
+		private StackLayout[] save = new StackLayout[2];
+		private StackLayout minimum, option;
+
 		private TaskData taskData;
 
 		public TaskAddPage()
@@ -47,8 +50,8 @@ namespace SukimaNote
 			deadlineTimePicker.Time = new TimeSpan(DateTime.Now.Ticks - DateTime.Now.Date.Ticks);   // 時刻は同じ
 
 			// セーブのスタックレイアウト
-			var save1 = makeSaveStackLayout();
-			var save2 = makeSaveStackLayout();
+			save[0] = makeSaveStackLayout(null);
+			save[1] = makeSaveStackLayout(null);
 
 			// 基本設定、追加設定を分けて配置
 			var minimumLabel = new Label { Text = "基本設定", FontSize = descriptionFontSize + 12, HorizontalOptions = LayoutOptions.Fill,
@@ -56,17 +59,17 @@ namespace SukimaNote
 			var optionLabel  = new Label { Text = "追加設定", FontSize = descriptionFontSize + 12, HorizontalOptions = LayoutOptions.Fill,
 				BackgroundColor = Color.FromHex(MyColor.MainColor3), TextColor = Color.White };
 
-			var minimum = new StackLayout
+			minimum = new StackLayout
 			{
 				BackgroundColor = Color.FromHex(MyColor.MainColor2),
 				Padding = new Thickness(0, 0, 0, 40),
-				Children = { minimumLabel, title, deadline, timeToFinish, save1 }
+				Children = { minimumLabel, title, deadline, timeToFinish, save[0] }
 			};
-			var option = new StackLayout
+			option = new StackLayout
 			{
 				BackgroundColor = Color.FromHex(MyColor.MainColor2),
 				Padding = new Thickness(0, 0, 0, 40),
-				Children = { optionLabel, place, priority, remark, save2 }
+				Children = { optionLabel, place, priority, remark, save[1] }
 			};
 
 			Content = new ScrollView
@@ -79,6 +82,19 @@ namespace SukimaNote
 					Children = { minimum, option }
 				}
 			};
+		}
+
+		// TopPegeから呼び出されたら、popする前にTopPageの更新をする
+		public TaskAddPage(TopPage topPage) : this()
+		{
+			save[0] = makeSaveStackLayout(topPage);
+			save[1] = makeSaveStackLayout(topPage);
+
+			// 要素を指定して削除するやり方がわからないので、仕方なくIndexで指定
+			minimum.Children.RemoveAt(4);
+			minimum.Children.Add(save[0]);
+			option.Children.RemoveAt(4);
+			option.Children.Add(save[1]);
 		}
 
 		// ページに配置するスタックレイアウトを作成するメソッド
@@ -119,7 +135,7 @@ namespace SukimaNote
 			var grid = makeSupplementaryGrid("備考", "その他記録したいこと");
 			return new StackLayout { Children = { grid, remarkEditor } };
 		}
-		private StackLayout makeSaveStackLayout()
+		private StackLayout makeSaveStackLayout(TopPage topPage)
 		{
 			// 「完了」ボタン。データの保存をする
 			var saveButton = new Button
@@ -150,8 +166,11 @@ namespace SukimaNote
 				{
 					taskData.Deadline = new DateTime(deadlineDatePicker.Date.Ticks + deadlineTimePicker.Time.Ticks);
 					await saveTaskAsync(taskData);
-					// 元の画面に戻す
-					//await Navigation.PopAsync();
+					if (topPage != null)
+					{
+						topPage.Content = topPage.makeTopPageContent();
+					}
+					await Navigation.PopAsync();
 				}
 			};
 			return new StackLayout

@@ -87,27 +87,26 @@ namespace SukimaNote
 					Navigation.PushAsync(newPage);
 				}
 			};
-	
-			// TaskAddPageへ遷移するボタン
-			var shiftButton = new Button
+
+			// TaskAddPageへ遷移するツールバーアイテム
+			var shiftItem = new ToolbarItem
 			{
-				Text = "タスクの追加ページヘ移行",
-				FontSize = 30,
-				BackgroundColor = Color.Aqua,
+				Text = "タスクの追加",
+				Priority = 1,
+				Order = ToolbarItemOrder.Secondary
 			};
-			shiftButton.Clicked += async (sender, e) =>
+			shiftItem.Clicked += async (sender, e) =>
 			{
 				await Navigation.PushAsync(new TaskAddPage());
 			};
-
-			// タスクを全削除するボタン
-			var allDeleteButton = new Button
+			// タスクを全削除するツールバーアイテム
+			var allDeleteItem = new ToolbarItem
 			{
-				Text = "全てのタスクの削除",
-				FontSize = 30,
-				BackgroundColor = Color.Aqua,
+				Text = "タスクの全削除",
+				Priority = 2,
+				Order = ToolbarItemOrder.Secondary
 			};
-			allDeleteButton.Clicked += async (sender, e) =>
+			allDeleteItem.Clicked += async (sender, e) =>
 			{
 				if (SharedData.taskList.Count == 0)
 				{
@@ -125,10 +124,12 @@ namespace SukimaNote
 					await DisplayAlert("Deleted", "削除しました", "OK");
 				}
 			};
+			ToolbarItems.Add(shiftItem);
+			ToolbarItems.Add(allDeleteItem);
 
 			Content = new StackLayout
 			{
-				Children = { listView, allDeleteButton, shiftButton }
+				Children = { listView }
 			};
 		}
 
