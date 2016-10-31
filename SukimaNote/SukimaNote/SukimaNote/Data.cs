@@ -233,6 +233,7 @@ namespace SukimaNote
 		}
 
 		// ファイルに保存する文字列を引数のTaskDataから生成する
+		// 一つのファイルあたりの書き込み量が少ないので、部分的に変更せずにこのメソッドで全て変更する
 		public static string makeSaveString(TaskData taskData)
 		{
 			return taskData.Title + ':' +
@@ -242,7 +243,7 @@ namespace SukimaNote
 				   taskData.Priority.ToString() + ':' +
 				   taskData.Progress.ToString() + ':' +
 				   taskData.Remark + ':' +
-				   taskData.Closed.ToString() + ':';
+				   taskData.Closed.ToString();
 		}
 		// TaskDataに対応するファイルを返す。見つからなかったならnull
 		public static async Task<IFile> searchFileAsync(TaskData taskData)

@@ -22,10 +22,24 @@ namespace SukimaNote
 			var title		  = new Label { FontSize = fontSize };
 			var deadline	  = new Label { FontSize = fontSize - 10 };
 			var progress	  = new Label { FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
-			var progressBar   = new BicoloredBoxView { LeftColor = Color.Teal, ShadowSize = 10, HorizontalOptions = LayoutOptions.Fill, VerticalOptions = LayoutOptions.Fill };	// ShadwoSizeを1以上で設定しないとエラーが出る。よくわからん
+			var progressBar   = new BicoloredBoxView { LeftColor = Color.Teal, ShadowSize = 10, HorizontalOptions = LayoutOptions.Fill, VerticalOptions = LayoutOptions.Fill }; // ShadwoSizeを1以上で設定しないとエラーが出る。よくわからん
+
 			var checkTGR	  = new TapGestureRecognizer();
-			checkTGR.Tapped += (sender, e) => {	checkBox.IsClosed = !checkBox.IsClosed;	};
+			var fileNameLabel = new Label { IsVisible = false }; // バインディングでTaskDataのFileNameを取得するためだけにあるLabel。配置しないと.Textは使えないので見えなくしている
+			checkTGR.Tapped += async (sender, e) =>
+			{
+				if (checkBox.IsClosed == true)
+					if (!(await taskListPage.DisplayAlert("Caution", "タスクを未完了に戻しますか?", "YES", "NO")))
+						return;
+
+				IFile updateFile = await SharedData.searchFileAsync(new TaskData { FileName = fileNameLabel.Text });
+				var text = await updateFile.ReadAllTextAsync();
+				var newText = text.Replace(checkBox.IsClosed.ToString(), (!checkBox.IsClosed).ToString());
+				await updateFile.WriteAllTextAsync(newText);
+				checkBox.IsClosed = !checkBox.IsClosed;
+			};
 			checkBox.GestureRecognizers.Add(checkTGR);
+
 			var actionDelete = new MenuItem
 			{
 				Text = "Delete",
@@ -35,7 +49,7 @@ namespace SukimaNote
 			{
 				var taskData = (sender as MenuItem).CommandParameter as TaskData;
 				if (await taskListPage.DisplayAlert("Caution", taskData.Title + "を削除しますか?", "YES", "NO"))
-					taskListPage.deleteTask(taskData);
+					await taskListPage.deleteTaskAsync(taskData);
 			};
 
 			// ViewとTaskDataのバインディング
@@ -45,6 +59,7 @@ namespace SukimaNote
 			deadline	 .SetBinding(Label.TextProperty,			 nameof(TaskData.DeadlineString));
 			progress	 .SetBinding(Label.TextProperty,			 nameof(TaskData.ProgressString));
 			progressBar  .SetBinding(BicoloredBoxView.RatioProperty, nameof(TaskData.Progress), BindingMode.TwoWay);
+			fileNameLabel.SetBinding(Label.TextProperty,			 nameof(TaskData.FileName), BindingMode.TwoWay);
 
 			// コンテキストアクションに追加
 			actionDelete.SetBinding(MenuItem.CommandParameterProperty, new Binding("."));
@@ -58,6 +73,7 @@ namespace SukimaNote
 			view.Children.Add(checkBox,		 1,  4,  1, 4);
 			view.Children.Add(sl,			 4,  20, 0, 5);
 			view.Children.Add(progress,		 20, 28, 0, 5);
+			view.Children.Add(fileNameLabel, 27, 28, 4, 5);	// 見えないけど一応端の方に表示
 
 			View = view;
 		}
@@ -114,16 +130,11 @@ namespace SukimaNote
 				}
 				else if (await DisplayAlert("Caution", "タスクを全て削除しますか?", "YES", "NO"))
 				{
-					// ローカルストレージ上の削除
-					IFolder rootFolder = FileSystem.Current.LocalStorage;
-					IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);    // 存在しなかったならば作成
-					IList<IFile> deletefiles = await taskDataFolder.GetFilesAsync();
-					await Task.WhenAll(deletefiles.Select(async file => await file.DeleteAsync()));
-					// 現在読み込まれているリストからの削除
-					SharedData.taskList.Clear();
+					await deleteAllTaskAsync();
 					await DisplayAlert("Deleted", "削除しました", "OK");
 				}
 			};
+
 			ToolbarItems.Add(shiftItem);
 			ToolbarItems.Add(allDeleteItem);
 
@@ -133,8 +144,19 @@ namespace SukimaNote
 			};
 		}
 
-		// コンテキストアクションでタスクの削除時に呼ばれるメソッド
-		public async void deleteTask(TaskData taskData)
+		// タスクの全削除
+		private async Task deleteAllTaskAsync()
+		{
+			// ローカルストレージ上の削除
+			IFolder rootFolder = FileSystem.Current.LocalStorage;
+			IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);    // 存在しなかったならば作成
+			IList<IFile> deletefiles = await taskDataFolder.GetFilesAsync();
+			await Task.WhenAll(deletefiles.Select(async file => await file.DeleteAsync()));
+			// 現在読み込まれているリストからの削除
+			SharedData.taskList.Clear();
+		}
+		// コンテキストアクションでタスクの削除時に呼ばれるメソッド。外部から呼び出すのでpublic
+		public async Task deleteTaskAsync(TaskData taskData)
 		{
 			SharedData.taskList.RemoveAt(SharedData.taskList.IndexOf(taskData));
 			var deleteFile = await SharedData.searchFileAsync(taskData);
@@ -199,9 +221,34 @@ namespace SukimaNote
 
 		public BasicTaskShowPage()
 		{
+			makeContent();
+		}
+
+		// Labelの初期化をする
+		protected void Initialize(TaskData taskData)
+		{
+			title.Text		  = taskData.Title;
+			if		(taskData.Closed == true)		   { restTime.Text = "終了" + Environment.NewLine + "済み"; }
+			else if (taskData.Deadline < DateTime.Now) { restTime.Text = ""; }
+			else if (taskData.MinutesByDeadline < 60)  { restTime.Text = "残り" + Environment.NewLine + taskData.MinutesByDeadline + "分"; }
+			else if (taskData.HoursByDeadline < 24)	   { restTime.Text = "残り" + Environment.NewLine + taskData.HoursByDeadline   + "時間"; }
+			else									   { restTime.Text = "残り" + Environment.NewLine + taskData.DaysByDeadline    + "日"; }
+			deadline.Text	  = taskData.Deadline.ToString("F");
+			timeToFinish.Text = SharedData.timeToFinishList[taskData.TimeToFinish];
+			place.Text		  = SharedData.placeList[taskData.Place];
+			priority.Text	  = SharedData.priorityList[taskData.Priority];
+			progress.Text	  = taskData.Progress.ToString() + "%";
+			remark.Text		  = taskData.Remark;
+
+			roundProgressBar.Angle = taskData.Progress;
+		}
+
+		// Contentの作成
+		private void makeContent()
+		{
 			// タイトルと残り時間
 			var grid1 = new Grid { BackgroundColor = Color.Pink };
-			grid1.Children.Add(title   , 0, 3, 0, 1);
+			grid1.Children.Add(title, 0, 3, 0, 1);
 			grid1.Children.Add(restTime, 3, 4, 0, 1);
 			grid1.Padding = new Thickness(20, 0, 0, 0);
 
@@ -240,9 +287,9 @@ namespace SukimaNote
 			// 予想作業時間と進捗度
 			var progressView = new ContentView
 			{
-				Content = new Grid	// Girdで重ねて表示
+				Content = new Grid  // Girdで重ねて表示
 				{
-					Children = {roundProgressBar, progress}
+					Children = { roundProgressBar, progress }
 				}
 			};
 			var sl4 = new StackLayout
@@ -270,8 +317,8 @@ namespace SukimaNote
 
 			var grid = new Grid();
 			grid.Children.Add(grid1, 0, 10, 0, 3);
-			grid.Children.Add(sl1, 0,  6, 3, 5);
-			grid.Children.Add(sl2, 0,  6, 5, 7);
+			grid.Children.Add(sl1, 0, 6, 3, 5);
+			grid.Children.Add(sl2, 0, 6, 5, 7);
 			grid.Children.Add(sl3, 0, 6, 7, 9);
 			grid.Children.Add(sl4, 6, 10, 3, 9);
 			grid.Children.Add(sl5, 0, 10, 9, 14);
@@ -279,25 +326,6 @@ namespace SukimaNote
 			frame.Content = grid;
 
 			Content = frame;
-		}
-
-		// Labelの初期化をする
-		protected void Initialize(TaskData taskData)
-		{
-			title.Text		  = taskData.Title;
-			if		(taskData.Closed == true)		   { restTime.Text = "終了" + Environment.NewLine + "済み"; }
-			else if (taskData.Deadline < DateTime.Now) { restTime.Text = ""; }
-			else if (taskData.MinutesByDeadline < 60)  { restTime.Text = "残り" + Environment.NewLine + taskData.MinutesByDeadline + "分"; }
-			else if (taskData.HoursByDeadline < 24)	   { restTime.Text = "残り" + Environment.NewLine + taskData.HoursByDeadline   + "時間"; }
-			else									   { restTime.Text = "残り" + Environment.NewLine + taskData.DaysByDeadline    + "日"; }
-			deadline.Text	  = taskData.Deadline.ToString("F");
-			timeToFinish.Text = SharedData.timeToFinishList[taskData.TimeToFinish];
-			place.Text		  = SharedData.placeList[taskData.Place];
-			priority.Text	  = SharedData.priorityList[taskData.Priority];
-			progress.Text	  = taskData.Progress.ToString() + "%";
-			remark.Text		  = taskData.Remark;
-
-			roundProgressBar.Angle = taskData.Progress;
 		}
 	}
 }
