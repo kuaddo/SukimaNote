@@ -223,7 +223,8 @@ namespace SukimaNote
 						Priority	 = int.Parse(propertyArray[4]),
 						Progress	 = int.Parse(propertyArray[5]),
 						Remark		 = propertyArray[6],
-						Closed		 = Convert.ToBoolean(propertyArray[7])
+						Closed		 = Convert.ToBoolean(propertyArray[7]),
+						FileName	 = file.Name,
 					};
 				}
 			})).ConfigureAwait(false);

@@ -51,22 +51,6 @@ namespace SukimaNote
 				{
 					await Navigation.PushAsync(new TaskAddPage(this));
 				};
-				/*
-				var updateItem = new ToolbarItem
-				{
-					Text = "更新",
-					Priority = 1,
-					Order = ToolbarItemOrder.Primary
-				};
-				updateItem.Clicked += (sender, e) =>
-				{
-					if (SharedData.taskList.Count == 0)
-						DisplayAlert("Caution", "タスクを追加してください", "OK");
-					else
-						Content = makeTopPageContent();
-				};
-				ToolbarItems.Add(updateItem);
-				*/
 				Content = shiftButton;
 				return;
 			}
@@ -142,6 +126,7 @@ namespace SukimaNote
 				}
 			};
 
+
 			// Gridでページの2/3がタスクの表示に使えるように調整
 			var grid = new Grid();
 
@@ -185,11 +170,12 @@ namespace SukimaNote
 		{
 			// TODO: 時間制限などの条件による有効なタスクを考慮してから、表示可能なタスクの数を数えるようにする
 			int taskCount = SharedData.taskList.Count;
-			int pickUpCount = MaxShow;        
+			int pickUpCount = MaxShow;
 
+			orderedTaskList.Clear();	// 追加時にエラーが出るので初期化しておく
 			if (taskCount < MaxShow) pickUpCount = taskCount;
 			orderedTaskList = new List<TaskData>(SharedData.taskList
-				.OrderBy(task => CalculationOfPriority(task))
+				.OrderBy(task => task.Deadline.Ticks)
 				.Take(pickUpCount));
 		}
 

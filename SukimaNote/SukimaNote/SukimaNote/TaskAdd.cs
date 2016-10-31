@@ -189,6 +189,7 @@ namespace SukimaNote
 
 			IFile file = await taskDataFolder.CreateFileAsync(taskData.Title + ".txt", CreationCollisionOption.GenerateUniqueName);
 			await file.WriteAllTextAsync(SharedData.makeSaveString(taskData));
+			taskData.FileName = file.Name;
 			SharedData.taskList.Add(taskData);
 			await DisplayAlert("Saved", taskData.Title + "が保存されました。", "OK");
 		}
