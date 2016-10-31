@@ -219,6 +219,7 @@ namespace SukimaNote
 
 			if (editMode)
 			{
+				// ファイル名は生成時のものを使い続ける
 				file = await taskDataFolder.GetFileAsync(taskData.FileName);
 				await file.WriteAllTextAsync(SharedData.makeSaveString(taskData));
 				return;

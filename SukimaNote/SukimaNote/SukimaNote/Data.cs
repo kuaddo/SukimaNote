@@ -256,6 +256,13 @@ namespace SukimaNote
 			IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);        // 存在しなかったならば作成
 			return await taskDataFolder.GetFileAsync(taskData.FileName);
 		}
+		// 引数のTaskをtaskListとファイルから削除する
+		public static async Task deleteTaskAsync(TaskData taskData)
+		{
+			taskList.RemoveAt(taskList.IndexOf(taskData));
+			var deleteFile = await searchFileAsync(taskData);
+			await deleteFile.DeleteAsync();
+		}
 		// Properties Dictionaryから場所の設定データを読み込む
 		public static void MakePlaceList()
 		{

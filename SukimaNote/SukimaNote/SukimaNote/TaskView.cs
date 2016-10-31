@@ -49,7 +49,7 @@ namespace SukimaNote
 			{
 				var taskData = (sender as MenuItem).CommandParameter as TaskData;
 				if (await taskListPage.DisplayAlert("Caution", taskData.Title + "を削除しますか?", "YES", "NO"))
-					await taskListPage.deleteTaskAsync(taskData);
+					await SharedData.deleteTaskAsync(taskData);
 			};
 
 			// ViewとTaskDataのバインディング
@@ -130,6 +130,9 @@ namespace SukimaNote
 				}
 				else if (await DisplayAlert("Caution", "タスクを全て削除しますか?", "YES", "NO"))
 				{
+					if (SharedData.taskList.Count >= 10)
+						if (!(await DisplayAlert("Caution", "タスクが" + SharedData.taskList.Count + "個あります。本当に全て削除しますか?", "YES", "NO")))
+							return;
 					await deleteAllTaskAsync();
 					await DisplayAlert("Deleted", "削除しました", "OK");
 				}
@@ -155,13 +158,6 @@ namespace SukimaNote
 			// 現在読み込まれているリストからの削除
 			SharedData.taskList.Clear();
 		}
-		// コンテキストアクションでタスクの削除時に呼ばれるメソッド。外部から呼び出すのでpublic
-		public async Task deleteTaskAsync(TaskData taskData)
-		{
-			SharedData.taskList.RemoveAt(SharedData.taskList.IndexOf(taskData));
-			var deleteFile = await SharedData.searchFileAsync(taskData);
-			await deleteFile.DeleteAsync();
-		}
 	}
 
 	// タスクの詳細画面を描画するページ
@@ -184,7 +180,25 @@ namespace SukimaNote
 			{
 				await Navigation.PushAsync(new TaskAddPage(this, taskData));
 			};
+			// Taskを削除するツールバーアイテム
+			var deleteTaskItem = new ToolbarItem
+			{
+				Text = "タスクの削除",
+				Priority = 2,
+				Order = ToolbarItemOrder.Secondary
+			};
+			deleteTaskItem.Clicked += async (sender, e) =>
+			{
+
+				if (await DisplayAlert("Caution", taskData.Title + "を削除しますか?", "YES", "NO"))
+				{
+					await SharedData.deleteTaskAsync(taskData);
+					await Navigation.PopAsync();
+				}
+			};
+
 			ToolbarItems.Add(taskEditItem);
+			ToolbarItems.Add(deleteTaskItem);
 
 			Content = makeContent();
 		}
@@ -215,10 +229,10 @@ namespace SukimaNote
 			};
 
 			var grid = new Grid();
-			grid.Children.Add(frame, 0, 10, 0, 9);
-			grid.Children.Add(progressLabel, 0, 2, 9, 10);
-			grid.Children.Add(progressSave, 8, 10, 9, 10);
-			grid.Children.Add(progressSlider, 2, 8, 9, 10);
+			grid.Children.Add(frame, 0, 10, 0, 7);
+			grid.Children.Add(progressLabel, 0, 2, 7, 10);
+			grid.Children.Add(progressSave, 8, 10, 7, 10);
+			grid.Children.Add(progressSlider, 2, 8, 7, 10);
 			return grid;
 		}
 	}
@@ -227,15 +241,17 @@ namespace SukimaNote
 	// 縦向き7/10程度の大きさで丁度いいレイアウトになる
 	public class BasicTaskShowPage : ContentPage
 	{
-		protected Label title		 = new Label { FontSize = 55, HorizontalOptions = LayoutOptions.Start,			 VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label restTime	 = new Label { FontSize = 20, HorizontalOptions = LayoutOptions.FillAndExpand,   VerticalOptions = LayoutOptions.CenterAndExpand, BackgroundColor = Color.Red};
-		protected Label deadline	 = new Label { FontSize = 35, HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label timeToFinish = new Label { FontSize = 20, HorizontalOptions = LayoutOptions.Center };
-		protected Label place		 = new Label { FontSize = 40, HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label priority	 = new Label { FontSize = 40, HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label progress	 = new Label { FontSize = 45, HorizontalOptions = LayoutOptions.Fill,			 VerticalOptions = LayoutOptions.Fill,
+		private const int descriptionFontSize = 15;
+
+		protected Label title		 = new Label { FontSize = descriptionFontSize + 10, HorizontalOptions = LayoutOptions.Start,			 VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label restTime	 = new Label { FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.FillAndExpand,   VerticalOptions = LayoutOptions.CenterAndExpand, BackgroundColor = Color.Red};
+		protected Label deadline	 = new Label { FontSize = descriptionFontSize,      HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label timeToFinish = new Label { FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.Center };
+		protected Label place		 = new Label { FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label priority	 = new Label { FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label progress	 = new Label { FontSize = descriptionFontSize * 2,  HorizontalOptions = LayoutOptions.Fill,			 VerticalOptions = LayoutOptions.Fill,
 																  HorizontalTextAlignment = TextAlignment.Center,	 VerticalTextAlignment = TextAlignment.Center,   TextColor = Color.Black };
-		protected Label remark		 = new Label { FontSize = 30 };
+		protected Label remark		 = new Label { FontSize = descriptionFontSize - 2 };
 		protected Frame frame		 = new Frame { OutlineColor = Color.Silver, HasShadow = true };
 
 		// 背景色で内側の円を消しているのでColorは必須
@@ -277,9 +293,10 @@ namespace SukimaNote
 			// 期限
 			var sl1 = new StackLayout
 			{
+				Orientation = StackOrientation.Horizontal,
 				Children =
 				{
-					new Label { Text = "期限:", FontSize = 20 },
+					new Label { Text = "期限:", FontSize = descriptionFontSize },
 					deadline
 				}
 			};
@@ -287,10 +304,11 @@ namespace SukimaNote
 			// 場所
 			var sl2 = new StackLayout
 			{
+				Orientation = StackOrientation.Horizontal,
 				BackgroundColor = Color.Olive,
 				Children =
 				{
-					new Label { Text = "場所:", FontSize = 20 },
+					new Label { Text = "場所:", FontSize = descriptionFontSize },
 					place
 				}
 			};
@@ -298,10 +316,11 @@ namespace SukimaNote
 			// 優先度
 			var sl3 = new StackLayout
 			{
+				Orientation = StackOrientation.Horizontal,
 				BackgroundColor = Color.Lime,
 				Children =
 				{
-					new Label { Text = "優先度:", FontSize = 20 },
+					new Label { Text = "優先度:", FontSize = descriptionFontSize },
 					priority
 				}
 			};
@@ -330,9 +349,10 @@ namespace SukimaNote
 			var sl5 = new StackLayout
 			{
 				BackgroundColor = Color.Aqua,
+				Spacing = 0,
 				Children =
 				{
-					new Label { Text = "備考:", FontSize = 20},
+					new Label { Text = "備考:", FontSize = descriptionFontSize},
 					new ScrollView { Content = remark }
 				}
 			};
@@ -343,7 +363,7 @@ namespace SukimaNote
 			grid.Children.Add(sl2, 0, 6, 5, 7);
 			grid.Children.Add(sl3, 0, 6, 7, 9);
 			grid.Children.Add(sl4, 6, 10, 3, 9);
-			grid.Children.Add(sl5, 0, 10, 9, 14);
+			grid.Children.Add(sl5, 0, 10, 9, 13);
 
 			frame.Content = grid;
 
