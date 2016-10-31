@@ -153,9 +153,13 @@ namespace SukimaNote
 			TopPage topPage = null;
 			TaskDetailPage taskDetailPage = null;
 			if (beforePage is TopPage)
+			{
 				topPage = beforePage as TopPage;
+			}
 			if (beforePage is TaskDetailPage)
+			{
 				taskDetailPage = beforePage as TaskDetailPage;
+			}
 
 
 			// 「完了」ボタン。データの保存をする
@@ -169,7 +173,7 @@ namespace SukimaNote
 			{
 				if (titleEntry.Text == "")
 				{
-					await DisplayAlert("Error", "タイトルを入力てください", "OK");
+					await DisplayAlert("Error", "タイトルを入力してください", "OK");
 				}
 				else if (titleEntry.Text.IndexOf(":") >= 0)
 				{

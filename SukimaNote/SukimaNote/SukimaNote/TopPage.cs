@@ -62,7 +62,6 @@ namespace SukimaNote
 		public Grid makeContent()
 		{
 			// 初期化
-			orderedTaskList.Clear();	//	とりあえずつけた
 			pickUpList();
 			int taskCount = orderedTaskList.Count;  // タスクの最大ページ数
 			int page = 1;                           // 現在のタスクのページ数
