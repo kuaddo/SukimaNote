@@ -105,13 +105,13 @@ namespace SukimaNote
 			};
 
 			// TaskAddPageへ遷移するツールバーアイテム
-			var shiftItem = new ToolbarItem
+			var taskAddtItem = new ToolbarItem
 			{
 				Text = "タスクの追加",
 				Priority = 1,
 				Order = ToolbarItemOrder.Secondary
 			};
-			shiftItem.Clicked += async (sender, e) =>
+			taskAddtItem.Clicked += async (sender, e) =>
 			{
 				await Navigation.PushAsync(new TaskAddPage());
 			};
@@ -135,7 +135,7 @@ namespace SukimaNote
 				}
 			};
 
-			ToolbarItems.Add(shiftItem);
+			ToolbarItems.Add(taskAddtItem);
 			ToolbarItems.Add(allDeleteItem);
 
 			Content = new StackLayout
@@ -167,11 +167,33 @@ namespace SukimaNote
 	// タスクの詳細画面を描画するページ
 	public class TaskDetailPage : BasicTaskShowPage
 	{
-		public TaskDetailPage(TaskData taskData)
+		TaskData taskData;
+
+		public TaskDetailPage(TaskData td)
+		{
+			taskData = td;
+
+			// Taskを編集するツールバーアイテム
+			var taskEditItem = new ToolbarItem
+			{
+				Text = "タスクの編集",
+				Priority = 1,
+				Order = ToolbarItemOrder.Secondary
+			};
+			taskEditItem.Clicked += async (sender, e) =>
+			{
+				await Navigation.PushAsync(new TaskAddPage(this, taskData));
+			};
+			ToolbarItems.Add(taskEditItem);
+
+			Content = makeContent();
+		}
+
+		public Grid makeContent()
 		{
 			Title = taskData.Title;
-			Initialize(taskData);
 
+			Initialize(taskData);
 			var progressSlider = new Slider
 			{
 				Minimum = 0,
@@ -197,7 +219,7 @@ namespace SukimaNote
 			grid.Children.Add(progressLabel, 0, 2, 9, 10);
 			grid.Children.Add(progressSave, 8, 10, 9, 10);
 			grid.Children.Add(progressSlider, 2, 8, 9, 10);
-			Content = grid;
+			return grid;
 		}
 	}
 

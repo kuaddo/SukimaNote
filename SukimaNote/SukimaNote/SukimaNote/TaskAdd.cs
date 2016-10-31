@@ -39,19 +39,19 @@ namespace SukimaNote
 			taskData = new TaskData();
 			BindingContext = taskData;
 
-			titleEntry		  .SetBinding(Entry.TextProperty,			nameof(taskData.Title));
-			timeToFinishPicker.SetBinding(Picker.SelectedIndexProperty, nameof(taskData.TimeToFinish));
-			placePicker		  .SetBinding(Picker.SelectedIndexProperty, nameof(taskData.Place));
-			priorityPicker	  .SetBinding(Picker.SelectedIndexProperty, nameof(taskData.Priority));
-			remarkEditor	  .SetBinding(Editor.TextProperty,			nameof(taskData.Remark));
+			titleEntry		  .SetBinding(Entry.TextProperty,			nameof(taskData.Title),		   BindingMode.TwoWay);
+			timeToFinishPicker.SetBinding(Picker.SelectedIndexProperty, nameof(taskData.TimeToFinish), BindingMode.TwoWay);
+			placePicker		  .SetBinding(Picker.SelectedIndexProperty, nameof(taskData.Place),		   BindingMode.TwoWay);
+			priorityPicker	  .SetBinding(Picker.SelectedIndexProperty, nameof(taskData.Priority),	   BindingMode.TwoWay);
+			remarkEditor	  .SetBinding(Editor.TextProperty,			nameof(taskData.Remark),	   BindingMode.TwoWay);
 
 			// Deadlineの初期値
 			deadlineDatePicker.Date = new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay);		// 次の日
 			deadlineTimePicker.Time = new TimeSpan(DateTime.Now.Ticks - DateTime.Now.Date.Ticks);   // 時刻は同じ
 
 			// セーブのスタックレイアウト
-			save[0] = makeSaveStackLayout(null);
-			save[1] = makeSaveStackLayout(null);
+			save[0] = makeSaveStackLayout(null, false);
+			save[1] = makeSaveStackLayout(null, false);
 
 			// 基本設定、追加設定を分けて配置
 			var minimumLabel = new Label { Text = "基本設定", FontSize = descriptionFontSize + 12, HorizontalOptions = LayoutOptions.Fill,
@@ -85,10 +85,23 @@ namespace SukimaNote
 		}
 
 		// TopPegeから呼び出されたら、popする前にTopPageの更新をする
-		public TaskAddPage(TopPage topPage) : this()
+		// TaskDataが与えられたら、saveを編集モードで作成
+		public TaskAddPage(Page beforePage, TaskData td) : this()
 		{
-			save[0] = makeSaveStackLayout(topPage);
-			save[1] = makeSaveStackLayout(topPage);
+			bool editMode;
+			if (td == null)
+				editMode = false;
+			else
+			{
+				editMode = true;
+				taskData = td;
+				deadlineDatePicker.Date = taskData.Deadline.Date;
+				deadlineTimePicker.Time = taskData.Deadline.TimeOfDay;
+				BindingContext = taskData;
+			}
+
+			save[0] = makeSaveStackLayout(beforePage, editMode);
+			save[1] = makeSaveStackLayout(beforePage, editMode);
 
 			// 要素を指定して削除するやり方がわからないので、仕方なくIndexで指定
 			minimum.Children.RemoveAt(4);
@@ -135,8 +148,16 @@ namespace SukimaNote
 			var grid = makeSupplementaryGrid("備考", "その他記録したいこと");
 			return new StackLayout { Children = { grid, remarkEditor } };
 		}
-		private StackLayout makeSaveStackLayout(TopPage topPage)
+		private StackLayout makeSaveStackLayout(Page beforePage, bool editMode)
 		{
+			TopPage topPage = null;
+			TaskDetailPage taskDetailPage = null;
+			if (beforePage is TopPage)
+				topPage = beforePage as TopPage;
+			if (beforePage is TaskDetailPage)
+				taskDetailPage = beforePage as TaskDetailPage;
+
+
 			// 「完了」ボタン。データの保存をする
 			var saveButton = new Button
 			{
@@ -165,10 +186,14 @@ namespace SukimaNote
 				else
 				{
 					taskData.Deadline = new DateTime(deadlineDatePicker.Date.Ticks + deadlineTimePicker.Time.Ticks);
-					await saveTaskAsync(taskData);
+					await saveTaskAsync(editMode);
+					if (taskDetailPage != null)
+					{
+						taskDetailPage.Content = taskDetailPage.makeContent();
+					}
 					if (topPage != null)
 					{
-						topPage.Content = topPage.makeTopPageContent();
+						topPage.Content = topPage.makeContent();
 					}
 					await Navigation.PopAsync();
 				}
@@ -181,13 +206,21 @@ namespace SukimaNote
 			};
 		}
 
-		// 与えられたTaskDataをファイルに保存して、taskListに追加するメソッド。makeSaveStackLayoutに使う
-		private async Task saveTaskAsync(TaskData taskData)
+		// TaskDataをファイルに保存して、taskListに追加するメソッド。makeSaveStackLayoutに使う
+		private async Task saveTaskAsync(bool editMode)
 		{
 			IFolder rootFolder = FileSystem.Current.LocalStorage;
-			IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);	// 存在しなかったならば作成
+			IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);    // 存在しなかったならば作成
+			IFile file;
 
-			IFile file = await taskDataFolder.CreateFileAsync(taskData.Title + ".txt", CreationCollisionOption.GenerateUniqueName);
+			if (editMode)
+			{
+				file = await taskDataFolder.GetFileAsync(taskData.FileName);
+				await file.WriteAllTextAsync(SharedData.makeSaveString(taskData));
+				return;
+			}
+
+			file = await taskDataFolder.CreateFileAsync(taskData.Title + ".txt", CreationCollisionOption.GenerateUniqueName);
 			await file.WriteAllTextAsync(SharedData.makeSaveString(taskData));
 			taskData.FileName = file.Name;
 			SharedData.taskList.Add(taskData);

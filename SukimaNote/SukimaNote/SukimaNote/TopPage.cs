@@ -49,39 +49,54 @@ namespace SukimaNote
 				};
 				shiftButton.Clicked += async (sender, e) =>
 				{
-					await Navigation.PushAsync(new TaskAddPage(this));
+					await Navigation.PushAsync(new TaskAddPage(this, null));
 				};
 				Content = shiftButton;
 				return;
 			}
 
-			Content = makeTopPageContent();
+			Content = makeContent();
 		}
 
 		// TopPageが呼び出したPageから使いたいので、仕方なくpublic
-		public Grid makeTopPageContent()
+		public Grid makeContent()
 		{
-			// ツールバーアイテム
-			ToolbarItems.Clear();
-			var shiftItem = new ToolbarItem
-			{
-				Text = "タスクの追加",
-				Priority = 1,
-				Order = ToolbarItemOrder.Secondary
-			};
-			shiftItem.Clicked += async (sender, e) =>
-			{
-				await Navigation.PushAsync(new TaskAddPage(this));
-			};
-			ToolbarItems.Add(shiftItem);
-
 			// 初期化
+			orderedTaskList.Clear();	//	とりあえずつけた
 			pickUpList();
 			int taskCount = orderedTaskList.Count;  // タスクの最大ページ数
 			int page = 1;                           // 現在のタスクのページ数
 			shiftSetting(page, taskCount);          // NEXT BACKボタンの初期化
 			Initialize(orderedTaskList[0]);
 
+			// ツールバーアイテム
+			ToolbarItems.Clear();
+			var taskAddItem = new ToolbarItem
+			{
+				Text = "タスクの追加",
+				Priority = 1,
+				Order = ToolbarItemOrder.Secondary
+			};
+			taskAddItem.Clicked += async (sender, e) =>
+			{
+				await Navigation.PushAsync(new TaskAddPage(this, null));
+			};
+	
+			var taskEditItem = new ToolbarItem
+			{
+				Text = "タスクの編集",
+				Priority = 2,
+				Order = ToolbarItemOrder.Secondary
+			};
+			taskEditItem.Clicked += async (sender, e) =>
+			{
+				// 現在開いているページのTaskDataをtaskListから取得
+				var taskData = SharedData.taskList[SharedData.taskList.IndexOf(orderedTaskList[page - 1])];
+				await Navigation.PushAsync(new TaskAddPage(this, taskData));
+			};
+
+			ToolbarItems.Add(taskAddItem);
+			ToolbarItems.Add(taskEditItem);
 
 			// タスクの表示切り替えのUI。
 			next.Clicked += (sender, e) =>
