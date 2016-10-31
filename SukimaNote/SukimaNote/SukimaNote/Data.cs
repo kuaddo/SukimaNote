@@ -247,22 +247,9 @@ namespace SukimaNote
 		// TaskDataに対応するファイルを返す。見つからなかったならnull
 		public static async Task<IFile> searchFileAsync(TaskData taskData)
 		{
-			var taskText = makeSaveString(taskData); // ファイルと比較する文字列の生成
-
 			IFolder rootFolder = FileSystem.Current.LocalStorage;
 			IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);        // 存在しなかったならば作成
-			IList<IFile> files = await taskDataFolder.GetFilesAsync();
-			foreach (var file in files)
-			{
-				if (!file.Name.Contains(taskData.Title)) continue;  // タイトルを見て、一致する可能性のないファイルを飛ばすことで処理を軽くする
-				var readText = await file.ReadAllTextAsync();
-				if (readText == taskText)   // 内容が完全に一致したなら
-				{
-					return file;
-				}
-			}
-
-			return null;
+			return await taskDataFolder.GetFileAsync(taskData.FileName);
 		}
 		// Properties Dictionaryから場所の設定データを読み込む
 		public static void MakePlaceList()
