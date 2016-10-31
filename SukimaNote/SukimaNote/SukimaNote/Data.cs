@@ -124,7 +124,11 @@ namespace SukimaNote
 		public bool		Closed
 		{
 			get { return closed; }
-			set { SetProperty(ref closed, value); }
+			set
+			{
+				SetProperty(ref closed, value);
+				if (value == true) Progress = 100;
+			}
 		}
 
 		public int		RestMinutes		  => TimeToFinish * (MaxProgress - Progress) / 100;
