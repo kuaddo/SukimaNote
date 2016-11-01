@@ -82,7 +82,7 @@ namespace SukimaNote
 	// タスクの一覧を描画するページ
 	public class TaskListPage : ContentPage
 	{
-		public TaskListPage()
+		public TaskListPage(RootPage rootPage)
 		{
 			Title = "タスク一覧";
 			BackgroundColor = Color.Gray;

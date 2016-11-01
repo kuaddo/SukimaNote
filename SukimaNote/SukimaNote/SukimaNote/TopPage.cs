@@ -32,7 +32,7 @@ namespace SukimaNote
 		}
 
 		// TODO: TaskDetailのレイアウトを流用する。
-		public TopPage()
+		public TopPage(RootPage rootPage)
 		{
 			Title = "トップページ";
 
@@ -49,18 +49,12 @@ namespace SukimaNote
 				};
 				shiftButton.Clicked += async (sender, e) =>
 				{
-					await Navigation.PushAsync(new TaskAddPage(this, null));
+					await Navigation.PushAsync(new TaskAddPage(rootPage, null));
 				};
 				Content = shiftButton;
 				return;
 			}
 
-			Content = makeContent();
-		}
-
-		// TopPageが呼び出したPageから使いたいので、仕方なくpublic
-		public Grid makeContent()
-		{
 			// 初期化
 			pickUpList();
 			int taskCount = orderedTaskList.Count;  // タスクの最大ページ数
@@ -78,9 +72,9 @@ namespace SukimaNote
 			};
 			taskAddItem.Clicked += async (sender, e) =>
 			{
-				await Navigation.PushAsync(new TaskAddPage(this, null));
+				await Navigation.PushAsync(new TaskAddPage(rootPage, null));
 			};
-	
+
 			var taskEditItem = new ToolbarItem
 			{
 				Text = "タスクの編集",
@@ -91,7 +85,7 @@ namespace SukimaNote
 			{
 				// 現在開いているページのTaskDataをtaskListから取得
 				var taskData = SharedData.taskList[SharedData.taskList.IndexOf(orderedTaskList[page - 1])];
-				await Navigation.PushAsync(new TaskAddPage(this, taskData));
+				await Navigation.PushAsync(new TaskAddPage(rootPage, taskData));
 			};
 
 			ToolbarItems.Add(taskAddItem);
@@ -126,29 +120,13 @@ namespace SukimaNote
 				}
 			};
 
-			// タスクに含める情報が確定したらちゃんと作る
-			var option = new StackLayout
-			{
-				HorizontalOptions = LayoutOptions.FillAndExpand,
-				VerticalOptions = LayoutOptions.CenterAndExpand,
-				BackgroundColor = Color.Green,
-				Children =
-				{
-					new StackLayout { Orientation = StackOrientation.Horizontal, Children = { new Switch { HorizontalOptions = LayoutOptions.CenterAndExpand}, new Switch { HorizontalOptions = LayoutOptions.CenterAndExpand } } },
-					new StackLayout { Orientation = StackOrientation.Horizontal, Children = { new Switch { HorizontalOptions = LayoutOptions.CenterAndExpand}, new Switch { HorizontalOptions = LayoutOptions.CenterAndExpand } } },
-					new StackLayout { Orientation = StackOrientation.Horizontal, Children = { new Switch { HorizontalOptions = LayoutOptions.CenterAndExpand}, new Switch { HorizontalOptions = LayoutOptions.CenterAndExpand } } }
-				}
-			};
-
-
 			// Gridでページの2/3がタスクの表示に使えるように調整
 			var grid = new Grid();
 
 			grid.Children.Add(frame, 0, 1, 0, 7);
-			grid.Children.Add(shift, 0, 1, 7, 8);
-			grid.Children.Add(option, 0, 1, 8, 10);
+			grid.Children.Add(shift, 0, 1, 7, 10);
 
-			return grid;
+			Content = grid;
 		}
 
 		// shiftのボタンとラベルの設定
@@ -185,8 +163,7 @@ namespace SukimaNote
 			// TODO: 時間制限などの条件による有効なタスクを考慮してから、表示可能なタスクの数を数えるようにする
 			int taskCount = SharedData.taskList.Count;
 			int pickUpCount = MaxShow;
-
-			orderedTaskList.Clear();	// 追加時にエラーが出るので初期化しておく
+			
 			if (taskCount < MaxShow) pickUpCount = taskCount;
 			orderedTaskList = new List<TaskData>(SharedData.taskList
 				.OrderBy(task => task.Deadline.Ticks)

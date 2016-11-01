@@ -86,7 +86,7 @@ namespace SukimaNote
 
 		// TopPegeから呼び出されたら、popする前にTopPageの更新をする
 		// TaskDataが与えられたら、saveを編集モードで作成
-		public TaskAddPage(Page beforePage, TaskData td) : this()
+		public TaskAddPage(Page page, TaskData td) : this()
 		{
 			bool editMode;
 			if (td == null)
@@ -100,8 +100,8 @@ namespace SukimaNote
 				BindingContext = taskData;
 			}
 
-			save[0] = makeSaveStackLayout(beforePage, editMode);
-			save[1] = makeSaveStackLayout(beforePage, editMode);
+			save[0] = makeSaveStackLayout(page, editMode);
+			save[1] = makeSaveStackLayout(page, editMode);
 
 			// 要素を指定して削除するやり方がわからないので、仕方なくIndexで指定
 			minimum.Children.RemoveAt(4);
@@ -148,17 +148,17 @@ namespace SukimaNote
 			var grid = makeSupplementaryGrid("備考", "その他記録したいこと");
 			return new StackLayout { Children = { grid, remarkEditor } };
 		}
-		private StackLayout makeSaveStackLayout(Page beforePage, bool editMode)
+		private StackLayout makeSaveStackLayout(Page page, bool editMode)
 		{
-			TopPage topPage = null;
+			RootPage rootPage = null;
 			TaskDetailPage taskDetailPage = null;
-			if (beforePage is TopPage)
+			if (page is RootPage)
 			{
-				topPage = beforePage as TopPage;
+				rootPage = page as RootPage;
 			}
-			if (beforePage is TaskDetailPage)
+			if (page is TaskDetailPage)
 			{
-				taskDetailPage = beforePage as TaskDetailPage;
+				taskDetailPage = page as TaskDetailPage;
 			}
 
 
@@ -195,9 +195,15 @@ namespace SukimaNote
 					{
 						taskDetailPage.Content = taskDetailPage.makeContent();
 					}
-					if (topPage != null)
+					if (rootPage != null)
 					{
-						topPage.Content = topPage.makeContent();
+						var menuData = new MenuData()
+						{
+							Title = "トップページ",
+							TargetType = typeof(TopPage),
+						};
+						rootPage.NavigateTo(menuData);
+						return;
 					}
 					await Navigation.PopAsync();
 				}

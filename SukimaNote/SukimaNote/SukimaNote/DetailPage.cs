@@ -9,7 +9,7 @@ namespace SukimaNote
 	// 本体設定をする。詳細未定
 	public class SettingPage : ContentPage
 	{
-		public SettingPage()
+		public SettingPage(RootPage rootPage)
 		{
 			Title = "設定";
 			Content = new Label

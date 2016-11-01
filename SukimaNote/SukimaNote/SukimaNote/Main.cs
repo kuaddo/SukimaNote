@@ -64,12 +64,12 @@ namespace SukimaNote
 		}
 
 		// ページ遷移のメソッド
-		void NavigateTo(MenuData menu)
+		public void NavigateTo(MenuData menu)
 		{
 			if (menu != null)
 			{
 				// menuPageのList<MenuItem>の選択肢をMenuItemで受け取る。インスタンス生成?
-				ContentPage displayPage = (ContentPage)Activator.CreateInstance(menu.TargetType);
+				ContentPage displayPage = (ContentPage)Activator.CreateInstance(menu.TargetType, this);
 
 				// 各ページに移動するときにバーの色を再設定する
 				Detail = new NavigationPage(displayPage)
