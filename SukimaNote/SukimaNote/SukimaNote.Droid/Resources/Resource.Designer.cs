@@ -1491,21 +1491,10 @@ namespace SukimaNote.Droid
 		public partial class Attribute
 		{
 			
-<<<<<<< HEAD
-			// aapt resource value: 0x7f040000
-			public const int abc_fade_in = 2130968576;
-			
-			// aapt resource value: 0x7f040001
-			public const int abc_fade_out = 2130968577;
-			
-			// aapt resource value: 0x7f040002
-			public const int abc_grow_fade_in_from_bottom = 2130968578;
-=======
 			static Attribute()
 			{
 				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
 			}
->>>>>>> 10bb8df... PCLStorageの扱いは保留、固有APIの使用の手前まで記述。
 			
 			private Attribute()
 			{
@@ -1515,16 +1504,6 @@ namespace SukimaNote.Droid
 		public partial class Drawable
 		{
 			
-<<<<<<< HEAD
-			// aapt resource value: 0x7f040004
-			public const int abc_popup_exit = 2130968580;
-			
-			// aapt resource value: 0x7f040005
-			public const int abc_shrink_fade_out_from_bottom = 2130968581;
-			
-			// aapt resource value: 0x7f040006
-			public const int abc_slide_in_bottom = 2130968582;
-=======
 			// aapt resource value: 0x7f020000
 			public const int checkA = 2130837504;
 			
@@ -1539,7 +1518,6 @@ namespace SukimaNote.Droid
 			
 			// aapt resource value: 0x7f020004
 			public const int question = 2130837508;
->>>>>>> 10bb8df... PCLStorageの扱いは保留、固有APIの使用の手前まで記述。
 			
 			static Drawable()
 			{

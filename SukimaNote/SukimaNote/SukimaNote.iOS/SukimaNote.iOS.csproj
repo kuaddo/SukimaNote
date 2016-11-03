@@ -88,20 +88,20 @@
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="BicoloredBoxViewRenderer.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="RoundProgressBarRenderer.cs" />
     <None Include="Entitlements.plist" />
     <None Include="Info.plist" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <ITunesArtwork Include="iTunesArtwork" />
     <ITunesArtwork Include="iTunesArtwork@2x" />
     <None Include="packages.config" />
+    <Compile Include="Notification_iOS.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SukimaNote\SukimaNote.csproj">
       <Name>SukimaNote</Name>
+      <Project>{402A020C-77EF-460D-AB90-DCA4890AAEF1}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
