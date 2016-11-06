@@ -153,16 +153,28 @@
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
   <ItemGroup>
-    <BundleResource Include="Resources\plus.png" />
+    <BundleResource Include="Resources\checkA.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\checkB.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\AppIcon.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\x.png" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\question.png" />
   </ItemGroup>
   <ItemGroup>
-    <BundleResource Include="Resources\checkA.png" />
+    <BundleResource Include="Resources\plus.png" />
   </ItemGroup>
   <ItemGroup>
-    <BundleResource Include="Resources\checkB.png" />
+    <BundleResource Include="Resources\gear.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\setting.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Import Project="..\..\packages\Xamarin.Forms.2.0.0.6482\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\..\packages\Xamarin.Forms.2.0.0.6482\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
