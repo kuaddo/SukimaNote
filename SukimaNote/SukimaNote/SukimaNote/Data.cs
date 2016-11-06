@@ -272,4 +272,24 @@ namespace SukimaNote
 			}
 		}
 	}
+
+    // Linqの拡張メソッド用クラス
+    public static class ExtendedMethodClass
+    {
+        // 評価関数メソッド
+        public static IEnumerable<TaskData> OptimizeTaskData(this IEnumerable<IGrouping<int, TaskData>> taskList)
+        {
+            foreach (var tasks in taskList)
+            {
+                // 残り時間（日数）からのキー値と評価値をもとに昇順に並び替える
+                tasks.OrderBy(task => task.RestMinutes / (float)task.Priority);
+
+                foreach (var task in tasks)
+                {
+                    // 一個ずつ返すことでIEnurableとの親和性を高めた
+                    yield return task;
+                }
+            }
+        }
+    }
 }

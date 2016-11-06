@@ -167,83 +167,9 @@ namespace SukimaNote
 			if (taskCount < MaxShow) pickUpCount = taskCount;
 			orderedTaskList = new List<TaskData>(SharedData.taskList
 				.OrderBy(task => task.Deadline.Ticks)
+                .GroupBy(task => task.DaysByDeadline)
+                .OptimizeTaskData()
 				.Take(pickUpCount));
-		}
-
-		// 優先度を計算するメソッド。優先度が大きいタスクほど数値が大きくなるようにする
-		// けんたが書いたアルゴリズムをそのままここに入れる
-		private int CalculationOfPriority(TaskData taskData)
-		{
-            int evaluationPoints = DefaultPoint;
-			/*
-            // 期限までの残り時間に対する評価
-            if (taskData.HoursByDeadline <= HoursInThreeDays)
-            {
-                evaluationPoints *= RestHoursMagnification / taskData.HoursByDeadline;
-            }
-
-            // タスクの残り時間の大きさに対する評価（昇降フラグ）
-            if (userOption.FlagsList.HasFlag(TaskDataFlags.RestTimeOrderByAscending))
-            {
-                if (BoundaryRestTaskTime > taskData.RestMinutes)
-                {
-                    evaluationPoints *= (BoundaryRestTaskTime - taskData.RestMinutes + 1);
-                }
-            }
-            else
-            {
-                evaluationPoints *= taskData.RestMinutes;
-            }
-
-            // 同上の評価だがCurrentFreeTimeを考慮した評価
-            //evaluationPoints *= EvaluateRestMinutesByFreeTime(taskData.RestMinutes, userOption.CurrentFreeTime);
-
-            // 優先度での評価
-            //evaluationPoints *= taskData.Priority;
-
-            // 進捗度での評価
-            if (userOption.FlagsList.HasFlag(TaskDataFlags.Progress))
-            {
-                if (taskData.Progress == 0)
-                {
-                    evaluationPoints *= ProgressMagnification;
-                }
-            }
-            else
-            {
-                if (taskData.Progress > 0)
-                {
-                    evaluationPoints *= ProgressMagnification;
-                }
-            }
-
-            //Console.WriteLine($"{taskData.Title} の評価値：{evaluationPoints}");
-			*/
-            return evaluationPoints;
-        }
-
-        // ユーザの現在自由に使える時間とタスクの残り時間を比較し、その差によって評価点を与える
-        private int EvaluateRestMinutesByFreeTime(int restMinutesOfTask, int currentFreeTime)
-        {
-            int dif = Math.Abs(restMinutesOfTask - currentFreeTime);
-
-            if (dif == 0)
-            {
-                return 3;
-            }
-            else if (dif <= 5)
-            {
-                return 2;
-            }
-
-            return 1;
-        }
-
-        // 評価に用いる定数一覧
-        private const int DefaultPoint           = 1;      // 評価値の初期値
-        private const int HoursInThreeDays       = 24 * 3; // 三日以内かに用いる境界値
-        private const int RestHoursMagnification = 72 * 2; // 三日で2倍の評価ができるように設定
-        private const int BoundaryRestTaskTime   = 60 * 2; // 二時間以内のものかどうかの境界値
-        private const int ProgressMagnification  = 2;      // 進捗度による評価倍率 
+		}       
     }
 }
