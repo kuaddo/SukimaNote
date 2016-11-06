@@ -104,10 +104,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BicoloredBoxViewRenderer.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Notification_Android.cs" />
+    <Compile Include="RoundProgressBarRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
