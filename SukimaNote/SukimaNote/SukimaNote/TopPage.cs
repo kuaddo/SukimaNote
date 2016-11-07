@@ -91,7 +91,7 @@ namespace SukimaNote
 					var taskData = SharedData.taskList[SharedData.taskList.IndexOf(orderedTaskList[page - 1])];
 					await SharedData.deleteTaskAsync(taskData);
 
-					// トップページの再生成
+					// トップページを再生成して画面を更新
 					var menuData = new MenuData()
 					{
 						Title = "トップページ",

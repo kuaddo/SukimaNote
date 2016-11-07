@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.IO;
 using Xamarin.Forms;
@@ -116,6 +117,31 @@ namespace SukimaNote
 			{
 				await Navigation.PushAsync(new TaskAddPage());
 			};
+			// taskListをソートするツールバーアイテム
+			var sortTaskList = new ToolbarItem
+			{
+				Text = "タスクのソート",
+				Priority = 1,
+				Order = ToolbarItemOrder.Secondary
+			};
+			sortTaskList.Clicked += async (sender, e) =>
+			{
+				var element = await DisplayActionSheet( "タスクのソート", "キャンセル", "", new string[] { "タイトル", "期限", "優先度", "進捗度" });
+				if (element == null || element == "キャンセル")
+					return;
+				var order = await DisplayActionSheet("並び方の選択", "キャンセル", "", new string[] { "昇順", "降順" });
+				if (order == null || order == "キャンセル")
+					return;
+
+				await sort(element, order);
+				// TaskListPageを再生成して画面を更新
+				var menuData = new MenuData()
+				{
+					Title = "タスク一覧",
+					TargetType = typeof(TaskListPage),
+				};
+				rootPage.NavigateTo(menuData);
+			};
 			// タスクを全削除するツールバーアイテム
 			var allDeleteItem = new ToolbarItem
 			{
@@ -140,6 +166,7 @@ namespace SukimaNote
 			};
 
 			ToolbarItems.Add(addTaskItem);
+			ToolbarItems.Add(sortTaskList);
 			ToolbarItems.Add(allDeleteItem);
 
 			Content = new StackLayout
@@ -159,6 +186,43 @@ namespace SukimaNote
 			// 現在読み込まれているリストからの削除
 			SharedData.taskList.Clear();
 		}
+
+		// TaskListをソート。非常に汚いが、解決に時間がかかりそうなので放置
+		private async Task sort (string element, string order)
+		{
+			IOrderedEnumerable<TaskData> sortedTaskList = null;
+
+			switch (element)
+			{
+				case "タイトル":
+					if (order == "昇順")
+						sortedTaskList = SharedData.taskList.OrderBy(task => task.Title);
+					else
+						sortedTaskList = SharedData.taskList.OrderByDescending(task => task.Title);
+					break;
+				case "期限":
+					if (order == "昇順")
+						sortedTaskList = SharedData.taskList.OrderBy(task => task.Deadline.Ticks);
+					else
+						sortedTaskList = SharedData.taskList.OrderByDescending(task => task.Deadline.Ticks);
+					break;
+				case "優先度":
+					if (order == "昇順")
+						sortedTaskList = SharedData.taskList.OrderBy(task => task.Priority);
+					else
+						sortedTaskList = SharedData.taskList.OrderByDescending(task => task.Priority);
+					break;
+				case "進捗度":
+					if (order == "昇順")
+					{
+						sortedTaskList = SharedData.taskList.OrderBy(task => task.Progress);
+					}
+					else
+						sortedTaskList = SharedData.taskList.OrderByDescending(task => task.Progress);
+					break;
+			}
+			SharedData.taskList = new ObservableCollection<TaskData>(sortedTaskList);
+		}
 	}
 
 	// タスクの詳細画面を描画するページ
@@ -170,17 +234,6 @@ namespace SukimaNote
 		{
 			taskData = td;
 
-			// Taskを編集するツールバーアイテム
-			var editTaskItem = new ToolbarItem
-			{
-				Text = "タスクの編集",
-				Priority = 1,
-				Order = ToolbarItemOrder.Secondary
-			};
-			editTaskItem.Clicked += async (sender, e) =>
-			{
-				await Navigation.PushAsync(new TaskAddPage(this, taskData));
-			};
 			// Taskを削除するツールバーアイテム
 			var deleteTaskItem = new ToolbarItem
 			{
@@ -198,9 +251,20 @@ namespace SukimaNote
 					await Navigation.PopAsync();
 				}
 			};
+			// Taskを編集するツールバーアイテム
+			var editTaskItem = new ToolbarItem
+			{
+				Text = "タスクの編集",
+				Priority = 1,
+				Order = ToolbarItemOrder.Secondary
+			};
+			editTaskItem.Clicked += async (sender, e) =>
+			{
+				await Navigation.PushAsync(new TaskAddPage(this, taskData));
+			};
 
-			ToolbarItems.Add(editTaskItem);
 			ToolbarItems.Add(deleteTaskItem);
+			ToolbarItems.Add(editTaskItem);
 
 			Content = makeContent();
 		}
