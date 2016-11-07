@@ -10,8 +10,12 @@ using SukimaNote;
 
 namespace SukimaNote
 {
+
+
 	public class Notification_Android : makeNotification
 	{
+
+		/*
 		public void make(string title, string text, int id, int interval)
 		{
 
@@ -20,11 +24,16 @@ namespace SukimaNote
 			{
 				Source = "icon.png"
 			};
-			NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-				.SetSmallIcon()
+			Notification.Builder builder = new Notification.Builder(this)
+				.SetSmallIcon(Resources.drawable.AppIcon)
 				.SetContentTitle(title)
 				.SetContentText(text);
+
+			Notification notification = builder.Build();
+			NotificationManager notificationManager;
+			notificationManager.Notify(id, notification);
 		}
+		*/
 	}
 
 
