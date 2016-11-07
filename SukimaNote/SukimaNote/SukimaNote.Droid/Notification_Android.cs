@@ -15,6 +15,17 @@ namespace SukimaNote
 		public void make(string title, string text, int id, int interval)
 		{
 
+			// アイコン
+			var image = new Image
+			{
+				Source = "icon.png"
+			};
+			NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+				.SetSmallIcon()
+				.SetContentTitle(title)
+				.SetContentText(text);
 		}
 	}
+
+
 }

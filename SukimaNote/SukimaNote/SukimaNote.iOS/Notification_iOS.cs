@@ -13,7 +13,12 @@ namespace SukimaNote
 	{
 		public void make(string title, string text, int id, int interval)
 		{
+			UILocalNotification notification = new UILocalNotification();
+			notification.FireDate = Foundation.NSDate.FromTimeIntervalSinceNow(interval);
+			notification.AlertTitle = title;
+			notification.AlertBody = text;
 
+			UIApplication.SharedApplication.ScheduleLocalNotification(notification);
 		}
 	}
 	
