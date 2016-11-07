@@ -105,13 +105,14 @@ namespace SukimaNote
 			};
 
 			// TaskAddPageへ遷移するツールバーアイテム
-			var taskAddtItem = new ToolbarItem
+			var addTaskItem = new ToolbarItem
 			{
 				Text = "タスクの追加",
 				Priority = 1,
-				Order = ToolbarItemOrder.Secondary
+				Icon = "plus.png",
+				Order = ToolbarItemOrder.Primary
 			};
-			taskAddtItem.Clicked += async (sender, e) =>
+			addTaskItem.Clicked += async (sender, e) =>
 			{
 				await Navigation.PushAsync(new TaskAddPage());
 			};
@@ -138,7 +139,7 @@ namespace SukimaNote
 				}
 			};
 
-			ToolbarItems.Add(taskAddtItem);
+			ToolbarItems.Add(addTaskItem);
 			ToolbarItems.Add(allDeleteItem);
 
 			Content = new StackLayout
@@ -170,13 +171,13 @@ namespace SukimaNote
 			taskData = td;
 
 			// Taskを編集するツールバーアイテム
-			var taskEditItem = new ToolbarItem
+			var editTaskItem = new ToolbarItem
 			{
 				Text = "タスクの編集",
 				Priority = 1,
 				Order = ToolbarItemOrder.Secondary
 			};
-			taskEditItem.Clicked += async (sender, e) =>
+			editTaskItem.Clicked += async (sender, e) =>
 			{
 				await Navigation.PushAsync(new TaskAddPage(this, taskData));
 			};
@@ -184,8 +185,9 @@ namespace SukimaNote
 			var deleteTaskItem = new ToolbarItem
 			{
 				Text = "タスクの削除",
-				Priority = 2,
-				Order = ToolbarItemOrder.Secondary
+				Priority = 1,
+				Icon = "x.png",
+				Order = ToolbarItemOrder.Primary
 			};
 			deleteTaskItem.Clicked += async (sender, e) =>
 			{
@@ -197,7 +199,7 @@ namespace SukimaNote
 				}
 			};
 
-			ToolbarItems.Add(taskEditItem);
+			ToolbarItems.Add(editTaskItem);
 			ToolbarItems.Add(deleteTaskItem);
 
 			Content = makeContent();

@@ -64,32 +64,59 @@ namespace SukimaNote
 
 			// ツールバーアイテム
 			ToolbarItems.Clear();
-			var taskAddItem = new ToolbarItem
+			var addTaskItem = new ToolbarItem
 			{
 				Text = "タスクの追加",
 				Priority = 1,
-				Order = ToolbarItemOrder.Secondary
+				Icon = "plus.png",
+				Order = ToolbarItemOrder.Primary
 			};
-			taskAddItem.Clicked += async (sender, e) =>
+			addTaskItem.Clicked += async (sender, e) =>
 			{
 				await Navigation.PushAsync(new TaskAddPage(rootPage, null));
 			};
 
-			var taskEditItem = new ToolbarItem
+			var deleteTaskItem = new ToolbarItem
+			{
+				Text = "タスクの削除",
+				Priority = 2,
+				Icon = "x.png",
+				Order = ToolbarItemOrder.Primary
+			};
+			deleteTaskItem.Clicked += async (sender, e) =>
+			{
+				if (await DisplayAlert("Caution", orderedTaskList[page - 1].Title + "を削除しますか?", "YES", "NO"))
+				{
+					// 現在開いているページのTaskDataをtaskListから取得
+					var taskData = SharedData.taskList[SharedData.taskList.IndexOf(orderedTaskList[page - 1])];
+					await SharedData.deleteTaskAsync(taskData);
+
+					// トップページの再生成
+					var menuData = new MenuData()
+					{
+						Title = "トップページ",
+						TargetType = typeof(TopPage),
+					};
+					rootPage.NavigateTo(menuData);
+				}
+			};
+
+			var editTaskItem = new ToolbarItem
 			{
 				Text = "タスクの編集",
 				Priority = 2,
 				Order = ToolbarItemOrder.Secondary
 			};
-			taskEditItem.Clicked += async (sender, e) =>
+			editTaskItem.Clicked += async (sender, e) =>
 			{
 				// 現在開いているページのTaskDataをtaskListから取得
 				var taskData = SharedData.taskList[SharedData.taskList.IndexOf(orderedTaskList[page - 1])];
 				await Navigation.PushAsync(new TaskAddPage(rootPage, taskData));
 			};
 
-			ToolbarItems.Add(taskAddItem);
-			ToolbarItems.Add(taskEditItem);
+			ToolbarItems.Add(addTaskItem);
+			ToolbarItems.Add(deleteTaskItem);
+			ToolbarItems.Add(editTaskItem);
 
 			// タスクの表示切り替えのUI。
 			next.Clicked += (sender, e) =>
