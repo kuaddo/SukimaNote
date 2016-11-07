@@ -131,10 +131,14 @@ namespace SukimaNote
 			BackgroundColor = Color.Transparent;
 
 			// TextCellの使用
-			var cell = new DataTemplate(typeof(TextCell));
-			cell.SetBinding(TextCell.TextProperty, "Title");
+			var cell = new DataTemplate(typeof(ImageCell));
+			cell.SetBinding(TextCell.TextProperty, nameof(MenuData.Title));
+			cell.SetBinding(ImageCell.ImageSourceProperty, nameof(MenuData.IconSource));
 
 			ItemTemplate = cell;
+
+			RowHeight = 70;
+			WidthRequest = 100;
 		}
 	}
 
@@ -144,6 +148,7 @@ namespace SukimaNote
 		public string Title { get; set; }
 		// ページクラスの指定をしている
 		public Type TargetType { get; set; }
+		public string IconSource { get; set; }
 	}
 
 
@@ -156,16 +161,19 @@ namespace SukimaNote
 			{
 				Title = "トップページ",
 				TargetType = typeof(TopPage),
+				IconSource = "plus.png"
 			});
 			this.Add(new MenuData()
 			{
 				Title = "タスク一覧",
 				TargetType = typeof(TaskListPage),
+				IconSource = "icon.png"
 			});
 			this.Add(new MenuData()
 			{
 				Title = "本体設定",
 				TargetType = typeof(SettingPage),
+				IconSource = "setting.png"
 			});
 		}
 	}
