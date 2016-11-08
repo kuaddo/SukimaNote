@@ -29,6 +29,17 @@ namespace SukimaNote
 				// table.txtが存在する場合
 				// table.txtを読み込んで、配列に格納する
 				// まず文字列変数に文字を格納してから、値の取り出しを行おうかなー
+				IFile readFile = await tableFolder.GetFileAsync("table.txt");
+
+				string readStr = await readFile.ReadAllTextAsync();
+
+				// csv形式のファイルを読み出す
+
+				string[] datas = readStr.Split(',');
+				for (int i = 0; i < datas.Length || i < 7 * 24; i++)
+				{
+					table[i / 24, i % 24] = int.Parse(datas[i]);
+				}
 
 			}
 			else {
@@ -110,8 +121,25 @@ namespace SukimaNote
 			}
 
 			// 翌日の通知を投げる時刻を決定した
-			// 通知時間までの差分を求めよう(とりあえずint型)
 
+			// 配列保存用の文字列を作成する
+			// csv形式のような形で保存
+			// ルート下のフォルダtableのファイルtable.txtに上書きする。
+			string saveTable = "";
+
+			for (int i = 0; i < 7; i++)
+			{
+				for (int j = 0; j < 24; j++)
+				{
+					saveTable = saveTable + table[i, j].ToString() + ",";
+				}
+			}
+
+			IFile tablefile = await tableFolder.CreateFileAsync("table.txt", CreationCollisionOption.ReplaceExisting);
+			await tablefile.WriteAllTextAsync(saveTable);
+
+
+			// 通知時間までの差分を求めよう(とりあえずint型)
 			int interval = 3600 * (24 - LogInHour + NotificationHour); // これで通知時間までのざっくりした時間が求まる
 			String NotificationStr = "スキマNote: スキマ時間でタスクの確認と作業をしよう！";
 			int NotificationId = 1000; // OnStartNotificationには1000番台のidを割り当てます
@@ -127,7 +155,7 @@ namespace SukimaNote
 	// インターフェースを宣言し、プラットフォームごとに実装
 	public interface makeNotification
 	{
-		void make(String title, String text, int id, int interval);
+		void make(string title, string text, int id, int interval);
 	}
 
 }
