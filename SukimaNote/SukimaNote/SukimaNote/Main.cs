@@ -72,7 +72,7 @@ namespace SukimaNote
 				ContentPage displayPage = (ContentPage)Activator.CreateInstance(menu.TargetType, this);
 
 				// 各ページに移動するときにバーの色を再設定する
-				Detail = new NavigationPage(displayPage)
+				Detail = new ExNavigationPage(displayPage)
 				{
 					BarBackgroundColor = Color.FromHex("3498DB"),
 					BarTextColor = Color.White,

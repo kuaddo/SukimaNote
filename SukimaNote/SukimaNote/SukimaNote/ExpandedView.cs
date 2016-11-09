@@ -40,33 +40,10 @@ namespace SukimaNote
 		}
 	}
 
-	// 値の範囲が0~100のプログレスバー
-	public class TaskProgressBar : ProgressBar
+	// 拡張NavigationPage。AndroidのNavigationBarのアイコンを非表示に
+	public class ExNavigationPage : NavigationPage
 	{
-		// TaskProgressのBindableProperty
-		public readonly static BindableProperty TaskProgressProperty = BindableProperty.Create<TaskProgressBar, int>(
-			o => o.TaskProgress,        // getter
-			0,						    // 初期値
-			BindingMode.TwoWay,         // とりあえずTwoWay
-			null,
-			OnTaskProgressPropertyChanged); // プロパティ変更イベントハンドラ
-
-		// 追加で実装したプロパティ。
-		public int TaskProgress
-		{
-			get { return (int)GetValue(TaskProgressProperty); }
-			set { SetValue(TaskProgressProperty, value); }
-		}
-
-		// TaskProgress変更後イベントハンドラ
-		private static void OnTaskProgressPropertyChanged(BindableObject bindable, int oldValue, int newValue)
-		{
-			var taskProgressBar = bindable as TaskProgressBar;
-			if (taskProgressBar != null)
-			{
-				taskProgressBar.Progress = newValue / 100.0;
-			}
-		}
+		public ExNavigationPage(Page root) : base(root) { }
 	}
 
 
@@ -99,6 +76,7 @@ namespace SukimaNote
 		}
 	}
 
+	// 左右で二色に分かれているBoxView。影をつけることができる
 	public class BicoloredBoxView : BoxView
 	{
 		public Color LeftColor { get; set; }
