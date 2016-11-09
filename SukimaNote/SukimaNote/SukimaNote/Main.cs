@@ -161,7 +161,7 @@ namespace SukimaNote
 			{
 				Title = "トップページ",
 				TargetType = typeof(TopPage),
-				IconSource = "plus.png"
+				IconSource = "appIcon.png"
 			});
 			this.Add(new MenuData()
 			{

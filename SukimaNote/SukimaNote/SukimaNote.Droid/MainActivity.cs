@@ -16,7 +16,7 @@ using System.ComponentModel;
 
 namespace SukimaNote.Droid
 {
-	[Activity(Label = "スキマNote", Icon = "@drawable/question", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation, ScreenOrientation = ScreenOrientation.Portrait)]
+	[Activity(Label = "スキマNote", Icon = "@drawable/appIcon", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation, ScreenOrientation = ScreenOrientation.Portrait)]
 	public class MainActivity : FormsApplicationActivity
 	{
 		protected override void OnCreate(Bundle bundle)
