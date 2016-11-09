@@ -189,6 +189,60 @@ namespace SukimaNote
         public int           DesignatedPlace { get; set; } = 0;
 	}
 
+
+    // サンプルのタスクリスト生成専用のクラス
+    static class SampleClass
+    {
+        private const int MaxDateRange = 4;       // GenerateRandomTaskDateメソッドのswitch文のカバー範囲
+        private const int MinTimeToFinish = 10;   // TimeToFinishの最小値
+        private const int MaxTimeToFinish = 360;  // TimeToFinishの最大値
+        private const int MaxPriorityRange = 3;   // Priorityの範囲の最大値
+        private const int MaxProgressRange = 90;  // Progressの指定範囲の最大値
+
+        // サンプルのタスクリスト生成メソッド、generateNumber数のサンプルを生成
+        public static List<TaskData> GenerateSampleData(int generateNumber)
+        {
+            List<TaskData> sampleTaskDataList = new List<TaskData>();
+            Random random = new Random();
+
+            for (int i = 1; i <= generateNumber; i++)
+            {
+                sampleTaskDataList.Add
+                    (
+                        new TaskData
+                        {
+                            Title = "Task" + i,                                            
+                            Deadline = GenerateRandomTaskDate(random.Next(MaxDateRange)),  // 後述メソッドのランダム日付付与 
+                            TimeToFinish = random.Next(MinTimeToFinish, MaxTimeToFinish),  // MinTimeToFinish ~ MaxTimeToFinish
+                            Priority = random.Next(MaxPriorityRange),                      // 0, 1, 2のいずれかを与える
+                            Progress = random.Next(MaxProgressRange),                      // 0 ~ (MaxProgressRange - 1)
+                        }
+                    );
+            }
+
+            return sampleTaskDataList;
+        }
+
+        // 乱数を使ってサンプルデータに日付を与えるメソッド
+        private static DateTime GenerateRandomTaskDate(int randomNum)
+        {
+            DateTime today            = DateTime.Now.AddHours(1);  
+            DateTime tomorrow         = DateTime.Now.AddDays(1);    
+            DateTime dayAfterTomorrow = DateTime.Now.AddDays(2);   // 明後日の日付
+            DateTime dayAfter2Days    = DateTime.Now.AddDays(3);   // 明々後日の日付
+
+            switch (randomNum)
+            {
+                case 0:  return today;
+                case 1:  return tomorrow;
+                case 2:  return dayAfterTomorrow;
+                case 3:  return dayAfter2Days;
+                default: return tomorrow;
+            }
+        }
+    }
+
+
     // アプリ内の様々な場所に使うTaskに関しての静的データ、メソッドのクラス
     public static class SharedData
 	{
@@ -282,7 +336,7 @@ namespace SukimaNote
             foreach (var tasks in taskList)
             {
                 // 残り時間（日数）からのキー値と評価値をもとに昇順に並び替える
-                tasks.OrderBy(task => task.RestMinutes / (float)task.Priority);
+                tasks.OrderBy(task => task.RestMinutes / (float)(task.Priority + 1));
 
                 foreach (var task in tasks)
                 {
