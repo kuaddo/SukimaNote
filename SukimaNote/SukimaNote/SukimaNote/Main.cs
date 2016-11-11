@@ -18,9 +18,8 @@ namespace SukimaNote
 
 		protected async override void OnStart()
 		{
-			// アプリ起動時にtaskListとplaceListを読み込んでおく
-			//SharedData.MakePlaceList();
-			//await deleteTaskData();
+			// アプリ起動時にtaskListと設定データを読み込んでおく
+			SharedData.makeSettingData();
 			await SharedData.MakeTaskDataListAsync();
 			// リスト生成後にRootPageをMainPageに
 			MainPage = new RootPage();
@@ -171,7 +170,7 @@ namespace SukimaNote
 			});
 			this.Add(new MenuData()
 			{
-				Title = "本体設定",
+				Title = "設定",
 				TargetType = typeof(SettingPage),
 				IconSource = "setting.png"
 			});

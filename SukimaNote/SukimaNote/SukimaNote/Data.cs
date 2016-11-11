@@ -255,6 +255,7 @@ namespace SukimaNote
 		public static List<string> priorityList = new List<string> { "低い", "普通", "高い" };
 		// タスクのリスト。ObservableCollectionを使うとAddした時に自動更新ができる
 		public static ObservableCollection<TaskData> taskList = new ObservableCollection<TaskData>();
+		public static int taskCountLimit = 30;
 
 
 		// taskListにファイルから読み込んだタスクのリストを反映させるメソッド。アプリスタート時に使用
@@ -317,15 +318,15 @@ namespace SukimaNote
 			var deleteFile = await searchFileAsync(taskData);
 			await deleteFile.DeleteAsync();
 		}
-		/*
-		// Properties Dictionaryから場所の設定データを読み込む
-		public static void MakePlaceList()
+		// Properties Dictionaryから設定データを読み込む
+		public static void makeSettingData()
 		{
-			if (Application.Current.Properties.ContainsKey("PlaceList"))
+			// taskCountLimitの取得
+			if (Application.Current.Properties.ContainsKey("taskCountList"))
 			{
-				placeList = new List<String>(Application.Current.Properties["PlaceList"]);
+				taskCountLimit = (int)Application.Current.Properties["taskCountList"];
 			}
-		}*/
+		}
 	}
 
     // Linqの拡張メソッド用クラス

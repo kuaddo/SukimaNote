@@ -26,7 +26,8 @@ namespace SukimaNote
 		public TaskAddPage()
 		{
 			Title = "タスク追加";
-			
+			checkTaskCount();
+
 			// タスクのデータ入力部分
 			var title		 = makeTitleStackLayout();
 			var deadline	 = makeDeadlineStackLayout();
@@ -82,8 +83,6 @@ namespace SukimaNote
 					Children = { minimum, option }
 				}
 			};
-
-			checkTaskCount();
 		}
 
 		// TopPegeから呼び出されたら、popする前にTopPageの更新をする
@@ -115,8 +114,11 @@ namespace SukimaNote
 		// タスクの上限数を超えていないかを判別するメソッド
 		private async void checkTaskCount()
 		{
-			await DisplayAlert("Caution", "タスクの数が上限の10個に達しています。タスクの整理をしてからもう一度追加してください", "OK");
-			await Navigation.PopAsync();
+			if (SharedData.taskList.Count > SharedData.taskCountLimit)
+			{
+				await DisplayAlert("Caution", "タスクの数が上限の" + SharedData.taskCountLimit + "個に達しています。タスクの整理をしてからもう一度追加してください", "OK");
+				await Navigation.PopAsync();
+			}
 		}
 
 		// ページに配置するスタックレイアウトを作成するメソッド
@@ -198,6 +200,7 @@ namespace SukimaNote
 				}
 				else
 				{
+					saveButton.IsEnabled = false;	// 保存することが確定したならばボタンを無効化する
 					taskData.Deadline = new DateTime(deadlineDatePicker.Date.Ticks + deadlineTimePicker.Time.Ticks);
 					await saveTaskAsync(editMode);
 					if (taskDetailPage != null)
