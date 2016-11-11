@@ -438,9 +438,10 @@ namespace SukimaNote
 				IsVisible = false,
 				Content = new StackLayout
 				{
+					VerticalOptions = LayoutOptions.Center,
 					Children =
 					{
-						new Label { Text = "進捗度を設定してください", HorizontalOptions = LayoutOptions.Center },
+						new Label { Text = "進捗度を設定してください", TextColor = Color.White, HorizontalOptions = LayoutOptions.Center },
 						new StackLayout { Orientation = StackOrientation.Horizontal, Children = { pSlider, pSave} }
 					}
 				}
@@ -453,7 +454,7 @@ namespace SukimaNote
 			grid.Children.Add(sl3, 0, 6, 7, 9);
 			grid.Children.Add(sl4, 6, 10, 3, 9);
 			grid.Children.Add(sl5, 0, 10, 9, 13);
-			grid.Children.Add(setPFrame,1, 9, 8, 12);
+			grid.Children.Add(setPFrame,1, 9, 7, 12);
 
 			frame.Content = grid;
 
