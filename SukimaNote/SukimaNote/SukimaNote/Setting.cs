@@ -10,16 +10,19 @@ namespace SukimaNote
 	// 本体設定をする。詳細未定
 	public class SettingPage : ContentPage
 	{
-		Label taskCountLimitLabel = new Label { Text = SharedData.taskCountLimit.ToString() };
+		Label taskCountLimitLabel = new Label { Text = SharedData.TaskCountLimit.ToString() };
+		Label maxShowLabel		  = new Label { Text = SharedData.MaxShow.ToString() };
 		ObservableCollection<PlaceData> pList = new ObservableCollection<PlaceData>();
 
 		public SettingPage(RootPage rootPage)
 		{
 			Title = "設定";
 
-			var taskCountLimitSlider = new Slider { Maximum = 50, Minimum = 10, Value = int.Parse(taskCountLimitLabel.Text) };
+			// タスクの保存件数の設定
+			var taskCountLimitSlider = new Slider { Maximum = 50, Minimum = 10, Value = int.Parse(taskCountLimitLabel.Text) };	// Maximumを先に設定しないとエラーが出る
 			taskCountLimitSlider.ValueChanged += (sender, e) => { taskCountLimitLabel.Text = ((int)taskCountLimitSlider.Value).ToString(); };
 
+			// 場所の設定
 			foreach (var place in SharedData.placeList) { pList.Add(new PlaceData { Place = place }); }
 			var placeListView = new ListView
 			{
@@ -54,6 +57,12 @@ namespace SukimaNote
 					placeListEditor.Text = "";
 				}
 			};
+
+			// TopPageのタスクの表示件数についての設定
+			// Sliderの表示範囲を偶数にしないと誤差により1小さい値に初期値が設定されてしまうので1~9
+			var maxShowSlider = new Slider { Maximum = 9, Minimum = 1, Value = int.Parse(maxShowLabel.Text)};
+			maxShowSlider.ValueChanged += (sender, e) => { maxShowLabel.Text = ((int)maxShowSlider.Value).ToString(); };
+
 			var saveButton = new Button { Text = "設定を保存する" };
 			saveButton.Clicked += (sender, e) =>
 			{
@@ -61,7 +70,7 @@ namespace SukimaNote
 				DisplayAlert("Saved", "設定が保存されました", "OK");
 			};
 
-			Content = new StackLayout { Children = { taskCountLimitLabel, taskCountLimitSlider, placeListView, placeListEditor, addPlaceButton, saveButton} };
+			Content = new StackLayout { Children = { taskCountLimitLabel, taskCountLimitSlider, placeListView, placeListEditor, addPlaceButton, maxShowLabel, maxShowSlider, saveButton} };
 		}
 
 		// 追加しようとしている場所が重複していないかを確認するメソッド
@@ -79,8 +88,8 @@ namespace SukimaNote
 		// 設定を保存するメソッド
 		private void saveSetting()
 		{
-			SharedData.taskCountLimit = int.Parse(taskCountLimitLabel.Text);
-			Application.Current.Properties["taskCountList"] = SharedData.taskCountLimit;
+			SharedData.TaskCountLimit = int.Parse(taskCountLimitLabel.Text);
+			Application.Current.Properties["taskCountList"] = SharedData.TaskCountLimit;
 
 			string saveText = "";
 			SharedData.placeList.Clear();
@@ -91,6 +100,8 @@ namespace SukimaNote
 			}
 			Application.Current.Properties["placeList"] = saveText;
 
+			SharedData.MaxShow = int.Parse(maxShowLabel.Text);
+			Application.Current.Properties["maxShow"] = SharedData.MaxShow;
 		}
 	}
 

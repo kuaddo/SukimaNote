@@ -17,19 +17,7 @@ namespace SukimaNote
 		private Button back = new Button { Text = "BACK" };
 		private Label taskCountLabel = new Label { HorizontalOptions = LayoutOptions.Center };
 
-		// 基本的には最大5件表示。TODO: 設定で変えられるようにする(1~10)。場所を移すかも
-		private int maxShow = 5;
-		public int MaxShow
-		{
-			get { return maxShow; }
-			set
-			{
-				if (value >= 1 && value <= 10)
-				{
-					maxShow = value;
-				}
-			}
-		}
+
 
 		// TODO: TaskDetailのレイアウトを流用する。
 		public TopPage(RootPage rootPage)
@@ -189,9 +177,9 @@ namespace SukimaNote
 		{
 			// TODO: 時間制限などの条件による有効なタスクを考慮してから、表示可能なタスクの数を数えるようにする
 			int taskCount = SharedData.taskList.Count;
-			int pickUpCount = MaxShow;
+			int pickUpCount = SharedData.MaxShow;
 			
-			if (taskCount < MaxShow) pickUpCount = taskCount;
+			if (taskCount < SharedData.MaxShow) pickUpCount = taskCount;
 			orderedTaskList = new List<TaskData>(SharedData.taskList
 				.OrderBy(task => task.Deadline.Ticks)
                 .GroupBy(task => task.DaysByDeadline)

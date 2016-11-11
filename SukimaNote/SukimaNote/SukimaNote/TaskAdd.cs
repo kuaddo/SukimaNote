@@ -115,9 +115,9 @@ namespace SukimaNote
 		// タスクの上限数を超えていないかを判別するメソッド
 		private async void checkTaskCount()
 		{
-			if (SharedData.taskList.Count > SharedData.taskCountLimit)
+			if (SharedData.taskList.Count > SharedData.TaskCountLimit)
 			{
-				await DisplayAlert("Caution", "タスクの数が上限の" + SharedData.taskCountLimit + "個に達しています。タスクの整理をしてからもう一度追加してください", "OK");
+				await DisplayAlert("Caution", "タスクの数が上限の" + SharedData.TaskCountLimit + "個に達しています。タスクの整理をしてからもう一度追加してください", "OK");
 				await Navigation.PopAsync();
 			}
 		}

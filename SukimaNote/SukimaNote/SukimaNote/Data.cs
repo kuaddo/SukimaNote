@@ -255,8 +255,10 @@ namespace SukimaNote
 		public static List<string> priorityList = new List<string> { "低い", "普通", "高い" };
 		// タスクのリスト。ObservableCollectionを使うとAddした時に自動更新ができる
 		public static ObservableCollection<TaskData> taskList = new ObservableCollection<TaskData>();
-
-		public static int taskCountLimit = 30;
+		// タスクの保存件数
+		public static int TaskCountLimit { get; set; } = 30;
+		// トップページの表示件数
+		public static int MaxShow { get; set; } = 5;
 
 
 		// taskListにファイルから読み込んだタスクのリストを反映させるメソッド。アプリスタート時に使用
@@ -325,10 +327,10 @@ namespace SukimaNote
 		// Properties Dictionaryから設定データを読み込む
 		public static void makeSettingData()
 		{
-			// taskCountLimitの取得
+			// TaskCountLimitの取得
 			if (Application.Current.Properties.ContainsKey("taskCountList"))
 			{
-				taskCountLimit = (int)Application.Current.Properties["taskCountList"];
+				TaskCountLimit = (int)Application.Current.Properties["taskCountList"];
 			}
 
 			// placeListの取得
@@ -337,6 +339,12 @@ namespace SukimaNote
 				var saveText = Application.Current.Properties["placeList"] as string;
 				placeList = new List<string>(saveText.Split(':'));
 				while (placeList.IndexOf("") >= 0) { placeList.Remove(""); }	// 空白は削除
+			}
+
+			// MaxShowの取得
+			if (Application.Current.Properties.ContainsKey("maxShow"))
+			{
+				MaxShow = (int)Application.Current.Properties["maxShow"];
 			}
 		}
 	}
