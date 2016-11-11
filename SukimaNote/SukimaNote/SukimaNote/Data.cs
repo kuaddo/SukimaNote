@@ -336,9 +336,8 @@ namespace SukimaNote
             foreach (var tasks in taskList)
             {
                 // 残り時間（日数）からのキー値と評価値をもとに昇順に並び替える
-                tasks.OrderBy(task => task.RestMinutes / (float)(task.Priority + 1));
-
-                foreach (var task in tasks)
+                var orderedTasks = tasks.OrderBy(task => task.RestMinutes / (float)(task.Priority + 1));
+                foreach (var task in orderedTasks)
                 {
                     // 一個ずつ返すことでIEnurableとの親和性を高めた
                     yield return task;
