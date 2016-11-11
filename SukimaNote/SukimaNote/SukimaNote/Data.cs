@@ -265,6 +265,8 @@ namespace SukimaNote
 		// usingでリソースを開放するためにstreamを使用。あまりうまく行かなかったが、起動時に一度だけ読み込むためリソース不足にならない
 		public async static Task MakeTaskDataListAsync()
 		{
+			TaskData taskData;
+
 			IFolder rootFolder = FileSystem.Current.LocalStorage;
 			IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);    // 存在しなかったならば作成
 			IList<IFile> files = await taskDataFolder.GetFilesAsync().ConfigureAwait(false);
@@ -274,7 +276,7 @@ namespace SukimaNote
 				{
 					string allText = sr.ReadToEnd();
 					string[] propertyArray = allText.Split(':');
-					return new TaskData
+					taskData = new TaskData
 					{
 						Title		 = propertyArray[0],
 						Deadline	 = new DateTime(long.Parse(propertyArray[1])),
@@ -286,6 +288,7 @@ namespace SukimaNote
 						Closed		 = Convert.ToBoolean(propertyArray[7]),
 						FileName	 = file.Name,
 					};
+					return taskData;
 				}
 			})).ConfigureAwait(false);
 
@@ -333,7 +336,7 @@ namespace SukimaNote
 			{
 				var saveText = Application.Current.Properties["placeList"] as string;
 				placeList = new List<string>(saveText.Split(':'));
-				while (placeList.IndexOf("") >= 0) { placeList.Remove(""); }
+				while (placeList.IndexOf("") >= 0) { placeList.Remove(""); }	// 空白は削除
 			}
 		}
 	}

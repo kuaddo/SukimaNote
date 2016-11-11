@@ -20,9 +20,6 @@ namespace SukimaNote
 			var taskCountLimitSlider = new Slider { Maximum = 50, Minimum = 10, Value = int.Parse(taskCountLimitLabel.Text) };
 			taskCountLimitSlider.ValueChanged += (sender, e) => { taskCountLimitLabel.Text = ((int)taskCountLimitSlider.Value).ToString(); };
 
-			var saveButton = new Button { Text = "設定を保存する" };
-
-
 			foreach (var place in SharedData.placeList) { pList.Add(new PlaceData { Place = place }); }
 			var placeListView = new ListView
 			{
@@ -30,6 +27,17 @@ namespace SukimaNote
 				ItemTemplate = new DataTemplate(typeof(TextCell))
 			};
 			placeListView.ItemTemplate.SetBinding(TextCell.TextProperty, nameof(PlaceData.Place));
+			placeListView.ItemSelected += async (sender, e) =>
+			{
+				var selectedPlace = e.SelectedItem as PlaceData;
+				if (selectedPlace.Place != "指定無し")
+				{
+					if (await DisplayAlert("Caution", selectedPlace.Place + "を削除しますか?", "YES", "NO"))
+					{
+						pList.Remove(selectedPlace);
+					}
+				}
+			};
 			var placeListEditor = new Editor { Text = ""};
 			var addPlaceButton = new Button { Text = "追加" };
 			addPlaceButton.Clicked += (sender, e) =>
@@ -46,9 +54,11 @@ namespace SukimaNote
 					placeListEditor.Text = "";
 				}
 			};
+			var saveButton = new Button { Text = "設定を保存する" };
 			saveButton.Clicked += (sender, e) =>
 			{
 				saveSetting();
+				DisplayAlert("Saved", "設定が保存されました", "OK");
 			};
 
 			Content = new StackLayout { Children = { taskCountLimitLabel, taskCountLimitSlider, placeListView, placeListEditor, addPlaceButton, saveButton} };
@@ -66,7 +76,6 @@ namespace SukimaNote
 			}
 			return true;
 		}
-
 		// 設定を保存するメソッド
 		private void saveSetting()
 		{
