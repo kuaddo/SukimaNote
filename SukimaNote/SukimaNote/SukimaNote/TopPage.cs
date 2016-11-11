@@ -5,6 +5,7 @@ using System.Text;
 using Xamarin.Forms;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using PCLStorage;
 
 namespace SukimaNote
 {
@@ -16,8 +17,6 @@ namespace SukimaNote
 		private Button next = new Button { Text = "NEXT" };
 		private Button back = new Button { Text = "BACK" };
 		private Label taskCountLabel = new Label { HorizontalOptions = LayoutOptions.Center };
-
-
 
 		// TODO: TaskDetailのレイアウトを流用する。
 		public TopPage(RootPage rootPage)
@@ -50,8 +49,7 @@ namespace SukimaNote
 			shiftSetting(page, taskCount);          // NEXT BACKボタンの初期化
 			Initialize(orderedTaskList[0]);
 
-			// ツールバーアイテム
-			ToolbarItems.Clear();
+			// TaskAddPageへ遷移するツールバーアイテム
 			var addTaskItem = new ToolbarItem
 			{
 				Text = "タスクの追加",
@@ -63,7 +61,7 @@ namespace SukimaNote
 			{
 				await Navigation.PushAsync(new TaskAddPage(rootPage, null));
 			};
-
+			// タスクを削除するツールバーアイテム
 			var deleteTaskItem = new ToolbarItem
 			{
 				Text = "タスクの削除",
@@ -88,7 +86,21 @@ namespace SukimaNote
 					rootPage.NavigateTo(menuData);
 				}
 			};
-
+			// 進捗度を設定するツールバーアイテム
+			var setProgressItem = new ToolbarItem
+			{
+				Text = "進捗度の設定",
+				Priority = 1,
+				Order = ToolbarItemOrder.Secondary
+			};
+			setProgressItem.Clicked += (sender, e) =>
+			{
+				// 現在開いているページのTaskDataをtaskListから取得
+				var taskData = SharedData.taskList[SharedData.taskList.IndexOf(orderedTaskList[page - 1])];
+				setPFrame.IsVisible = true;
+				pSlider.Value = taskData.Progress;
+			};
+			// Taskを編集するツールバーアイテム
 			var editTaskItem = new ToolbarItem
 			{
 				Text = "タスクの編集",
@@ -104,6 +116,7 @@ namespace SukimaNote
 
 			ToolbarItems.Add(addTaskItem);
 			ToolbarItems.Add(deleteTaskItem);
+			ToolbarItems.Add(setProgressItem);
 			ToolbarItems.Add(editTaskItem);
 
 			// タスクの表示切り替えのUI。
@@ -135,11 +148,23 @@ namespace SukimaNote
 				}
 			};
 
+			// 進捗度の設定
+			pSave.Clicked += async (sender, e) =>
+			{
+				// 現在開いているページのTaskDataをtaskListから取得
+				var taskData = SharedData.taskList[SharedData.taskList.IndexOf(orderedTaskList[page - 1])];
+
+				IFile updateFile = await SharedData.searchFileAsync(taskData);
+				taskData.Progress = (int)pSlider.Value;
+				await updateFile.WriteAllTextAsync(SharedData.makeSaveString(taskData));
+				setPFrame.IsVisible = false;
+			};
+
 			// Gridでページの2/3がタスクの表示に使えるように調整
 			var grid = new Grid();
 
-			grid.Children.Add(frame, 0, 1, 0, 7);
-			grid.Children.Add(shift, 0, 1, 7, 10);
+			grid.Children.Add(frame, 0, 1, 0, 8);
+			grid.Children.Add(shift, 0, 1, 8, 10);
 
 			Content = grid;
 		}

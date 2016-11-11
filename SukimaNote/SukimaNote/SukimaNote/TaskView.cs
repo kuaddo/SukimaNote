@@ -251,11 +251,23 @@ namespace SukimaNote
 					await Navigation.PopAsync();
 				}
 			};
+			// 進捗度を設定するツールバーアイテム
+			var setProgressItem = new ToolbarItem
+			{
+				Text = "進捗度の設定",
+				Priority = 1,
+				Order = ToolbarItemOrder.Secondary
+			};
+			setProgressItem.Clicked += (sender, e) =>
+			{
+				setPFrame.IsVisible = true;
+				pSlider.Value = taskData.Progress;
+			};
 			// Taskを編集するツールバーアイテム
 			var editTaskItem = new ToolbarItem
 			{
 				Text = "タスクの編集",
-				Priority = 1,
+				Priority = 2,
 				Order = ToolbarItemOrder.Secondary
 			};
 			editTaskItem.Clicked += async (sender, e) =>
@@ -264,6 +276,7 @@ namespace SukimaNote
 			};
 
 			ToolbarItems.Add(deleteTaskItem);
+			ToolbarItems.Add(setProgressItem);
 			ToolbarItems.Add(editTaskItem);
 
 			Content = makeContent();
@@ -272,33 +285,20 @@ namespace SukimaNote
 		public Grid makeContent()
 		{
 			Title = taskData.Title;
-
 			Initialize(taskData);
-			var progressSlider = new Slider
-			{
-				Minimum = 0,
-				Maximum = 100,
-			};
-			progressSlider.ValueChanged += (sender, e) =>
-			{
-				progress.Text = ((int)progressSlider.Value).ToString() + "%";
-				roundProgressBar.Angle = (int)progressSlider.Value;
-			};
-			progressSlider.Value = taskData.Progress;
-			var progressLabel = new Label { Text = "進捗", FontSize = 15 };
-			var progressSave = new Button { Text = "save", FontSize = 15 };
-			progressSave.Clicked += async (sender, e) =>
+
+			pSave.Clicked += async (sender, e) =>
 			{
 				IFile updateFile = await SharedData.searchFileAsync(taskData);
-				taskData.Progress = (int)progressSlider.Value;
+				taskData.Progress = (int)pSlider.Value;
 				await updateFile.WriteAllTextAsync(SharedData.makeSaveString(taskData));
+				setPFrame.IsVisible = false;
 			};
 
 			var grid = new Grid();
-			grid.Children.Add(frame, 0, 10, 0, 7);
-			grid.Children.Add(progressLabel, 0, 2, 7, 10);
-			grid.Children.Add(progressSave, 8, 10, 7, 10);
-			grid.Children.Add(progressSlider, 2, 8, 7, 10);
+			grid.Children.Add(frame, 0, 10, 0, 8);
+			grid.Children.Add(new BoxView { IsEnabled = false, IsVisible = false }, 0, 10, 8, 10);	// 見えないBoxViewで間隔調整	
+	
 			return grid;
 		}
 	}
@@ -318,6 +318,9 @@ namespace SukimaNote
 		protected Label progress	 = new Label { FontSize = descriptionFontSize * 2,  HorizontalOptions = LayoutOptions.Fill,			 VerticalOptions = LayoutOptions.Fill,
 																  HorizontalTextAlignment = TextAlignment.Center,	 VerticalTextAlignment = TextAlignment.Center,   TextColor = Color.Black };
 		protected Label remark		 = new Label { FontSize = descriptionFontSize - 2 };
+		protected Slider pSlider	 = new Slider { Maximum = 100, Minimum = 0, HorizontalOptions = LayoutOptions.FillAndExpand };
+		protected Button pSave		 = new Button { Text = "save" };	// セーブの処理は各ページで記述
+		protected Frame setPFrame    = new Frame { OutlineColor = Color.Silver, HasShadow = true };
 		protected Frame frame		 = new Frame { OutlineColor = Color.Silver, HasShadow = true };
 
 		// 背景色で内側の円を消しているのでColorは必須
@@ -423,6 +426,26 @@ namespace SukimaNote
 				}
 			};
 
+			// 進捗度設定の際に表示する
+			pSlider.ValueChanged += (sender, e) =>
+			{
+				progress.Text = ((int)pSlider.Value).ToString() + "%";
+				roundProgressBar.Angle = (int)pSlider.Value;
+			};
+			setPFrame = new Frame
+			{
+				BackgroundColor = Color.Black.MultiplyAlpha(0.7d), // 透過
+				IsVisible = false,
+				Content = new StackLayout
+				{
+					Children =
+					{
+						new Label { Text = "進捗度を設定してください", HorizontalOptions = LayoutOptions.Center },
+						new StackLayout { Orientation = StackOrientation.Horizontal, Children = { pSlider, pSave} }
+					}
+				}
+			};
+
 			var grid = new Grid();
 			grid.Children.Add(grid1, 0, 10, 0, 3);
 			grid.Children.Add(sl1, 0, 6, 3, 5);
@@ -430,6 +453,7 @@ namespace SukimaNote
 			grid.Children.Add(sl3, 0, 6, 7, 9);
 			grid.Children.Add(sl4, 6, 10, 3, 9);
 			grid.Children.Add(sl5, 0, 10, 9, 13);
+			grid.Children.Add(setPFrame,1, 9, 8, 12);
 
 			frame.Content = grid;
 
