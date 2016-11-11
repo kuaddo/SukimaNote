@@ -250,7 +250,7 @@ namespace SukimaNote
 		public static List<string> timeToFinishList = new List<string>
 			{ "5分", "10分", "15分", "20分", "30分", "45分", "1時間", "1.5時間", "2時間", "2.5時間", "3時間", "4時間", "5時間", "6時間", "6時間以上"};
 		// 場所で使うList
-		public static ObservableCollection<string> placeList = new ObservableCollection<string>{ "指定無し" };
+		public static List<string> placeList = new List<string>{ "指定無し" };
 		// 優先度で使うList
 		public static List<string> priorityList = new List<string> { "低い", "普通", "高い" };
 		// タスクのリスト。ObservableCollectionを使うとAddした時に自動更新ができる
@@ -317,14 +317,15 @@ namespace SukimaNote
 			var deleteFile = await searchFileAsync(taskData);
 			await deleteFile.DeleteAsync();
 		}
+		/*
 		// Properties Dictionaryから場所の設定データを読み込む
 		public static void MakePlaceList()
 		{
 			if (Application.Current.Properties.ContainsKey("PlaceList"))
 			{
-				placeList = Application.Current.Properties["PlaceList"] as ObservableCollection<string>;
+				placeList = new List<String>(Application.Current.Properties["PlaceList"]);
 			}
-		}
+		}*/
 	}
 
     // Linqの拡張メソッド用クラス

@@ -133,7 +133,7 @@ namespace SukimaNote
 				if (order == null || order == "キャンセル")
 					return;
 
-				await sort(element, order);
+				sort(element, order);
 				// TaskListPageを再生成して画面を更新
 				var menuData = new MenuData()
 				{
@@ -188,7 +188,7 @@ namespace SukimaNote
 		}
 
 		// TaskListをソート。非常に汚いが、解決に時間がかかりそうなので放置
-		private async Task sort (string element, string order)
+		private void sort (string element, string order)
 		{
 			IOrderedEnumerable<TaskData> sortedTaskList = null;
 

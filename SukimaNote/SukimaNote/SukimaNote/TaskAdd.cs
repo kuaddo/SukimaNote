@@ -82,6 +82,8 @@ namespace SukimaNote
 					Children = { minimum, option }
 				}
 			};
+
+			checkTaskCount();
 		}
 
 		// TopPegeから呼び出されたら、popする前にTopPageの更新をする
@@ -108,6 +110,13 @@ namespace SukimaNote
 			minimum.Children.Add(save[0]);
 			option.Children.RemoveAt(4);
 			option.Children.Add(save[1]);
+		}
+
+		// タスクの上限数を超えていないかを判別するメソッド
+		private async void checkTaskCount()
+		{
+			await DisplayAlert("Caution", "タスクの数が上限の10個に達しています。タスクの整理をしてからもう一度追加してください", "OK");
+			await Navigation.PopAsync();
 		}
 
 		// ページに配置するスタックレイアウトを作成するメソッド
