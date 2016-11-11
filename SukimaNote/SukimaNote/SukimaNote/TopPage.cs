@@ -54,7 +54,7 @@ namespace SukimaNote
 			{
 				Text = "タスクの追加",
 				Priority = 1,
-				Icon = "plus.png",
+				//Icon = "plus.png",
 				Order = ToolbarItemOrder.Primary
 			};
 			addTaskItem.Clicked += async (sender, e) =>
@@ -66,7 +66,7 @@ namespace SukimaNote
 			{
 				Text = "タスクの削除",
 				Priority = 2,
-				Icon = "x.png",
+				//Icon = "x.png",
 				Order = ToolbarItemOrder.Primary
 			};
 			deleteTaskItem.Clicked += async (sender, e) =>
