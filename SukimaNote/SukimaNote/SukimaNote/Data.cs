@@ -18,7 +18,7 @@ namespace SukimaNote
         string   Title             { get; set; } // タスクのタイトル
         DateTime Deadline          { get; set; } // 期限
         int      TimeToFinish      { get; set; } // 予想作業時間(index)
-        int      Place             { get; set; } // (index)
+        string   Place             { get; set; } // (index)
 		int      Priority          { get; set; } // (index)
 		int      Progress          { get; set; } // 進捗度（0 ~ 100%）
         string   Remark            { get; set; } // 備考
@@ -48,7 +48,7 @@ namespace SukimaNote
 		private string	 title		  = "Task";
 		private DateTime deadline;
 		private int		 timeToFinish = 1;
-		private int		 place		  = 0;
+		private string	 place		  = "指定無し";
 		private int		 priority	  = 1;
 		private int		 progress	  = MinProgress;
 		private string	 remark		  = "";				// stringのデフォルト値はnullになってしまうため
@@ -86,7 +86,7 @@ namespace SukimaNote
 				OnPropertyChanged(nameof(RestMinutes));
 			}
 		}
-		public int		Place
+		public string	Place
 		{
 			get { return place; }
 			set { SetProperty(ref place, value); }
@@ -255,6 +255,7 @@ namespace SukimaNote
 		public static List<string> priorityList = new List<string> { "低い", "普通", "高い" };
 		// タスクのリスト。ObservableCollectionを使うとAddした時に自動更新ができる
 		public static ObservableCollection<TaskData> taskList = new ObservableCollection<TaskData>();
+
 		public static int taskCountLimit = 30;
 
 
@@ -278,7 +279,7 @@ namespace SukimaNote
 						Title		 = propertyArray[0],
 						Deadline	 = new DateTime(long.Parse(propertyArray[1])),
 						TimeToFinish = int.Parse(propertyArray[2]),
-						Place		 = int.Parse(propertyArray[3]),
+						Place		 = propertyArray[3],
 						Priority	 = int.Parse(propertyArray[4]),
 						Progress	 = int.Parse(propertyArray[5]),
 						Remark		 = propertyArray[6],
@@ -298,7 +299,7 @@ namespace SukimaNote
 			return taskData.Title + ':' +
 				   taskData.Deadline.Ticks.ToString() + ':' +
 				   taskData.TimeToFinish.ToString() + ':' +
-				   taskData.Place.ToString() + ':' +
+				   taskData.Place + ':' +
 				   taskData.Priority.ToString() + ':' +
 				   taskData.Progress.ToString() + ':' +
 				   taskData.Remark + ':' +
@@ -325,6 +326,14 @@ namespace SukimaNote
 			if (Application.Current.Properties.ContainsKey("taskCountList"))
 			{
 				taskCountLimit = (int)Application.Current.Properties["taskCountList"];
+			}
+
+			// placeListの取得
+			if (Application.Current.Properties.ContainsKey("placeList"))
+			{
+				var saveText = Application.Current.Properties["placeList"] as string;
+				placeList = new List<string>(saveText.Split(':'));
+				while (placeList.IndexOf("") >= 0) { placeList.Remove(""); }
 			}
 		}
 	}

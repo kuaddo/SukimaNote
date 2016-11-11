@@ -339,7 +339,7 @@ namespace SukimaNote
 			else									   { restTime.Text = "残り" + Environment.NewLine + taskData.DaysByDeadline    + "日"; }
 			deadline.Text	  = taskData.Deadline.ToString("F");
 			timeToFinish.Text = SharedData.timeToFinishList[taskData.TimeToFinish];
-			place.Text		  = SharedData.placeList[taskData.Place];
+			place.Text		  = taskData.Place;
 			priority.Text	  = SharedData.priorityList[taskData.Priority];
 			progress.Text	  = taskData.Progress.ToString() + "%";
 			remark.Text		  = taskData.Remark;

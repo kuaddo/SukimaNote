@@ -36,19 +36,19 @@ namespace SukimaNote
 			var priority	 = makePriorityStackLayout();
 			var remark		 = makeRemarkStackLayout();
 
-			// 日にちと時刻設定以外をバインディング
+			// 日にちと時刻設定、場所以外をバインディング
 			taskData = new TaskData();
 			BindingContext = taskData;
 
 			titleEntry		  .SetBinding(Entry.TextProperty,			nameof(taskData.Title),		   BindingMode.TwoWay);
 			timeToFinishPicker.SetBinding(Picker.SelectedIndexProperty, nameof(taskData.TimeToFinish), BindingMode.TwoWay);
-			placePicker		  .SetBinding(Picker.SelectedIndexProperty, nameof(taskData.Place),		   BindingMode.TwoWay);
 			priorityPicker	  .SetBinding(Picker.SelectedIndexProperty, nameof(taskData.Priority),	   BindingMode.TwoWay);
 			remarkEditor	  .SetBinding(Editor.TextProperty,			nameof(taskData.Remark),	   BindingMode.TwoWay);
 
 			// Deadlineの初期値
 			deadlineDatePicker.Date = new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay);		// 次の日
 			deadlineTimePicker.Time = new TimeSpan(DateTime.Now.Ticks - DateTime.Now.Date.Ticks);   // 時刻は同じ
+			placePicker.SelectedIndex = 0;
 
 			// セーブのスタックレイアウト
 			save[0] = makeSaveStackLayout(null, false);
@@ -98,6 +98,7 @@ namespace SukimaNote
 				taskData = td;
 				deadlineDatePicker.Date = taskData.Deadline.Date;
 				deadlineTimePicker.Time = taskData.Deadline.TimeOfDay;
+				placePicker.SelectedIndex = SharedData.placeList.IndexOf(taskData.Place);
 				BindingContext = taskData;
 			}
 
@@ -202,6 +203,7 @@ namespace SukimaNote
 				{
 					saveButton.IsEnabled = false;	// 保存することが確定したならばボタンを無効化する
 					taskData.Deadline = new DateTime(deadlineDatePicker.Date.Ticks + deadlineTimePicker.Time.Ticks);
+					taskData.Place = SharedData.placeList[placePicker.SelectedIndex];
 					await saveTaskAsync(editMode);
 					if (taskDetailPage != null)
 					{
