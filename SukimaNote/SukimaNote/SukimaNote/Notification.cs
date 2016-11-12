@@ -84,7 +84,7 @@ namespace SukimaNote
 			}
 
 			// オーバーフローを防ぐために要素の値がある一定値以上になったら全部の要素の値を減らしましょうっていう処理
-			if (table[LogInDayOfWeek, LogInHour] > 10000)
+			if (checkOver(table))
 			{
 				for (int i = 0; i < 7; i++)
 				{
@@ -148,6 +148,17 @@ namespace SukimaNote
 			var obj = DependencyService.Get<makeNotification>();
 			// 必要な情報を渡して、通知を作成させる。
 			obj.make("スキマNote", NotificationStr, NotificationId, interval);
+		}
+
+		// オーバーフロー防止のチェックに使用
+		private bool checkOver(int[,] t)
+		{
+			foreach(var value in t)
+			{
+				if (value > 10000)
+					return true;
+			}
+			return false;
 		}
 	}
 
