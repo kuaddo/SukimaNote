@@ -19,9 +19,9 @@ namespace SukimaNote
 		{
 			// Cellを構成するView
 			var checkBox	  = new CheckBoxImage { IsClosed = true };
-			var title		  = new Label { FontSize = fontSize };
-			var deadline	  = new Label { FontSize = fontSize - 10 };
-			var progress	  = new Label { FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
+			var title		  = new Label { FontFamily = "syunkasyuuotuBB.ttf", TextColor = Color.Black, FontSize = fontSize + 5 };
+			var deadline	  = new Label { FontFamily = "syunkasyuuotuBB.ttf", TextColor = Color.Black, FontSize = fontSize - 10 };
+			var progress	  = new Label { FontFamily = "syunkasyuuotuBB.ttf", TextColor = Color.Black, FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
 			var postItView    = new PostItView { Color = Color.Red, ShadowSize = 7};
 			var checkTGR	  = new TapGestureRecognizer();
 			var fileNameLabel = new Label { IsVisible = false }; // バインディングでTaskDataのFileNameを取得するためだけにあるLabel。配置しないと.Textは使えないので見えなくしている
@@ -56,6 +56,7 @@ namespace SukimaNote
 			title		 .SetBinding(Label.TextProperty,			 nameof(TaskData.Title));
 			deadline	 .SetBinding(Label.TextProperty,			 nameof(TaskData.DeadlineString));
 			progress	 .SetBinding(Label.TextProperty,			 nameof(TaskData.ProgressString));
+			postItView   .SetBinding(PostItView.ColorProperty,		 nameof(TaskData.PriorityColor));
 			fileNameLabel.SetBinding(Label.TextProperty,			 nameof(TaskData.FileName), BindingMode.TwoWay);
 
 			// コンテキストアクションに追加
@@ -303,15 +304,22 @@ namespace SukimaNote
 	{
 		private const int descriptionFontSize = 15;
 
-		protected Label title		 = new Label { TextColor = Color.Black, FontSize = descriptionFontSize + 13, HorizontalOptions = LayoutOptions.Start,			VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label restTime	 = new Label { TextColor = Color.Black, FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.Center,   VerticalOptions = LayoutOptions.Center, BackgroundColor = Color.Yellow };
-		protected Label deadline	 = new Label { TextColor = Color.Black, FontSize = descriptionFontSize,      HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label timeToFinish = new Label { TextColor = Color.Black, FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.Center };
-		protected Label place		 = new Label { TextColor = Color.Black, FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label priority	 = new Label { TextColor = Color.Black, FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label progress	 = new Label { TextColor = Color.White, FontSize = descriptionFontSize * 2,  HorizontalOptions = LayoutOptions.Fill,			VerticalOptions = LayoutOptions.Fill,
-																  HorizontalTextAlignment = TextAlignment.Center,	 VerticalTextAlignment = TextAlignment.Center };
-		protected Label remark		 = new Label { FontSize = descriptionFontSize - 2, TextColor = Color.Black };
+		protected Label title		 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 13,
+			HorizontalOptions = LayoutOptions.Start,		   VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label restTime	 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 5,
+			HorizontalOptions = LayoutOptions.Center,		   VerticalOptions = LayoutOptions.Center,		  BackgroundColor = Color.Yellow };
+		protected Label deadline	 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize,
+			HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label timeToFinish = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 5,
+			HorizontalOptions = LayoutOptions.Center,		   VerticalOptions = LayoutOptions.Center };
+		protected Label place		 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 5,
+			HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label priority	 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 5,
+			HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label progress	 = new Label { TextColor = Color.White, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize * 2,
+			HorizontalOptions = LayoutOptions.Fill,			   VerticalOptions = LayoutOptions.Fill,
+			HorizontalTextAlignment = TextAlignment.Center,	   VerticalTextAlignment = TextAlignment.Center };
+		protected Label remark		 = new Label { FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize - 2, TextColor = Color.Black };
 		protected Slider pSlider	 = new Slider { Maximum = 100, Minimum = 0, HorizontalOptions = LayoutOptions.FillAndExpand };
 		protected Button pSave		 = new Button { Text = "save" };	// セーブの処理は各ページで記述
 		protected Frame setPFrame    = new Frame { OutlineColor = Color.Silver, HasShadow = true };

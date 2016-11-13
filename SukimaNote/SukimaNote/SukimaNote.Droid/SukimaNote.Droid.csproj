@@ -107,6 +107,7 @@
     <Compile Include="BicoloredBoxViewRenderer.cs" />
     <Compile Include="ExNavigationPageRenderer.cs" />
     <Compile Include="MainActivity.cs" />
+    <Compile Include="NFLabelRenderer.cs" />
     <Compile Include="NoteBoxViewRenderer.cs" />
     <Compile Include="PostItViewRenderer.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
@@ -115,6 +116,8 @@
     <Compile Include="RoundProgressBarRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <AndroidAsset Include="Assets\syunkasyuuotuB.ttf" />
+    <AndroidAsset Include="Assets\syunkasyuuotuBB.ttf" />
     <None Include="packages.config" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
