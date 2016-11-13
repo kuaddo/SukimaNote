@@ -33,13 +33,13 @@ namespace SukimaNote.Droid
 				canvas.DrawPath(path, paint);
 
 				// 付箋の左側の描画
-				paint.Color = postItView.Color.ToAndroid();
+				paint.Color = postItView.LightColor.ToAndroid();
 				var rectangle = new RectF(0, 0, (float)(postItWidth * 0.03), (float)postItHeight);
 				canvas.DrawRect(rectangle, paint);
 
 				// 付箋の右側の描画
 				path = new Path();
-				paint.Color = postItView.LightColor.ToAndroid();
+				paint.Color = Xamarin.Forms.Color.White.ToAndroid();
 				path.MoveTo((float)(postItWidth * 0.03), 0);
 				path.LineTo((float)(postItWidth * 0.03), (float)postItHeight);
 				path.LineTo((float)(postItWidth * 0.85), (float)postItHeight);

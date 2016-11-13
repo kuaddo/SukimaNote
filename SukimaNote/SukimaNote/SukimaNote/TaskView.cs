@@ -307,7 +307,7 @@ namespace SukimaNote
 		protected Label title		 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 13,
 			HorizontalOptions = LayoutOptions.Start,		   VerticalOptions = LayoutOptions.CenterAndExpand };
 		protected Label restTime	 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 5,
-			HorizontalOptions = LayoutOptions.Center,		   VerticalOptions = LayoutOptions.Center,		  BackgroundColor = Color.Yellow };
+			HorizontalOptions = LayoutOptions.Center,		   VerticalOptions = LayoutOptions.Center,		  BackgroundColor = Color.FromHex("FCF1D388") };
 		protected Label deadline	 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize,
 			HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
 		protected Label timeToFinish = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 5,
@@ -316,17 +316,17 @@ namespace SukimaNote
 			HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
 		protected Label priority	 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 5,
 			HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label progress	 = new Label { TextColor = Color.White, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize * 2,
+		protected Label progress	 = new Label { TextColor = Color.Blue, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize * 2,
 			HorizontalOptions = LayoutOptions.Fill,			   VerticalOptions = LayoutOptions.Fill,
 			HorizontalTextAlignment = TextAlignment.Center,	   VerticalTextAlignment = TextAlignment.Center };
-		protected Label remark		 = new Label { FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize - 2, TextColor = Color.Black };
+		protected Label remark		 = new Label { FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize, TextColor = Color.Black };
 		protected Slider pSlider	 = new Slider { Maximum = 100, Minimum = 0, HorizontalOptions = LayoutOptions.FillAndExpand };
 		protected Button pSave		 = new Button { Text = "save" };	// セーブの処理は各ページで記述
 		protected Frame setPFrame    = new Frame { OutlineColor = Color.Silver, HasShadow = true };
 		protected Frame frame		 = new Frame { OutlineColor = Color.Silver, HasShadow = true, Padding = new Thickness(5, 5, 5, 5) };
 
 		// 背景色で内側の円を消しているのでColorは必須
-		protected RoundProgressBar roundProgressBar = new RoundProgressBar { Color = Color.Silver, StrokeColor = Color.Black, StrokeWidth = 0.7f, WidthRequest = 90, HeightRequest = 90};
+		protected RoundProgressBar roundProgressBar = new RoundProgressBar { Color = Color.White, StrokeColor = Color.Black, StrokeWidth = 0.7f, WidthRequest = 90, HeightRequest = 90};
 
 		// コンストラクタ
 		public BasicTaskShowPage()
@@ -362,8 +362,8 @@ namespace SukimaNote
 			grid.Children.Add(new NoteBoxView { Color = Color.White, StrokeColor = Color.Blue, StrokeWidth = 3, EdgeSpaceRatio = 0.1, Row = 13 }, 0, 20, 0, 13);
 
 			// タイトル
-			grid.Children.Add(new ContentView { Padding = new Thickness(0, 5, 0, 5), Content = new BoxView { Color = Color.Silver } }, 1, 15, 0, 3);
-			grid.Children.Add(new ContentView { Padding = new Thickness(10, 7, 0, 7), Content = title }, 1, 15, 0, 3);
+			grid.Children.Add(new ContentView { Padding = new Thickness(0, 5, 0, 5), Content = new PostItView { Color = Color.Navy, ShadowSize = 5} }, 1, 15, 0, 3);
+			grid.Children.Add(new ContentView { Padding = new Thickness(15, 7, 0, 7), Content = title }, 1, 15, 0, 3);
 
 			// 残り時間
 			grid.Children.Add(new ContentView { Padding = new Thickness(0, 5, 0, 5), Content = restTime }, 15, 19, 0, 3);
@@ -381,15 +381,15 @@ namespace SukimaNote
 			grid.Children.Add(priority, 1, 12, 8, 9);
 
 			// 進捗度
-			grid.Children.Add(new ContentView { Padding = new Thickness(0, 7, 0, 7), Content = new BoxView { Color = Color.Silver }}, 12, 19, 3, 7);
-			grid.Children.Add(new Grid { Children = { roundProgressBar, progress } }, 13, 19, 3, 7);
+			grid.Children.Add(new ContentView { Padding = new Thickness(0, 7, 0, 7), Content = new PostItView { Color = Color.Red, ShadowSize = 5 }}, 12, 19, 3, 7);
+			grid.Children.Add(new ContentView { Padding = new Thickness(3, 0, 0, 0), Content = new Grid { Children = { roundProgressBar, progress } } }, 12, 18, 3, 7);
 
 			// 予想作業時間
 			grid.Children.Add(makeShadowGrid(Color.Pink, "作業時間"), 12, 17, 7, 8);
 			grid.Children.Add(timeToFinish, 12, 19, 8, 9);
 
 			// 備考
-			grid.Children.Add(new ContentView { Padding = new Thickness(0, 0, 0, 10), Content = new BoxView { Color = Color.Silver } }, 1, 19, 9, 13);
+			grid.Children.Add(new ContentView { Padding = new Thickness(0, 0, 0, 10), Content = new PostItView { Color = Color.Purple, ShadowSize = 5 } }, 1, 19, 9, 13);
 			grid.Children.Add(new ContentView { Padding = new Thickness(0, 0, 0, 15), Content = new ScrollView { Content = remark } }, 3, 19, 10, 13);
 			grid.Children.Add(makeShadowGrid(Color.Pink, "備考"), 1, 4, 9, 10);
 
