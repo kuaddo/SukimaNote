@@ -176,6 +176,12 @@ namespace SukimaNote
 				TargetType = typeof(SettingPage),
 				IconSource = "setting.png"
 			});
+			this.Add(new MenuData()
+			{
+				Title = "Table確認",
+				TargetType = typeof(NotificationPage),
+				IconSource = "icon.png"
+			});
 		}
 	}
 

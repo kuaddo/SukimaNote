@@ -1,6 +1,7 @@
 ﻿using System;
 using PCLStorage;
 using Xamarin.Forms;
+using System.Threading.Tasks;
 
 
 
@@ -170,5 +171,68 @@ namespace SukimaNote
 		void make(string title, string text, int id, int interval);
 	}
 
+	// Tableの状況を確認するページ(デバッグ用)
+	public class NotificationPage : ContentPage
+	{
+		public NotificationPage(RootPage rootPage)
+		{
+			Title = "Table確認";
+			int[,] table = makeTable().Result;
+
+			var grid = new Grid { RowSpacing = 0, ColumnSpacing = 0 };
+			for (int i = 0; i < 24; i++)
+			{
+				for (int j = 0; j < 7; j++)
+				{
+					grid.Children.Add(new Label { Text = table[j, i].ToString()}, j, j + 1, i, i + 1);
+				}
+			}
+
+			Content = grid;
+		}
+		private async Task<int[,]> makeTable()
+		{
+			int[,] table = new int[7, 24];
+			// appのルートフォルダを取得
+			IFolder rootFolder = FileSystem.Current.LocalStorage;
+			// ルート直下にサブフォルダを作成
+			IFolder tableFolder = await rootFolder.CreateFolderAsync("table", CreationCollisionOption.OpenIfExists).ConfigureAwait(false);
+			// table.txtが存在するかを確認する
+			ExistenceCheckResult res = await tableFolder.CheckExistsAsync("table.txt").ConfigureAwait(false);
+
+			if (res == ExistenceCheckResult.FileExists)
+			{
+				// table.txtが存在する場合
+				// table.txtを読み込んで、配列に格納する
+				// まず文字列変数に文字を格納してから、値の取り出しを行おうかなー
+				IFile readFile = await tableFolder.GetFileAsync("table.txt").ConfigureAwait(false);
+
+				string readStr = await readFile.ReadAllTextAsync().ConfigureAwait(false);
+
+				// csv形式のファイルを読み出す
+
+				string[] datas = readStr.Split(',');
+				for (int i = 0; i < datas.Length && i < 7 * 24; i++)
+				{
+					table[i / 24, i % 24] = int.Parse(datas[i]);
+				}
+
+			}
+			else
+			{
+				// table.txtが存在しない場合
+				// 配列を初期化する
+				for (int i = 0; i < 7; i++)
+				{
+					for (int j = 0; j < 24; j++)
+					{
+						table[i, j] = 0;
+					}
+				}
+			}
+
+			return table;
+		}
+	}
 }
 
