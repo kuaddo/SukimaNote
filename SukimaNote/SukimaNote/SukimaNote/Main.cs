@@ -75,8 +75,8 @@ namespace SukimaNote
 				// 各ページに移動するときにバーの色を再設定する
 				Detail = new ExNavigationPage(displayPage)
 				{
-					BarBackgroundColor = Color.FromHex("3498DB"),
-					BarTextColor = Color.White,
+					BarBackgroundColor = Color.FromHex("CAE7F2"),
+					BarTextColor = Color.Black,
 				};
 
 				IsPresented = false;
@@ -151,7 +151,6 @@ namespace SukimaNote
 		public Type TargetType { get; set; }
 		public string IconSource { get; set; }
 	}
-
 
 	// ListViewのデータクラス。Masterに使うページを登録する
 	public class MenuListData : List<MenuData>

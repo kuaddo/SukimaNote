@@ -19,8 +19,8 @@ namespace SukimaNote
 		{
 			Title = "設定";
 
-			// タスクの保存件数の設定
-			var taskCountLimitSlider = new Slider { Maximum = 50, Minimum = 10, Value = int.Parse(taskCountLimitLabel.Text) };	// Maximumを先に設定しないとエラーが出る
+			// タスクの保存件数の設定。重さを考慮して30まで
+			var taskCountLimitSlider = new Slider { Maximum = 30, Minimum = 10, Value = int.Parse(taskCountLimitLabel.Text) };	// Maximumを先に設定しないとエラーが出る
 			taskCountLimitSlider.ValueChanged += (sender, e) => { taskCountLimitLabel.Text = ((int)taskCountLimitSlider.Value).ToString(); };
 
 			// 場所の設定

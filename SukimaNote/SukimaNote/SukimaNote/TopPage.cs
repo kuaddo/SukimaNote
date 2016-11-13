@@ -86,6 +86,20 @@ namespace SukimaNote
 					rootPage.NavigateTo(menuData);
 				}
 			};
+			// タスクを完了させるツールバーアイテム
+			var finishTaskItem = new ToolbarItem
+			{
+				Text = "タスクの完了",
+				Priority = 3,
+				//Icon = "",
+				Order = ToolbarItemOrder.Primary
+			};
+			finishTaskItem.Clicked += (sender, e) =>
+			{
+				// 現在開いているページのTaskDataをtaskListから取得
+				var taskData = SharedData.taskList[SharedData.taskList.IndexOf(orderedTaskList[page - 1])];
+				taskData.Closed = true;
+			};
 			// 進捗度を設定するツールバーアイテム
 			var setProgressItem = new ToolbarItem
 			{
@@ -99,6 +113,10 @@ namespace SukimaNote
 				var taskData = SharedData.taskList[SharedData.taskList.IndexOf(orderedTaskList[page - 1])];
 				setPFrame.IsVisible = true;
 				pSlider.Value = taskData.Progress;
+
+				// ページをめくれないようにする
+				next.IsEnabled = false;
+				back.IsEnabled = false;
 			};
 			// Taskを編集するツールバーアイテム
 			var editTaskItem = new ToolbarItem
@@ -119,18 +137,25 @@ namespace SukimaNote
 			ToolbarItems.Add(setProgressItem);
 			ToolbarItems.Add(editTaskItem);
 
-			// タスクの表示切り替えのUI。
+			// タスクの表示切り替えのUI。早くすることでアニメーションの粗をごまかしている
 			next.Clicked += (sender, e) =>
 			{
 				page++;
 				shiftSetting(page, taskCount);
 				Initialize(orderedTaskList[page - 1]);
+				frame.AnchorX = 0.999;
+				frame.RotationY = 90;
+				frame.RotateYTo(0, 500);
 			};
-			back.Clicked += (sender, e) =>
+			back.Clicked += async (sender, e) =>
 			{
 				page--;
 				shiftSetting(page, taskCount);
+				frame.AnchorX = 0.999;
+				frame.RotationY = 0;
+				await frame.RotateYTo(90, 400);
 				Initialize(orderedTaskList[page - 1]);
+				frame.RotationY = 0;
 			};
 			var shift = new StackLayout
 			{
@@ -158,6 +183,9 @@ namespace SukimaNote
 				taskData.Progress = (int)pSlider.Value;
 				await updateFile.WriteAllTextAsync(SharedData.makeSaveString(taskData));
 				setPFrame.IsVisible = false;
+
+				// ページを元に戻す
+				shiftSetting(page, taskCount);
 			};
 
 			// Gridでページの2/3がタスクの表示に使えるように調整

@@ -17,11 +17,11 @@ namespace SukimaNote
 
 		public TaskListViewCell(TaskListPage taskListPage)
 		{
-			// Cellを構成するView
+			// Cellを構成するView。このページだけフォント指定すると非常に重たい
 			var checkBox	  = new CheckBoxImage { IsClosed = true };
-			var title		  = new Label { FontFamily = "syunkasyuuotuBB.ttf", TextColor = Color.Black, FontSize = fontSize + 5 };
-			var deadline	  = new Label { FontFamily = "syunkasyuuotuBB.ttf", TextColor = Color.Black, FontSize = fontSize - 10 };
-			var progress	  = new Label { FontFamily = "syunkasyuuotuBB.ttf", TextColor = Color.Black, FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
+			var title		  = new Label { /*FontFamily = "syunkasyuuotuBB.ttf",*/ TextColor = Color.Black, FontSize = fontSize + 5 };
+			var deadline	  = new Label { /*FontFamily = "syunkasyuuotuBB.ttf",*/ TextColor = Color.Black, FontSize = fontSize - 10 };
+			var progress	  = new Label { /*FontFamily = "syunkasyuuotuBB.ttf",*/ TextColor = Color.Black, FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
 			var postItView    = new PostItView { Color = Color.Red, ShadowSize = 7};
 			var checkTGR	  = new TapGestureRecognizer();
 			var fileNameLabel = new Label { IsVisible = false }; // バインディングでTaskDataのFileNameを取得するためだけにあるLabel。配置しないと.Textは使えないので見えなくしている
@@ -323,7 +323,7 @@ namespace SukimaNote
 		protected Slider pSlider	 = new Slider { Maximum = 100, Minimum = 0, HorizontalOptions = LayoutOptions.FillAndExpand };
 		protected Button pSave		 = new Button { Text = "save" };	// セーブの処理は各ページで記述
 		protected Frame setPFrame    = new Frame { OutlineColor = Color.Silver, HasShadow = true };
-		protected Frame frame		 = new Frame { OutlineColor = Color.Silver, HasShadow = true, Padding = new Thickness(5, 5, 5, 5) };
+		protected Frame frame		 = new Frame { HasShadow = true, Padding = new Thickness(5, 5, 5, 5) };
 
 		// 背景色で内側の円を消しているのでColorは必須
 		protected RoundProgressBar roundProgressBar = new RoundProgressBar { Color = Color.White, StrokeColor = Color.Black, StrokeWidth = 0.7f, WidthRequest = 90, HeightRequest = 90};
