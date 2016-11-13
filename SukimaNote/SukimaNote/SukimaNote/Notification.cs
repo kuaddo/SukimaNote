@@ -33,7 +33,7 @@ namespace SukimaNote
 				// csv形式のファイルを読み出す
 
 				string[] datas = readStr.Split(',');
-				for (int i = 0; i < datas.Length || i < 7 * 24; i++)
+				for (int i = 0; i < datas.Length && i < 7 * 24; i++)
 				{
 					table[i / 24, i % 24] = int.Parse(datas[i]);
 				}
@@ -128,7 +128,11 @@ namespace SukimaNote
 			{
 				for (int j = 0; j < 24; j++)
 				{
-					saveTable = saveTable + table[i, j].ToString() + ",";
+					saveTable = saveTable + table[i, j].ToString();
+					if (i != 6 || j != 23)
+					{
+						saveTable = saveTable + ",";
+					}
 				}
 			}
 

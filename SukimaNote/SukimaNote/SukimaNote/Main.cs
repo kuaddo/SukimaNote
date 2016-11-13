@@ -21,6 +21,8 @@ namespace SukimaNote
 			// アプリ起動時にtaskListと設定データを読み込んでおく
 			SharedData.makeSettingData();
 			await SharedData.MakeTaskDataListAsync();
+			Notification notification = new Notification();
+			notification.OnStartAsync();
 			// リスト生成後にRootPageをMainPageに
 			MainPage = new RootPage();
 		}

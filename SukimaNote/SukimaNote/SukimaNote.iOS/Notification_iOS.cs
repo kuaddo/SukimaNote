@@ -14,7 +14,7 @@ namespace SukimaNote
 		public void make(string title, string text, int id, int interval)
 		{
 			UILocalNotification notification = new UILocalNotification();
-			notification.FireDate = Foundation.NSDate.FromTimeIntervalSinceNow(interval);
+			notification.FireDate = Foundation.NSDate.FromTimeIntervalSinceNow((double)interval);
 			notification.AlertTitle = title;
 			notification.AlertBody = text;
 
