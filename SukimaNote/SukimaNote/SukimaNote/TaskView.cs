@@ -106,7 +106,7 @@ namespace SukimaNote
 			{
 				Text = "タスクの追加",
 				Priority = 1,
-				Icon = "plus.png",
+				Icon = "pencil1.png",
 				Order = ToolbarItemOrder.Primary
 			};
 			addTaskItem.Clicked += async (sender, e) =>

@@ -161,13 +161,13 @@ namespace SukimaNote
 			{
 				Title = "トップページ",
 				TargetType = typeof(TopPage),
-				IconSource = "appIcon.png"
+				IconSource = "sukimaNote.png"
 			});
 			this.Add(new MenuData()
 			{
 				Title = "タスク一覧",
 				TargetType = typeof(TaskListPage),
-				IconSource = "icon.png"
+				IconSource = "taskList.png"
 			});
 			this.Add(new MenuData()
 			{

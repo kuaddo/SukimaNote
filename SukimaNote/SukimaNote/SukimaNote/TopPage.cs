@@ -54,7 +54,7 @@ namespace SukimaNote
 			{
 				Text = "タスクの追加",
 				Priority = 1,
-				//Icon = "plus.png",
+				Icon = "pencil2.png",
 				Order = ToolbarItemOrder.Primary
 			};
 			addTaskItem.Clicked += async (sender, e) =>
@@ -66,7 +66,7 @@ namespace SukimaNote
 			{
 				Text = "タスクの削除",
 				Priority = 2,
-				//Icon = "x.png",
+				Icon = "x.png",
 				Order = ToolbarItemOrder.Primary
 			};
 			deleteTaskItem.Clicked += async (sender, e) =>
@@ -86,20 +86,6 @@ namespace SukimaNote
 					rootPage.NavigateTo(menuData);
 				}
 			};
-			// タスクを完了させるツールバーアイテム
-			var finishTaskItem = new ToolbarItem
-			{
-				Text = "タスクの完了",
-				Priority = 3,
-				//Icon = "",
-				Order = ToolbarItemOrder.Primary
-			};
-			finishTaskItem.Clicked += (sender, e) =>
-			{
-				// 現在開いているページのTaskDataをtaskListから取得
-				var taskData = SharedData.taskList[SharedData.taskList.IndexOf(orderedTaskList[page - 1])];
-				taskData.Closed = true;
-			};
 			// 進捗度を設定するツールバーアイテム
 			var setProgressItem = new ToolbarItem
 			{
@@ -118,11 +104,35 @@ namespace SukimaNote
 				next.IsEnabled = false;
 				back.IsEnabled = false;
 			};
+			// タスクを完了させるツールバーアイテム
+			var finishTaskItem = new ToolbarItem
+			{
+				Text = "タスクの完了",
+				Priority = 2,
+				Order = ToolbarItemOrder.Secondary
+			};
+			finishTaskItem.Clicked += async (sender, e) =>
+			{
+				// 現在開いているページのTaskDataをtaskListから取得
+				var taskData = SharedData.taskList[SharedData.taskList.IndexOf(orderedTaskList[page - 1])];
+				taskData.Closed = true;
+				IFile updateFile = await SharedData.searchFileAsync(taskData);
+				var text = SharedData.makeSaveString(taskData);
+				await updateFile.WriteAllTextAsync(text);
+
+				// トップページを再生成して画面を更新
+				var menuData = new MenuData()
+				{
+					Title = "トップページ",
+					TargetType = typeof(TopPage),
+				};
+				rootPage.NavigateTo(menuData);
+			};
 			// Taskを編集するツールバーアイテム
 			var editTaskItem = new ToolbarItem
 			{
 				Text = "タスクの編集",
-				Priority = 2,
+				Priority = 3,
 				Order = ToolbarItemOrder.Secondary
 			};
 			editTaskItem.Clicked += async (sender, e) =>
@@ -135,6 +145,7 @@ namespace SukimaNote
 			ToolbarItems.Add(addTaskItem);
 			ToolbarItems.Add(deleteTaskItem);
 			ToolbarItems.Add(setProgressItem);
+			ToolbarItems.Add(finishTaskItem);
 			ToolbarItems.Add(editTaskItem);
 
 			// タスクの表示切り替えのUI。早くすることでアニメーションの粗をごまかしている
