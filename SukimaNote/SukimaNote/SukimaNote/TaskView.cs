@@ -309,22 +309,22 @@ namespace SukimaNote
 	{
 		private const int descriptionFontSize = 15;
 
-		protected Label title		 = new Label { FontSize = descriptionFontSize + 10, HorizontalOptions = LayoutOptions.Start,			 VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label restTime	 = new Label { FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.FillAndExpand,   VerticalOptions = LayoutOptions.CenterAndExpand, BackgroundColor = Color.Red};
-		protected Label deadline	 = new Label { FontSize = descriptionFontSize,      HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label timeToFinish = new Label { FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.Center };
-		protected Label place		 = new Label { FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label priority	 = new Label { FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label progress	 = new Label { FontSize = descriptionFontSize * 2,  HorizontalOptions = LayoutOptions.Fill,			 VerticalOptions = LayoutOptions.Fill,
-																  HorizontalTextAlignment = TextAlignment.Center,	 VerticalTextAlignment = TextAlignment.Center,   TextColor = Color.Black };
+		protected Label title		 = new Label { TextColor = Color.Black, FontSize = descriptionFontSize + 10, HorizontalOptions = LayoutOptions.Start,			VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label restTime	 = new Label { TextColor = Color.Black, FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.FillAndExpand,   VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label deadline	 = new Label { TextColor = Color.Black, FontSize = descriptionFontSize,      HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label timeToFinish = new Label { TextColor = Color.Black, FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.Center };
+		protected Label place		 = new Label { TextColor = Color.Black, FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label priority	 = new Label { TextColor = Color.Black, FontSize = descriptionFontSize + 5,  HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
+		protected Label progress	 = new Label { TextColor = Color.Black, FontSize = descriptionFontSize * 2,  HorizontalOptions = LayoutOptions.Fill,			VerticalOptions = LayoutOptions.Fill,
+																  HorizontalTextAlignment = TextAlignment.Center,	 VerticalTextAlignment = TextAlignment.Center };
 		protected Label remark		 = new Label { FontSize = descriptionFontSize - 2 };
 		protected Slider pSlider	 = new Slider { Maximum = 100, Minimum = 0, HorizontalOptions = LayoutOptions.FillAndExpand };
 		protected Button pSave		 = new Button { Text = "save" };	// セーブの処理は各ページで記述
 		protected Frame setPFrame    = new Frame { OutlineColor = Color.Silver, HasShadow = true };
-		protected Frame frame		 = new Frame { OutlineColor = Color.Silver, HasShadow = true };
+		protected Frame frame		 = new Frame { OutlineColor = Color.Silver, HasShadow = true, Padding = new Thickness(5, 5, 5, 5) };
 
 		// 背景色で内側の円を消しているのでColorは必須
-		protected RoundProgressBar roundProgressBar = new RoundProgressBar { Color = Color.Red, StrokeColor = Color.White, StrokeWidth = 0.7f};
+		protected RoundProgressBar roundProgressBar = new RoundProgressBar { Color = Color.Red, StrokeColor = Color.Black, StrokeWidth = 0.7f};
 
 		public BasicTaskShowPage()
 		{
@@ -354,7 +354,7 @@ namespace SukimaNote
 		private void makeContent()
 		{
 			// タイトルと残り時間
-			var grid1 = new Grid { BackgroundColor = Color.Pink };
+			var grid1 = new Grid();
 			grid1.Children.Add(title, 0, 3, 0, 1);
 			grid1.Children.Add(restTime, 3, 4, 0, 1);
 			grid1.Padding = new Thickness(20, 0, 0, 0);
@@ -365,7 +365,7 @@ namespace SukimaNote
 				Orientation = StackOrientation.Horizontal,
 				Children =
 				{
-					new Label { Text = "期限:", FontSize = descriptionFontSize },
+					new Label { Text = "期限:", TextColor = Color.Black, FontSize = descriptionFontSize },
 					deadline
 				}
 			};
@@ -374,10 +374,9 @@ namespace SukimaNote
 			var sl2 = new StackLayout
 			{
 				Orientation = StackOrientation.Horizontal,
-				BackgroundColor = Color.Olive,
 				Children =
 				{
-					new Label { Text = "場所:", FontSize = descriptionFontSize },
+					new Label { Text = "場所:", TextColor = Color.Black, FontSize = descriptionFontSize },
 					place
 				}
 			};
@@ -386,10 +385,9 @@ namespace SukimaNote
 			var sl3 = new StackLayout
 			{
 				Orientation = StackOrientation.Horizontal,
-				BackgroundColor = Color.Lime,
 				Children =
 				{
-					new Label { Text = "優先度:", FontSize = descriptionFontSize },
+					new Label { Text = "優先度:", TextColor = Color.Black, FontSize = descriptionFontSize },
 					priority
 				}
 			};
@@ -404,7 +402,6 @@ namespace SukimaNote
 			};
 			var sl4 = new StackLayout
 			{
-				BackgroundColor = Color.Maroon,
 				Padding = new Thickness(0, 7, 0, 0),
 				Spacing = 0,
 				Children =
@@ -417,11 +414,10 @@ namespace SukimaNote
 			// 備考
 			var sl5 = new StackLayout
 			{
-				BackgroundColor = Color.Aqua,
 				Spacing = 0,
 				Children =
 				{
-					new Label { Text = "備考:", FontSize = descriptionFontSize},
+					new Label { Text = "備考:", TextColor = Color.Black, FontSize = descriptionFontSize},
 					new ScrollView { Content = remark }
 				}
 			};
@@ -447,7 +443,11 @@ namespace SukimaNote
 				}
 			};
 
-			var grid = new Grid();
+			var grid = new Grid { RowSpacing = 0 };
+			// ノートの描画
+			for (int i = 0; i < 13; i++)
+				grid.Children.Add(new NoteBoxView { Color = Color.White, StrokeColor = Color.Blue, StrokeWidth = 3, EdgeSpaceRatio = 0.1 }, 0, 10, i, i + 1);
+			/*
 			grid.Children.Add(grid1, 0, 10, 0, 3);
 			grid.Children.Add(sl1, 0, 6, 3, 5);
 			grid.Children.Add(sl2, 0, 6, 5, 7);
@@ -455,7 +455,7 @@ namespace SukimaNote
 			grid.Children.Add(sl4, 6, 10, 3, 9);
 			grid.Children.Add(sl5, 0, 10, 9, 13);
 			grid.Children.Add(setPFrame,1, 9, 7, 12);
-
+			*/
 			frame.Content = grid;
 
 			Content = frame;

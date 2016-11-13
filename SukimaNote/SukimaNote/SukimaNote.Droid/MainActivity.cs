@@ -14,6 +14,8 @@ using SukimaNote;
 using SukimaNote.Droid;
 using System.ComponentModel;
 
+using Android.Content;
+
 namespace SukimaNote.Droid
 {
 	[Activity(Label = "スキマNote", Icon = "@drawable/appIcon", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation, ScreenOrientation = ScreenOrientation.Portrait)]

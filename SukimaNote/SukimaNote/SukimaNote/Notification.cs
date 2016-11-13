@@ -8,9 +8,6 @@ namespace SukimaNote
 {
 	public class Notification
 	{
-		
-
-
 		public async void OnStartAsync()
 		{
 
@@ -145,9 +142,10 @@ namespace SukimaNote
 			int NotificationId = 1000; // OnStartNotificationには1000番台のidを割り当てます
 
 			// 以下のコードで、プラットフォームごとに処理分岐を行う。
-			var obj = DependencyService.Get<makeNotification>();
+			var obj = DependencyService.Get<IMakeNotification>();
 			// 必要な情報を渡して、通知を作成させる。
-			obj.make("スキマNote", NotificationStr, NotificationId, interval);
+			//obj.make("スキマNote", NotificationStr, NotificationId, interval);
+			obj.make("スキマNote", NotificationStr, NotificationId, 0);
 		}
 
 		// オーバーフロー防止のチェックに使用
@@ -164,7 +162,7 @@ namespace SukimaNote
 
 
 	// インターフェースを宣言し、プラットフォームごとに実装
-	public interface makeNotification
+	public interface IMakeNotification
 	{
 		void make(string title, string text, int id, int interval);
 	}

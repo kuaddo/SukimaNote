@@ -9,7 +9,7 @@ using SukimaNote;
 
 namespace SukimaNote
 {
-	public class Notification_iOS : makeNotification
+	public class Notification_iOS : IMakeNotification
 	{
 		public void make(string title, string text, int id, int interval)
 		{
