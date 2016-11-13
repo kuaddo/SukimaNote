@@ -12,6 +12,7 @@ namespace SukimaNote
 	{
 		Label taskCountLimitLabel = new Label { Text = SharedData.TaskCountLimit.ToString() };
 		Label maxShowLabel		  = new Label { Text = SharedData.MaxShow.ToString() };
+		Switch notificationSwitch = new Switch { IsToggled = SharedData.IsNotify };
 		ObservableCollection<PlaceData> pList = new ObservableCollection<PlaceData>();
 
 		public SettingPage(RootPage rootPage)
@@ -63,6 +64,7 @@ namespace SukimaNote
 			var maxShowSlider = new Slider { Maximum = 9, Minimum = 1, Value = int.Parse(maxShowLabel.Text)};
 			maxShowSlider.ValueChanged += (sender, e) => { maxShowLabel.Text = ((int)maxShowSlider.Value).ToString(); };
 
+			// 全ての設定の保存
 			var saveButton = new Button { Text = "設定を保存する" };
 			saveButton.Clicked += (sender, e) =>
 			{
@@ -70,7 +72,7 @@ namespace SukimaNote
 				DisplayAlert("Saved", "設定が保存されました", "OK");
 			};
 
-			Content = new StackLayout { Children = { taskCountLimitLabel, taskCountLimitSlider, placeListView, placeListEditor, addPlaceButton, maxShowLabel, maxShowSlider, saveButton} };
+			Content = new StackLayout { Children = { taskCountLimitLabel, taskCountLimitSlider, placeListView, placeListEditor, addPlaceButton, maxShowLabel, maxShowSlider, notificationSwitch, saveButton} };
 		}
 
 		// 追加しようとしている場所が重複していないかを確認するメソッド
@@ -102,6 +104,9 @@ namespace SukimaNote
 
 			SharedData.MaxShow = int.Parse(maxShowLabel.Text);
 			Application.Current.Properties["maxShow"] = SharedData.MaxShow;
+
+			SharedData.IsNotify = notificationSwitch.IsToggled;
+			Application.Current.Properties["isNotify"] = SharedData.IsNotify;
 		}
 	}
 

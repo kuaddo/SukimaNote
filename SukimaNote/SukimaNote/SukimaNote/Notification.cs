@@ -11,6 +11,8 @@ namespace SukimaNote
 	{
 		public async void OnStartAsync()
 		{
+			if (!SharedData.IsNotify)	// 通知がオフならばそのまま終了
+				return;
 
 			int[,] table = new int[7, 24];
 			// appのルートフォルダを取得

@@ -259,6 +259,8 @@ namespace SukimaNote
 		public static int TaskCountLimit { get; set; } = 30;
 		// トップページの表示件数
 		public static int MaxShow { get; set; } = 5;
+		// 通知をするかどうか
+		public static bool IsNotify { get; set; } = true; 
 
 
 		// taskListにファイルから読み込んだタスクのリストを反映させるメソッド。アプリスタート時に使用
@@ -345,6 +347,12 @@ namespace SukimaNote
 			if (Application.Current.Properties.ContainsKey("maxShow"))
 			{
 				MaxShow = (int)Application.Current.Properties["maxShow"];
+			}
+
+			// IsNotifyの取得
+			if (Application.Current.Properties.ContainsKey("isNotify"))
+			{
+				IsNotify = (bool)Application.Current.Properties["isNotify"];
 			}
 		}
 	}
