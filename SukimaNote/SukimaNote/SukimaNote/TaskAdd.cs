@@ -63,14 +63,14 @@ namespace SukimaNote
 			minimum = new StackLayout
 			{
 				BackgroundColor = Color.FromHex(MyColor.MainColor2),
-				Padding = new Thickness(0, 0, 0, 40),
-				Children = { minimumLabel, title, deadline, timeToFinish, save[0] }
+				Padding = new Thickness(10, 0, 10, 40),
+				Children = { title, deadline, timeToFinish, save[0] }
 			};
 			option = new StackLayout
 			{
 				BackgroundColor = Color.FromHex(MyColor.MainColor2),
-				Padding = new Thickness(0, 0, 0, 40),
-				Children = { optionLabel, place, priority, remark, save[1] }
+				Padding = new Thickness(10, 0, 10, 40),
+				Children = { place, priority, remark, save[1] }
 			};
 
 			Content = new ScrollView
@@ -78,9 +78,7 @@ namespace SukimaNote
 				BackgroundColor = Color.FromHex(MyColor.MainColor2),
 				Content = new StackLayout
 				{
-					// iOSのみ上部に空白を取る。Navigationだから必要ない?
-					//Padding = new Thickness(0, Device.OnPlatform(20, 0, 0), 0, 0),
-					Children = { minimum, option }
+					Children = { minimumLabel, minimum, optionLabel, option }
 				}
 			};
 		}
@@ -106,9 +104,9 @@ namespace SukimaNote
 			save[1] = makeSaveStackLayout(page, editMode);
 
 			// 要素を指定して削除するやり方がわからないので、仕方なくIndexで指定
-			minimum.Children.RemoveAt(4);
+			minimum.Children.RemoveAt(3);
 			minimum.Children.Add(save[0]);
-			option.Children.RemoveAt(4);
+			option.Children.RemoveAt(3);
 			option.Children.Add(save[1]);
 		}
 
