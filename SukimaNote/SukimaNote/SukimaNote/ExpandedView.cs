@@ -112,4 +112,25 @@ namespace SukimaNote
 			HeightRequest = 100;
 		}
 	}
+	
+	// 付箋を描画するBoxView
+	public class PostItView : BoxView
+	{
+		public Color LightColor
+		{
+			get
+			{
+				return Color.WithSaturation(0.4)
+					.WithLuminosity(0.7);
+			}
+		}
+		public int ShadowSize { get; set; }
+
+
+		public PostItView()
+		{
+			WidthRequest = 100;
+			HeightRequest = 100;
+		}
+	}
 }

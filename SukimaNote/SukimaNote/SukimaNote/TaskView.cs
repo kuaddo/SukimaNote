@@ -18,13 +18,11 @@ namespace SukimaNote
 		public TaskListViewCell(TaskListPage taskListPage)
 		{
 			// Cellを構成するView
-			var priorityLabel = new Label { BackgroundColor = Color.Aqua };
 			var checkBox	  = new CheckBoxImage { IsClosed = true };
 			var title		  = new Label { FontSize = fontSize };
 			var deadline	  = new Label { FontSize = fontSize - 10 };
 			var progress	  = new Label { FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
-			var progressBar   = new BicoloredBoxView { LeftColor = Color.Teal, ShadowSize = 10, HorizontalOptions = LayoutOptions.Fill, VerticalOptions = LayoutOptions.Fill }; // ShadwoSizeを1以上で設定しないとエラーが出る。よくわからん
-
+			var postItView    = new PostItView { Color = Color.Red, ShadowSize = 7};
 			var checkTGR	  = new TapGestureRecognizer();
 			var fileNameLabel = new Label { IsVisible = false }; // バインディングでTaskDataのFileNameを取得するためだけにあるLabel。配置しないと.Textは使えないので見えなくしている
 			checkTGR.Tapped += async (sender, e) =>
@@ -54,12 +52,10 @@ namespace SukimaNote
 			};
 
 			// ViewとTaskDataのバインディング
-			priorityLabel.SetBinding(Label.BackgroundColorProperty,	 nameof(TaskData.PriorityColor));
 			checkBox	 .SetBinding(CheckBoxImage.IsClosedProperty, nameof(TaskData.Closed), BindingMode.TwoWay);
 			title		 .SetBinding(Label.TextProperty,			 nameof(TaskData.Title));
 			deadline	 .SetBinding(Label.TextProperty,			 nameof(TaskData.DeadlineString));
 			progress	 .SetBinding(Label.TextProperty,			 nameof(TaskData.ProgressString));
-			progressBar  .SetBinding(BicoloredBoxView.RatioProperty, nameof(TaskData.Progress), BindingMode.TwoWay);
 			fileNameLabel.SetBinding(Label.TextProperty,			 nameof(TaskData.FileName), BindingMode.TwoWay);
 
 			// コンテキストアクションに追加
@@ -69,8 +65,7 @@ namespace SukimaNote
 			// レイアウト
 			var sl = new StackLayout { Children = { title, deadline }, Spacing = 0 };
 			var view = new Grid();  // 列0~25 行0~5
-			view.Children.Add(progressBar,   0, 28,  0, 5);
-			view.Children.Add(priorityLabel, 0,  1,  0, 2);
+			view.Children.Add(postItView,   0, 28,  0, 5);
 			view.Children.Add(checkBox,		 1,  4,  1, 4);
 			view.Children.Add(sl,			 4,  20, 0, 5);
 			view.Children.Add(progress,		 20, 28, 0, 5);
@@ -303,8 +298,7 @@ namespace SukimaNote
 		}
 	}
 
-	// TopPage DetailPageでのレイアウトの基本となるページ。そのまま使うことは多分ない
-	// 縦向き7/10程度の大きさで丁度いいレイアウトになる
+	// TopPage DetailPageでのレイアウトの基本となるページ
 	public class BasicTaskShowPage : ContentPage
 	{
 		private const int descriptionFontSize = 15;
@@ -326,6 +320,7 @@ namespace SukimaNote
 		// 背景色で内側の円を消しているのでColorは必須
 		protected RoundProgressBar roundProgressBar = new RoundProgressBar { Color = Color.Silver, StrokeColor = Color.Black, StrokeWidth = 0.7f, WidthRequest = 90, HeightRequest = 90};
 
+		// コンストラクタ
 		public BasicTaskShowPage()
 		{
 			makeContent();

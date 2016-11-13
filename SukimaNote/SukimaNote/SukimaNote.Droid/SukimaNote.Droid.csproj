@@ -108,6 +108,7 @@
     <Compile Include="ExNavigationPageRenderer.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="NoteBoxViewRenderer.cs" />
+    <Compile Include="PostItViewRenderer.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Notification_Android.cs" />
