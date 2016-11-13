@@ -9,6 +9,7 @@ using Java.Lang;
 using Android.Content;
 using Android.Content.PM;
 using SukimaNote.Droid;
+using Java.Util;
 
 [assembly: Dependency(typeof(Notification_Android))]
 

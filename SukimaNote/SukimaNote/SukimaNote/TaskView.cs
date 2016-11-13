@@ -445,9 +445,8 @@ namespace SukimaNote
 
 			var grid = new Grid { RowSpacing = 0 };
 			// ノートの描画
-			for (int i = 0; i < 13; i++)
-				grid.Children.Add(new NoteBoxView { Color = Color.White, StrokeColor = Color.Blue, StrokeWidth = 3, EdgeSpaceRatio = 0.1 }, 0, 10, i, i + 1);
-			/*
+			grid.Children.Add(new NoteBoxView { Color = Color.White, StrokeColor = Color.Blue, StrokeWidth = 3, EdgeSpaceRatio = 0.1, Row = 13 }, 0, 10, 0, 13);
+
 			grid.Children.Add(grid1, 0, 10, 0, 3);
 			grid.Children.Add(sl1, 0, 6, 3, 5);
 			grid.Children.Add(sl2, 0, 6, 5, 7);
@@ -455,7 +454,7 @@ namespace SukimaNote
 			grid.Children.Add(sl4, 6, 10, 3, 9);
 			grid.Children.Add(sl5, 0, 10, 9, 13);
 			grid.Children.Add(setPFrame,1, 9, 7, 12);
-			*/
+
 			frame.Content = grid;
 
 			Content = frame;

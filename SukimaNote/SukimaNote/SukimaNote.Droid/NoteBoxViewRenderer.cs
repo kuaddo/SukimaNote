@@ -15,7 +15,9 @@ namespace SukimaNote.Droid
 
 			using (var paint = new Paint())
 			{
-				var edgeSpace = Width * noteBoxView.EdgeSpaceRatio / 2;
+				double edgeSpace = Width * noteBoxView.EdgeSpaceRatio / 2;
+				int row = noteBoxView.Row;
+				double rowHeight = (double)Height / row;
 
 				paint.AntiAlias = true;
 
@@ -26,8 +28,11 @@ namespace SukimaNote.Droid
 
 				// ノートの線の描画
 				paint.Color = noteBoxView.StrokeColor.ToAndroid();
-				rectangle = new RectF((float)edgeSpace, (float)(Height - noteBoxView.StrokeWidth * 1.2), (float)(Width - edgeSpace), (float)(Height - noteBoxView.StrokeWidth * 0.2));
-				canvas.DrawRect(rectangle, paint);
+				for (int i = 1; i <= row; i++)
+				{
+					rectangle = new RectF((float)edgeSpace, (float)(rowHeight * i - noteBoxView.StrokeWidth * 1.2), (float)(Width - edgeSpace), (float)(rowHeight * i - noteBoxView.StrokeWidth * 0.2));
+					canvas.DrawRect(rectangle, paint);
+				}
 			}
 		}
 	}

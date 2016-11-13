@@ -148,8 +148,7 @@ namespace SukimaNote
 			// 以下のコードで、プラットフォームごとに処理分岐を行う。
 			var obj = DependencyService.Get<IMakeNotification>();
 			// 必要な情報を渡して、通知を作成させる。
-			//obj.make("スキマNote", NotificationStr, NotificationId, interval);
-			obj.make("スキマNote", NotificationStr, NotificationId, 0);
+			obj.make("スキマNote", NotificationStr, NotificationId, interval);
 		}
 
 		// オーバーフロー防止のチェックに使用

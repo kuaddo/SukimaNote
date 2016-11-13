@@ -98,12 +98,13 @@ namespace SukimaNote
 		}
 	}
 
-	// ノートの一行分を描画するBoxView
+	// ノートを描画するBoxView
 	public class NoteBoxView : BoxView
 	{
 		public Color StrokeColor { get; set; }
 		public double StrokeWidth { get; set; }
 		public double EdgeSpaceRatio { get; set; }  // Widthに対しての線の開いている幅の割合。0~1
+		public int Row { get; set; }
 
 		public NoteBoxView()
 		{
