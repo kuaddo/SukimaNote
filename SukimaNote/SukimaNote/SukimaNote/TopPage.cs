@@ -23,10 +23,13 @@ namespace SukimaNote
 		{
 			Title = "トップページ";
 
+			// 表示可能なタスクのリストを作る
+			pickUpList();
+			int taskCount = orderedTaskList.Count;  // タスクの最大ページ数
+
 			// 登録されたタスクが0個の時。時間が余ったらレイアウトを凝ったものにする
-			if (SharedData.taskList.Count == 0)
+			if (taskCount == 0)
 			{
-				// TODO: 別のページに遷移してからでないと、タスクが更新されない
 				var shiftButton = new Button
 				{
 					HorizontalOptions = LayoutOptions.Center,
@@ -43,8 +46,6 @@ namespace SukimaNote
 			}
 
 			// 初期化
-			pickUpList();
-			int taskCount = orderedTaskList.Count;  // タスクの最大ページ数
 			int page = 1;                           // 現在のタスクのページ数
 			shiftSetting(page, taskCount);          // NEXT BACKボタンの初期化
 			Initialize(orderedTaskList[0]);
@@ -242,18 +243,13 @@ namespace SukimaNote
 		// 引数で考慮する要素を受け取り、優先度を元にListを作るメソッド。タスクが一つでも存在するときに呼び出す
 		private void pickUpList()
 		{
-			// TODO: 時間制限などの条件による有効なタスクを考慮してから、表示可能なタスクの数を数えるようにする
-			int taskCount = SharedData.taskList.Count;
-			int pickUpCount = SharedData.MaxShow;
-
-            // 期限過ぎと完了済みのタスクの排除、その後カウントしなおす
+            // 期限過ぎと完了済みのタスクの排除
             var selectedTaskList = SharedData.taskList
                                    .Where(task => task.DaysByDeadline >= 0 && !task.Closed)
                                    .Select(task => task);
 
-            taskCount = selectedTaskList.Count();
-			
-			if (taskCount < SharedData.MaxShow) pickUpCount = taskCount;
+			// TopPageの要素として取り出す数
+			int pickUpCount = Math.Min(selectedTaskList.Count(), SharedData.MaxShow);
 
 			orderedTaskList = selectedTaskList
 				              .OrderBy(task => task.Deadline.Ticks)
