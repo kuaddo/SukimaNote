@@ -245,6 +245,7 @@ namespace SukimaNote
 			
 			if (taskCount < SharedData.MaxShow) pickUpCount = taskCount;
 			orderedTaskList = new List<TaskData>(SharedData.taskList
+                .Where(task => task.DaysByDeadline >= 0 && task.Closed)
 				.OrderBy(task => task.Deadline.Ticks)
                 .GroupBy(task => task.DaysByDeadline)
                 .OptimizeTaskData()
