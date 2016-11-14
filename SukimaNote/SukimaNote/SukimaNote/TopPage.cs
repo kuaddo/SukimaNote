@@ -149,23 +149,26 @@ namespace SukimaNote
 			ToolbarItems.Add(editTaskItem);
 
 			// タスクの表示切り替えのUI。早くすることでアニメーションの粗をごまかしている
-			next.Clicked += (sender, e) =>
+			frame.AnchorX = 0;
+			next.Clicked += async (sender, e) =>
 			{
 				page++;
 				shiftSetting(page, taskCount);
-				Initialize(orderedTaskList[page - 1]);
-				frame.AnchorX = 0.999;
-				frame.RotationY = 90;
-				frame.RotateYTo(0, 500);
+				frame.RotationY = 0;
+
+				// アニメーション前に何ページ目にいるのかを保存することで、連続で呼び出されてもInitioalizeで先のページに遷移できなくする
+				int nowPage = page;		
+				await frame.RotateYTo(-90, 400);
+				Initialize(orderedTaskList[nowPage - 1]);
+				frame.RotationY = 0;
 			};
 			back.Clicked += async (sender, e) =>
 			{
 				page--;
 				shiftSetting(page, taskCount);
-				frame.AnchorX = 0.999;
-				frame.RotationY = 0;
-				await frame.RotateYTo(90, 400);
 				Initialize(orderedTaskList[page - 1]);
+				frame.RotationY = -90;
+				await frame.RotateYTo(0, 500);
 				frame.RotationY = 0;
 			};
 			var shift = new StackLayout
