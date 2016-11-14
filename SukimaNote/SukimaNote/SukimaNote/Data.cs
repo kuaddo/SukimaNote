@@ -136,7 +136,7 @@ namespace SukimaNote
 		public int		HoursByDeadline	  => (int)new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalHours;
 		public int		MinutesByDeadline => (int)new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalMinutes;
 
-		public string	DeadlineString	  => Deadline.ToString("D");	// 実際はF、デバックしにくいのでDにしている
+		public string	DeadlineString	  => Deadline.ToString("F");
 		public string	ProgressString	  => Progress.ToString() + "%";
 		public Color	PriorityColor { get {
 				switch (Priority)

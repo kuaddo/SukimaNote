@@ -18,15 +18,13 @@ namespace SukimaNote
 		private Picker	   priorityPicker	  = new Picker	   { BackgroundColor = Color.FromHex(MyColor.MainColor1) };
 		private Editor	   remarkEditor		  = new Editor	   { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = 180, FontSize = descriptionFontSize + 7 };
 
-		private StackLayout[] save = new StackLayout[2];
-		private StackLayout minimum, option;
+		private TaskData taskData = new TaskData();
 
-		private TaskData taskData;
-
-		public TaskAddPage()
+		// TopPegeから呼び出されたら、popする前にTopPageの更新をする
+		// TaskDataが与えられたら、saveを編集モードで作成
+		public TaskAddPage(Page page, TaskData td)
 		{
 			Title = "タスク追加";
-			checkTaskCount();
 
 			// タスクのデータ入力部分
 			var title		 = makeTitleStackLayout();
@@ -37,7 +35,6 @@ namespace SukimaNote
 			var remark		 = makeRemarkStackLayout();
 
 			// 日にちと時刻設定、場所以外をバインディング
-			taskData = new TaskData();
 			BindingContext = taskData;
 
 			titleEntry		  .SetBinding(Entry.TextProperty,			nameof(taskData.Title),		   BindingMode.TwoWay);
@@ -45,14 +42,37 @@ namespace SukimaNote
 			priorityPicker	  .SetBinding(Picker.SelectedIndexProperty, nameof(taskData.Priority),	   BindingMode.TwoWay);
 			remarkEditor	  .SetBinding(Editor.TextProperty,			nameof(taskData.Remark),	   BindingMode.TwoWay);
 
-			// Deadlineの初期値
-			deadlineDatePicker.Date = new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay);		// 次の日
-			deadlineTimePicker.Time = new TimeSpan(DateTime.Now.Ticks - DateTime.Now.Date.Ticks);   // 時刻は同じ
-			placePicker.SelectedIndex = 0;
+			// 編集モードかどうかで分岐
+			bool editMode;
+			if (td == null)
+			{
+				editMode = false;
+				checkTaskCount();		// 編集モードでないならばタスクの上限数確認
+
+				// Deadlineの初期値
+				deadlineDatePicker.Date = new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay);      // 次の日
+				deadlineTimePicker.Time = new TimeSpan(DateTime.Now.Ticks - DateTime.Now.Date.Ticks);   // 時刻は同じ
+				placePicker.SelectedIndex = 0;
+			}
+			else
+			{
+				editMode = true;
+				taskData = td;
+
+				// タイトルの書き換え
+				Title = taskData.Title + "の編集";
+				// バインディング対象の変更
+				BindingContext = taskData;
+				// Deadlineの値
+				deadlineDatePicker.Date = taskData.Deadline.Date;
+				deadlineTimePicker.Time = taskData.Deadline.TimeOfDay;
+				placePicker.SelectedIndex = SharedData.placeList.IndexOf(taskData.Place);
+			}
 
 			// セーブのスタックレイアウト
-			save[0] = makeSaveStackLayout(null, false);
-			save[1] = makeSaveStackLayout(null, false);
+			var save = new StackLayout[2];
+			save[0] = makeSaveStackLayout(page, editMode);
+			save[1] = makeSaveStackLayout(page, editMode);
 
 			// 基本設定、追加設定を分けて配置
 			var minimumLabel = new Label { Text = "基本設定", FontSize = descriptionFontSize + 12, HorizontalOptions = LayoutOptions.Fill,
@@ -60,13 +80,13 @@ namespace SukimaNote
 			var optionLabel  = new Label { Text = "追加設定", FontSize = descriptionFontSize + 12, HorizontalOptions = LayoutOptions.Fill,
 				BackgroundColor = Color.FromHex(MyColor.MainColor3), TextColor = Color.White };
 
-			minimum = new StackLayout
+			var minimum = new StackLayout
 			{
 				BackgroundColor = Color.FromHex(MyColor.MainColor2),
 				Padding = new Thickness(10, 0, 10, 40),
 				Children = { title, deadline, timeToFinish, save[0] }
 			};
-			option = new StackLayout
+			var option = new StackLayout
 			{
 				BackgroundColor = Color.FromHex(MyColor.MainColor2),
 				Padding = new Thickness(10, 0, 10, 40),
@@ -81,43 +101,6 @@ namespace SukimaNote
 					Children = { minimumLabel, minimum, optionLabel, option }
 				}
 			};
-		}
-
-		// TopPegeから呼び出されたら、popする前にTopPageの更新をする
-		// TaskDataが与えられたら、saveを編集モードで作成
-		public TaskAddPage(Page page, TaskData td) : this()
-		{
-			bool editMode;
-			if (td == null)
-				editMode = false;
-			else
-			{
-				editMode = true;
-				taskData = td;
-				deadlineDatePicker.Date = taskData.Deadline.Date;
-				deadlineTimePicker.Time = taskData.Deadline.TimeOfDay;
-				placePicker.SelectedIndex = SharedData.placeList.IndexOf(taskData.Place);
-				BindingContext = taskData;
-			}
-
-			save[0] = makeSaveStackLayout(page, editMode);
-			save[1] = makeSaveStackLayout(page, editMode);
-
-			// 要素を指定して削除するやり方がわからないので、仕方なくIndexで指定
-			minimum.Children.RemoveAt(3);
-			minimum.Children.Add(save[0]);
-			option.Children.RemoveAt(3);
-			option.Children.Add(save[1]);
-		}
-
-		// タスクの上限数を超えていないかを判別するメソッド
-		private async void checkTaskCount()
-		{
-			if (SharedData.taskList.Count > SharedData.TaskCountLimit)
-			{
-				await DisplayAlert("Caution", "タスクの数が上限の" + SharedData.TaskCountLimit + "個に達しています。タスクの整理をしてからもう一度追加してください", "OK");
-				await Navigation.PopAsync();
-			}
 		}
 
 		// ページに配置するスタックレイアウトを作成するメソッド
@@ -228,6 +211,15 @@ namespace SukimaNote
 			};
 		}
 
+		// タスクの上限数を超えていないかを判別するメソッド
+		private async void checkTaskCount()
+		{
+			if (SharedData.taskList.Count > SharedData.TaskCountLimit)
+			{
+				await DisplayAlert("Caution", "タスクの数が上限の" + SharedData.TaskCountLimit + "個に達しています。タスクの整理をしてからもう一度追加してください", "OK");
+				await Navigation.PopAsync();
+			}
+		}
 		// TaskDataをファイルに保存して、taskListに追加するメソッド。makeSaveStackLayoutに使う
 		private async Task saveTaskAsync(bool editMode)
 		{

@@ -111,7 +111,7 @@ namespace SukimaNote
 			};
 			addTaskItem.Clicked += async (sender, e) =>
 			{
-				await Navigation.PushAsync(new TaskAddPage());
+				await Navigation.PushAsync(new TaskAddPage(null, null));
 			};
 			// taskListをソートするツールバーアイテム
 			var sortTaskList = new ToolbarItem
