@@ -137,7 +137,7 @@ namespace SukimaNote
 			{
 				Text = "タスクの削除",
 				Priority = 2,
-				Icon = "x.png",
+				Icon = "garbageBox.png",
 				Order = ToolbarItemOrder.Primary
 			};
 			deleteTaskItem.Clicked += async (sender, e) =>
