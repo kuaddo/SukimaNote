@@ -242,14 +242,22 @@ namespace SukimaNote
 			// TODO: 時間制限などの条件による有効なタスクを考慮してから、表示可能なタスクの数を数えるようにする
 			int taskCount = SharedData.taskList.Count;
 			int pickUpCount = SharedData.MaxShow;
+
+            // 期限過ぎと完了済みのタスクの排除、その後カウントしなおす
+            var selectedTaskList = SharedData.taskList
+                                   .Where(task => task.DaysByDeadline >= 0 && !task.Closed)
+                                   .Select(task => task);
+
+            taskCount = selectedTaskList.Count();
 			
 			if (taskCount < SharedData.MaxShow) pickUpCount = taskCount;
-			orderedTaskList = new List<TaskData>(SharedData.taskList
-                .Where(task => task.DaysByDeadline >= 0 && task.Closed)
-				.OrderBy(task => task.Deadline.Ticks)
-                .GroupBy(task => task.DaysByDeadline)
-                .OptimizeTaskData()
-				.Take(pickUpCount));
+
+			orderedTaskList = selectedTaskList
+				              .OrderBy(task => task.Deadline.Ticks)
+                              .GroupBy(task => task.DaysByDeadline)
+                              .OptimizeTaskData()
+				              .Take(pickUpCount)
+                              .ToList();
 		}       
     }
 }
