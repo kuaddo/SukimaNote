@@ -245,7 +245,7 @@ namespace SukimaNote
 
             // 期限過ぎと完了済みのタスクの排除、その後カウントしなおす
             var selectedTaskList = SharedData.taskList
-                                   .Where(task => task.DaysByDeadline >= 0 && !task.Closed)
+                                   .Where(task => task.MinutesByDeadline >= 0 && !task.Closed)
                                    .Select(task => task);
 
             taskCount = selectedTaskList.Count();
@@ -253,7 +253,7 @@ namespace SukimaNote
 			if (taskCount < SharedData.MaxShow) pickUpCount = taskCount;
 
 			orderedTaskList = selectedTaskList
-				              .OrderBy(task => task.Deadline.Ticks)
+				              .OrderBy(task => task.DaysByDeadline)
                               .GroupBy(task => task.DaysByDeadline)
                               .OptimizeTaskData()
 				              .Take(pickUpCount)
