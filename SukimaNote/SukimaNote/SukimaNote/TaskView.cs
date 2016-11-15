@@ -111,7 +111,7 @@ namespace SukimaNote
 			};
 			addTaskItem.Clicked += async (sender, e) =>
 			{
-				await Navigation.PushAsync(new TaskAddPage());
+				await Navigation.PushAsync(new TaskAddPage(null, null));
 			};
 			// taskListをソートするツールバーアイテム
 			var sortTaskList = new ToolbarItem
@@ -235,7 +235,7 @@ namespace SukimaNote
 			{
 				Text = "タスクの削除",
 				Priority = 1,
-				Icon = "x.png",
+				Icon = "garbageBox.png",
 				Order = ToolbarItemOrder.Primary
 			};
 			deleteTaskItem.Clicked += async (sender, e) =>

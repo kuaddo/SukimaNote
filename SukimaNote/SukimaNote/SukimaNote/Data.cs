@@ -34,7 +34,7 @@ namespace SukimaNote
 		string	 ProgressString	   { get; }		 // '%'を末尾につけたProgress
 		Color	 PriorityColor	   { get; }		 // Priorityに対応した色
 
-		string   FileName		   { get; set; } // 保存されているファイル名。タスクをファイルに保存したとき、ファイルから読み出したときにsetされる。
+		string   FileName		   { get; set; } // 保存されているファイル名。タスクの内容が変化しても変更されることはない
 	}
 
     // タスクの設定項目のプロパティのクラス
@@ -136,7 +136,7 @@ namespace SukimaNote
 		public int		HoursByDeadline	  => (int)new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalHours;
 		public int		MinutesByDeadline => (int)new TimeSpan(Deadline.Ticks - DateTime.Now.Ticks).TotalMinutes;
 
-		public string	DeadlineString	  => Deadline.ToString("D");	// 実際はF、デバックしにくいのでDにしている
+		public string	DeadlineString	  => Deadline.ToString("F");
 		public string	ProgressString	  => Progress.ToString() + "%";
 		public Color	PriorityColor { get {
 				switch (Priority)
@@ -188,7 +188,6 @@ namespace SukimaNote
 		public int           CurrentFreeTime { get; set; }
         public int           DesignatedPlace { get; set; } = 0;
 	}
-
 
     // サンプルのタスクリスト生成専用のクラス
     static class SampleClass
@@ -298,7 +297,6 @@ namespace SukimaNote
 
 			taskList = new ObservableCollection<TaskData>(taskDataArray);
 		}
-
 		// ファイルに保存する文字列を引数のTaskDataから生成する
 		// 一つのファイルあたりの書き込み量が少ないので、部分的に変更せずにこのメソッドで全て変更する
 		public static string makeSaveString(TaskData taskData)
@@ -312,7 +310,7 @@ namespace SukimaNote
 				   taskData.Remark + ':' +
 				   taskData.Closed.ToString();
 		}
-		// TaskDataに対応するファイルを返す。見つからなかったならnull
+		// TaskDataに対応するファイルを返す。見つからなかったならnull。ファイル名はタスク生成時から変更しない
 		public static async Task<IFile> searchFileAsync(TaskData taskData)
 		{
 			IFolder rootFolder = FileSystem.Current.LocalStorage;
@@ -322,7 +320,7 @@ namespace SukimaNote
 		// 引数のTaskをtaskListとファイルから削除する
 		public static async Task deleteTaskAsync(TaskData taskData)
 		{
-			taskList.RemoveAt(taskList.IndexOf(taskData));
+			taskList.Remove(taskData);
 			var deleteFile = await searchFileAsync(taskData);
 			await deleteFile.DeleteAsync();
 		}
