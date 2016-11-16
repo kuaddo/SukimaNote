@@ -358,7 +358,12 @@ namespace SukimaNote
 		private void makeContent()
 		{
 
-			var grid = new Grid { RowSpacing = 0 };
+			var grid = new Grid { RowSpacing = 0, ColumnSpacing = 0 };
+			for (int i = 0; i < 13; i++)
+				grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(10, GridUnitType.Star) });
+			for (int i = 0; i < 20; i++)
+				grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(10, GridUnitType.Star) });
+
 			// ノートの描画
 			grid.Children.Add(new NoteBoxView { Color = Color.FromHex("FFFFE0"), StrokeColor = Color.Gray, StrokeWidth = 3, EdgeSpaceRatio = 0.1, Row = 13 }, 0, 20, 0, 13);
 
