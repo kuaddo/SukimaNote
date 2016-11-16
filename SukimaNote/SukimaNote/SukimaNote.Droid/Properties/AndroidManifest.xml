@@ -2,4 +2,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="SukimaNote.Droid.SukimaNote.Droid" android:installLocation="auto" android:versionCode="1" android:versionName="1.0.0.0">
 	<uses-sdk android:minSdkVersion="15" />
 	<application android:label="スキマNote" android:screenOrientation="portrait" android:icon="@drawable/appIcon"></application>
+<receiver android:name="NotificationReceiver" android:process="remote"/>
 </manifest>

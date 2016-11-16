@@ -306,8 +306,8 @@ namespace SukimaNote
 
 		protected Label title		 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 13,
 			HorizontalOptions = LayoutOptions.Start,		   VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label restTime	 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 5,
-			HorizontalOptions = LayoutOptions.Center,		   VerticalOptions = LayoutOptions.Center,		  BackgroundColor = Color.FromHex("FCF1D388") };
+		protected Label restTime	 = new Label { TextColor = Color.Transparent, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 5,
+			HorizontalOptions = LayoutOptions.Center,		   VerticalOptions = LayoutOptions.Center };
 		protected Label deadline	 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize,
 			HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
 		protected Label timeToFinish = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 5,
@@ -326,12 +326,13 @@ namespace SukimaNote
 		protected Frame frame		 = new Frame { HasShadow = true, Padding = new Thickness(5, 5, 5, 5) };
 
 		// 背景色で内側の円を消しているのでColorは必須
-		protected RoundProgressBar roundProgressBar = new RoundProgressBar { Color = Color.White, StrokeColor = Color.Black, StrokeWidth = 0.7f, WidthRequest = 90, HeightRequest = 90};
+		protected RoundProgressBar roundProgressBar = new RoundProgressBar { Color = Color.White, StrokeColor = Color.Navy, StrokeWidth = 0.7f, WidthRequest = 90, HeightRequest = 90};
 
 		// コンストラクタ
 		public BasicTaskShowPage()
 		{
 			makeContent();
+			BackgroundColor = Color.FromHex("D1F1CC");
 		}
 
 		// Labelの初期化をする
@@ -359,39 +360,39 @@ namespace SukimaNote
 
 			var grid = new Grid { RowSpacing = 0 };
 			// ノートの描画
-			grid.Children.Add(new NoteBoxView { Color = Color.White, StrokeColor = Color.Blue, StrokeWidth = 3, EdgeSpaceRatio = 0.1, Row = 13 }, 0, 20, 0, 13);
+			grid.Children.Add(new NoteBoxView { Color = Color.FromHex("FFFFE0"), StrokeColor = Color.Gray, StrokeWidth = 3, EdgeSpaceRatio = 0.1, Row = 13 }, 0, 20, 0, 13);
 
 			// タイトル
-			grid.Children.Add(new ContentView { Padding = new Thickness(0, 5, 0, 5), Content = new PostItView { Color = Color.Navy, ShadowSize = 5} }, 1, 15, 0, 3);
+			grid.Children.Add(new ContentView { Padding = new Thickness(0, 5, 0, 5), Content = new PostItView { Color = Color.Blue, ShadowSize = 5} }, 1, 15, 0, 3);
 			grid.Children.Add(new ContentView { Padding = new Thickness(15, 7, 0, 7), Content = title }, 1, 15, 0, 3);
 
 			// 残り時間
-			grid.Children.Add(new ContentView { Padding = new Thickness(0, 5, 0, 5), Content = restTime }, 15, 19, 0, 3);
+			grid.Children.Add(new ContentView { Padding = new Thickness(0, 5, 0, 5), Content = makeShadowGrid(Color.FromHex("FCF1D388"), restTime.Text) }, 15, 19, 0, 3);
 
 			// 期限
-			grid.Children.Add(makeShadowGrid(Color.Pink, "期限"), 1, 4, 3, 4);
+			grid.Children.Add(makeShadowGrid(Color.FromHex("FCF1D388"), "期限"), 1, 4, 3, 4);
 			grid.Children.Add(deadline, 1, 12, 4, 5);
 
 			// 場所
-			grid.Children.Add(makeShadowGrid(Color.Pink, "場所"), 1, 4, 5, 6);
+			grid.Children.Add(makeShadowGrid(Color.FromHex("FCF1D388"), "場所"), 1, 4, 5, 6);
 			grid.Children.Add(place, 1, 12, 6, 7);
 
 			// 優先度
-			grid.Children.Add(makeShadowGrid(Color.Pink, "優先度"), 1, 5, 7, 8);
+			grid.Children.Add(makeShadowGrid(Color.FromHex("FCF1D388"), "優先度"), 1, 5, 7, 8);
 			grid.Children.Add(priority, 1, 12, 8, 9);
 
 			// 進捗度
-			grid.Children.Add(new ContentView { Padding = new Thickness(0, 7, 0, 7), Content = new PostItView { Color = Color.Red, ShadowSize = 5 }}, 12, 19, 3, 7);
+			grid.Children.Add(new ContentView { Padding = new Thickness(0, 7, 0, 7), Content = new PostItView { Color = Color.Pink, ShadowSize = 5 }}, 12, 19, 3, 7);
 			grid.Children.Add(new ContentView { Padding = new Thickness(3, 0, 0, 0), Content = new Grid { Children = { roundProgressBar, progress } } }, 12, 18, 3, 7);
 
 			// 予想作業時間
-			grid.Children.Add(makeShadowGrid(Color.Pink, "作業時間"), 12, 17, 7, 8);
+			grid.Children.Add(makeShadowGrid(Color.FromHex("FCF1D388"), "作業時間"), 12, 17, 7, 8);
 			grid.Children.Add(timeToFinish, 12, 19, 8, 9);
 
 			// 備考
-			grid.Children.Add(new ContentView { Padding = new Thickness(0, 0, 0, 10), Content = new PostItView { Color = Color.Purple, ShadowSize = 5 } }, 1, 19, 9, 13);
+			grid.Children.Add(new ContentView { Padding = new Thickness(0, 0, 0, 10), Content = new PostItView { Color = Color.Green, ShadowSize = 5 } }, 1, 19, 9, 13);
 			grid.Children.Add(new ContentView { Padding = new Thickness(0, 0, 0, 15), Content = new ScrollView { Content = remark } }, 3, 19, 10, 13);
-			grid.Children.Add(makeShadowGrid(Color.Pink, "備考"), 1, 4, 9, 10);
+			grid.Children.Add(makeShadowGrid(Color.FromHex("FCF1D388"), "備考"), 1, 4, 9, 10);
 
 			// 進捗度設定の際に表示する
 			pSlider.ValueChanged += (sender, e) =>

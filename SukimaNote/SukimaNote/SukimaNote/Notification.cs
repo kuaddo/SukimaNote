@@ -145,7 +145,7 @@ namespace SukimaNote
 
 			// 通知時間までの差分を求めよう(とりあえずint型)
 			int interval = 3600 * (24 - LogInHour + NotificationHour); // これで通知時間までのざっくりした時間が求まる
-			String NotificationStr = "スキマNote: スキマ時間でタスクの確認と作業をしよう！";
+			String NotificationStr = "スキマ時間でタスクの確認と作業をしよう！";
 			int NotificationId = 1000; // OnStartNotificationには1000番台のidを割り当てます
 
 			// 以下のコードで、プラットフォームごとに処理分岐を行う。
@@ -192,6 +192,7 @@ namespace SukimaNote
 
 			Content = grid;
 		}
+
 		private async Task<int[,]> makeTable()
 		{
 			int[,] table = new int[7, 24];
