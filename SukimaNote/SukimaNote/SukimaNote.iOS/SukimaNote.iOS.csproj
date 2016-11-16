@@ -92,6 +92,7 @@
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <Compile Include="NoteBoxViewRenderer.cs" />
+    <Compile Include="PostItViewRenderer.cs" />
     <Compile Include="RoundProgressBarRenderer.cs" />
     <ITunesArtwork Include="iTunesArtwork%402x" />
     <None Include="Entitlements.plist" />
