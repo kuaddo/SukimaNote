@@ -15,8 +15,8 @@ namespace SukimaNote
 		List<TaskData> orderedTaskList = new List<TaskData>();
 		RootPage rootPage;
 
-		private Button next = new Button { Text = "NEXT" };
-		private Button back = new Button { Text = "BACK" };
+		private Button next = new Button { Text = "NEXT", BackgroundColor = Color.FromHex("EDAC6B") };
+		private Button back = new Button { Text = "BACK", BackgroundColor = Color.FromHex("EDAC6B") };
 		private Label taskCountLabel = new Label { HorizontalOptions = LayoutOptions.Center };
 
 		private int position = 0;   // 表示しているorderedTaskListのindex
