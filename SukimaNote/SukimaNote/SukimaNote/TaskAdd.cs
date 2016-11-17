@@ -160,7 +160,7 @@ namespace SukimaNote
 			{
 				Text = "Save",
 				FontSize = descriptionFontSize + 13,
-				BackgroundColor = Color.FromHex(MyColor.MainColor1),
+				BackgroundColor = Color.FromHex("F6D580"),
 			};
 			saveButton.Clicked += async (sender, e) =>
 			{
