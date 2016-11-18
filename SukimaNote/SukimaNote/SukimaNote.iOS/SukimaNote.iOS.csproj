@@ -96,11 +96,14 @@
     <Compile Include="RoundProgressBarRenderer.cs" />
     <ITunesArtwork Include="iTunesArtwork%402x" />
     <None Include="Entitlements.plist" />
-    <None Include="Info.plist" />
+    <None Include="Info.plist">
+      <SubType>Designer</SubType>
+    </None>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <ITunesArtwork Include="iTunesArtwork" />
     <None Include="packages.config" />
     <Compile Include="Notification_iOS.cs" />
+    <BundleResource Include="Resources\syunkasyuuotuBB.ttf" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SukimaNote\SukimaNote.csproj">
@@ -163,13 +166,9 @@
   <ItemGroup>
     <BundleResource Include="Resources\Icon-Small-40.png" />
     <BundleResource Include="Resources\Icon-Small.png" />
-    <BundleResource Include="Resources\x.png" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\question.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <BundleResource Include="Resources\plus.png" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\gear.png" />
@@ -178,10 +177,7 @@
     <BundleResource Include="Resources\setting.png" />
   </ItemGroup>
   <ItemGroup>
-    <BundleResource Include="Resources\pencil1.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <BundleResource Include="Resources\pencil2.png" />
+    <BundleResource Include="Resources\pencil.png" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\taskList.png" />

@@ -7,6 +7,11 @@
 		<integer>1</integer>
 		<integer>2</integer>
 	</array>
+	<key>UIAppFonts</key>
+    <array>
+      <string>Fonts/FontAwesome.otf</string>
+      <string>Fonts/segmdl2.ttf</string>
+    </array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

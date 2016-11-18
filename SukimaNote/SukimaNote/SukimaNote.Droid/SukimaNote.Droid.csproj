@@ -116,7 +116,6 @@
     <Compile Include="RoundProgressBarRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidAsset Include="Assets\syunkasyuuotuB.ttf" />
     <AndroidAsset Include="Assets\syunkasyuuotuBB.ttf" />
     <None Include="packages.config" />
     <None Include="Resources\AboutResources.txt" />
@@ -147,13 +146,7 @@
     <AndroidResource Include="Resources\drawable\setting.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable\x.png" />
-  </ItemGroup>
-  <ItemGroup>
     <AndroidResource Include="Resources\drawable\question.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidResource Include="Resources\drawable\plus.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\gear.png" />
@@ -174,10 +167,7 @@
     <AndroidResource Include="Resources\drawable\ic_notification.png" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable\pencil1.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidResource Include="Resources\drawable\pencil2.png" />
+    <AndroidResource Include="Resources\drawable\pencil.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\taskList.png" />
