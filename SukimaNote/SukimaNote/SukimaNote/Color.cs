@@ -12,9 +12,9 @@ namespace SukimaNote
 	// getのみのプロパティにする
 	public class MyColor
 	{
-		private static string _mainColor1 = "EDAD0B";	// TaskAdd入力部分　"FF9129"
-		private static string _mainColor2 = "FFFFFF";	// TaskAdd背景 "FF8119"
-		private static string _mainColor3 = "EF7109";
+		private static string _mainColor1 = "888888";	// TaskAdd入力部分　"FF9129"
+		private static string _mainColor2 = "FCFCE5";	// TaskAdd背景 "FF8119"
+		private static string _mainColor3 = "F6D580";
 		private static string _subColor = "FFFAFA";
 
 		public static string MainColor1

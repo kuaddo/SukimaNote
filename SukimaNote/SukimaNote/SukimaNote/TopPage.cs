@@ -240,7 +240,7 @@ namespace SukimaNote
 			int pickUpCount = Math.Min(selectedTaskList.Count(), SharedData.MaxShow);
 
 			orderedTaskList = selectedTaskList
-				              .OrderBy(task => task.DaysByDeadline)
+				              .OrderBy(task => task.Deadline.Ticks)
                               .GroupBy(task => task.DaysByDeadline)
                               .OptimizeTaskData()
 				              .Take(pickUpCount)
