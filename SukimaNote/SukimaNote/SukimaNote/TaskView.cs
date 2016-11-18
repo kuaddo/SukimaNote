@@ -408,7 +408,7 @@ namespace SukimaNote
 
 			// 備考
 			grid.Children.Add(new ContentView { Padding = new Thickness(0, 0, 0, 10), Content = new PostItView { Color = Color.Green, ShadowSize = 5 } }, 1, 19, 9, 13);
-			grid.Children.Add(new ContentView { Padding = new Thickness(0, 0, 0, 15), Content = new ScrollView { Content = remark } }, 3, 19, 10, 13);
+			grid.Children.Add(new ScrollView { Content = remark } , 3, 19, 10, 12);
 			grid.Children.Add(makeShadowGrid(Color.FromHex("FCF1D388"), "備考"), 1, 4, 9, 10);
 
 			// 進捗度設定の際に表示する
