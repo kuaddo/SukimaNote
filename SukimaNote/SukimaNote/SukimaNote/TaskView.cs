@@ -252,8 +252,15 @@ namespace SukimaNote
 			};
 			setProgressItem.Clicked += (sender, e) =>
 			{
-				setPFrame.IsVisible = true;
-				pSlider.Value = taskData.Progress;
+				if (taskData.Closed)
+				{
+					DisplayAlert("Caution", "完了済みのタスクです", "OK");
+				}
+				else
+				{
+					setPFrame.IsVisible = true;
+					pSlider.Value = taskData.Progress;
+				}
 			};
 			// Taskを編集するツールバーアイテム
 			var editTaskItem = new ToolbarItem
@@ -264,7 +271,14 @@ namespace SukimaNote
 			};
 			editTaskItem.Clicked += async (sender, e) =>
 			{
-				await Navigation.PushAsync(new TaskAddPage(this, taskData));
+				if (taskData.Closed)
+				{
+					await DisplayAlert("Caution", "完了済みのタスクです", "OK");
+				}
+				else
+				{
+					await Navigation.PushAsync(new TaskAddPage(this, taskData));
+				}
 			};
 
 			ToolbarItems.Add(deleteTaskItem);
@@ -316,7 +330,7 @@ namespace SukimaNote
 			HorizontalOptions = LayoutOptions.Fill,			   VerticalOptions = LayoutOptions.Fill,
 			HorizontalTextAlignment = TextAlignment.Center,	   VerticalTextAlignment = TextAlignment.Center };
 		protected Label remark		 = new Label { FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize, TextColor = Color.Black };
-		protected Slider pSlider	 = new Slider { Maximum = 100, Minimum = 0, HorizontalOptions = LayoutOptions.FillAndExpand };
+		protected Slider pSlider	 = new Slider { Maximum = 99, Minimum = 0, HorizontalOptions = LayoutOptions.FillAndExpand };
 		protected Button pSave		 = new Button { Text = "save" };	// セーブの処理は各ページで記述
 		protected Frame setPFrame    = new Frame { OutlineColor = Color.Silver, HasShadow = true };
 		protected Frame frame		 = new Frame { HasShadow = true, Padding = new Thickness(5, 5, 5, 5) };

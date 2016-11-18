@@ -35,6 +35,7 @@ namespace SukimaNote
 		Color	 PriorityColor	   { get; }		 // Priorityに対応した色
 
 		string   FileName		   { get; set; } // 保存されているファイル名。タスクの内容が変化しても変更されることはない
+		int		 BeforeProgress	   { get; set; } // タスクを完了させる直前のProgressを保存。ファイルには残さない
 	}
 
     // タスクの設定項目のプロパティのクラス
@@ -127,7 +128,21 @@ namespace SukimaNote
 			set
 			{
 				SetProperty(ref closed, value);
-				if (value == true) Progress = 100;
+				if (value == true)
+				{
+					BeforeProgress = Progress;
+					Progress = 100;
+				}
+				if (value == false && Progress == 100)
+				{
+					if (BeforeProgress == 100)	// ファイルから読み出した時に100%だった場合
+						Progress = 99;
+					else
+					{
+						Progress = BeforeProgress;
+						BeforeProgress = -1;
+					}
+				}
 			}
 		}
 
@@ -148,7 +163,8 @@ namespace SukimaNote
 				}		 
 			} }
 
-		public string	FileName { get; set; }
+		public string	FileName	   { get; set; }
+		public int		BeforeProgress { get; set; } = -1;
 
 		// ジェネリックで全ての型に対応。refで呼び出し元に反映させる
 		private void SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
@@ -289,7 +305,7 @@ namespace SukimaNote
 						Progress	 = int.Parse(propertyArray[5]),
 						Remark		 = propertyArray[6],
 						Closed		 = Convert.ToBoolean(propertyArray[7]),
-						FileName	 = file.Name,
+						FileName	 = file.Name
 					};
 					return taskData;
 				}
