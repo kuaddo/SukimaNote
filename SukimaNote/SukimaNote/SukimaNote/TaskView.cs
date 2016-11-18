@@ -301,8 +301,10 @@ namespace SukimaNote
 			};
 
 			var grid = new Grid();
-			grid.Children.Add(frame, 0, 10, 0, 8);
-			grid.Children.Add(new BoxView { IsEnabled = false, IsVisible = false }, 0, 10, 8, 10);	// 見えないBoxViewで間隔調整	
+			for (int i = 0; i < 5; i++)
+				grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(10, GridUnitType.Star) });
+			grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(10, GridUnitType.Star) });
+			grid.Children.Add(frame, 0, 1, 0, 4);	
 	
 			return grid;
 		}
@@ -315,7 +317,7 @@ namespace SukimaNote
 
 		protected Label title		 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuutouBB.ttf", FontSize = descriptionFontSize + 13,
 			HorizontalOptions = LayoutOptions.Start,		   VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label restTime	 = new Label { TextColor = Color.Transparent, FontFamily = "syunkasyuutouBB.ttf", FontSize = descriptionFontSize + 5,
+		protected Label restTime	 = new Label { TextColor = Color.Black, /*FontFamily = "syunkasyuutouBB.ttf",*/ FontSize = descriptionFontSize + 5,
 			HorizontalOptions = LayoutOptions.Center,		   VerticalOptions = LayoutOptions.Center };
 		protected Label deadline	 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuutouBB.ttf", FontSize = descriptionFontSize,
 			HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
@@ -340,8 +342,8 @@ namespace SukimaNote
 		// コンストラクタ
 		public BasicTaskShowPage()
 		{
-			makeContent();
 			BackgroundColor = Color.FromHex("D1F1CC");
+			makeContent();
 		}
 
 		// Labelの初期化をする
@@ -349,7 +351,7 @@ namespace SukimaNote
 		{
 			title.Text		  = taskData.Title;
 			if		(taskData.Closed == true)		   { restTime.Text = "終了" + Environment.NewLine + "済み"; }
-			else if (taskData.Deadline < DateTime.Now) { restTime.Text = ""; }
+			else if (taskData.Deadline < DateTime.Now) { restTime.Text = "期限" + Environment.NewLine + "超過"; }
 			else if (taskData.MinutesByDeadline < 60)  { restTime.Text = "残り" + Environment.NewLine + taskData.MinutesByDeadline + "分"; }
 			else if (taskData.HoursByDeadline < 24)	   { restTime.Text = "残り" + Environment.NewLine + taskData.HoursByDeadline   + "時間"; }
 			else									   { restTime.Text = "残り" + Environment.NewLine + taskData.DaysByDeadline    + "日"; }
@@ -366,22 +368,23 @@ namespace SukimaNote
 		// Contentの作成
 		private void makeContent()
 		{
-
+			const int rowCount = 13, columnCount = 20;
 			var grid = new Grid { RowSpacing = 0, ColumnSpacing = 0 };
-			for (int i = 0; i < 13; i++)
+			for (int i = 0; i < rowCount; i++)
 				grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(10, GridUnitType.Star) });
-			for (int i = 0; i < 20; i++)
+			for (int i = 0; i < columnCount; i++)
 				grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(10, GridUnitType.Star) });
 
 			// ノートの描画
-			grid.Children.Add(new NoteBoxView { Color = Color.FromHex("FFFFE0"), StrokeColor = Color.Gray, StrokeWidth = 3, EdgeSpaceRatio = 0.1, Row = 13 }, 0, 20, 0, 13);
+			grid.Children.Add(new NoteBoxView { Color = Color.FromHex("FFFFE0"), StrokeColor = Color.Gray, StrokeWidth = 3, EdgeSpaceRatio = 0.1, Row = rowCount }, 0, 20, 0, 13);
 
 			// タイトル
 			grid.Children.Add(new ContentView { Padding = new Thickness(0, 5, 0, 5), Content = new PostItView { Color = Color.Blue, ShadowSize = 5} }, 1, 15, 0, 3);
 			grid.Children.Add(new ContentView { Padding = new Thickness(15, 7, 0, 7), Content = title }, 1, 15, 0, 3);
 
 			// 残り時間
-			grid.Children.Add(new ContentView { Padding = new Thickness(0, 5, 0, 5), Content = makeShadowGrid(Color.FromHex("FCF1D388"), restTime.Text) }, 15, 19, 0, 3);
+			grid.Children.Add(new ContentView { Padding = new Thickness(0, 5, 0, 0), Content = new BicoloredBoxView { LeftColor = Color.FromHex("FCF1D388"), ShadowSize = 6, Ratio = 100 } }, 15, 19, 0, 2);
+			grid.Children.Add(restTime, 15, 19, 0, 2);
 
 			// 期限
 			grid.Children.Add(makeShadowGrid(Color.FromHex("FCF1D388"), "期限"), 1, 4, 3, 4);
@@ -428,7 +431,7 @@ namespace SukimaNote
 					}
 				}
 			};
-			grid.Children.Add(setPFrame,2, 18, 7, 12);
+			grid.Children.Add(setPFrame, 2, 18, 7, 12);
 
 			frame.Content = grid;
 
@@ -438,7 +441,7 @@ namespace SukimaNote
 		// 要素の説明に使う影付きのgrid
 		private Grid makeShadowGrid(Color color, string str)
 		{
-			var bBoxView = new BicoloredBoxView { LeftColor = color, ShadowSize = 7, Ratio = 100, HorizontalOptions = LayoutOptions.FillAndExpand, VerticalOptions = LayoutOptions.FillAndExpand };
+			var bBoxView = new BicoloredBoxView { LeftColor = color, ShadowSize = 6, Ratio = 100, HorizontalOptions = LayoutOptions.FillAndExpand, VerticalOptions = LayoutOptions.FillAndExpand };
 			var label = new Label { Text = str, TextColor = Color.Black, FontSize = descriptionFontSize, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, HorizontalTextAlignment = TextAlignment.Center, VerticalTextAlignment = TextAlignment.Center };
 
 			var grid = new Grid();

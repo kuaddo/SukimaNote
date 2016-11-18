@@ -99,6 +99,9 @@ namespace SukimaNote
 
 			// Gridでページの4/5がタスクの表示に使えるように調整
 			var grid = new Grid();
+			for (int i = 0; i < 5; i++)
+				grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(10, GridUnitType.Star) });
+			grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(10, GridUnitType.Star) });
 
 			grid.Children.Add(frame, 0, 1, 0, 4);
 			grid.Children.Add(shift, 0, 1, 4, 5);
