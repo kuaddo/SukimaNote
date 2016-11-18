@@ -19,16 +19,14 @@ namespace SukimaNote.Droid
 {
 	public class NFLabelRenderer : LabelRenderer
 	{
+		private static Typeface syunkasyuutouFont = Typeface.CreateFromAsset(Forms.Context.Assets, "syunkasyuutouBB.ttf");
+
 		protected override void OnElementChanged(ElementChangedEventArgs<Label> e)
 		{
 			base.OnElementChanged(e);
-			var label = (TextView)Control;
-
-			var fontFamily = e.NewElement.FontFamily?.ToLower();
-			if (fontFamily != null && (fontFamily.EndsWith(".otf") || fontFamily.EndsWith(".ttf")))
+			if (e.NewElement.FontFamily == "syunkasyuutouBB.ttf")
 			{
-				var lable = (TextView)Control;
-				lable.Typeface = Typeface.CreateFromAsset(Forms.Context.Assets, e.NewElement.FontFamily);
+				Control.Typeface = syunkasyuutouFont;
 			}
 		}
 	}

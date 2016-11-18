@@ -17,11 +17,10 @@ namespace SukimaNote
 
 		public TaskListViewCell(TaskListPage taskListPage)
 		{
-			// Cellを構成するView。このページだけフォント指定すると非常に重たい
 			var checkBox	  = new CheckBoxImage { IsClosed = true };
-			var title		  = new Label { /*FontFamily = "syunkasyuuotuBB.ttf",*/ TextColor = Color.Black, FontSize = fontSize + 5 };
-			var deadline	  = new Label { /*FontFamily = "syunkasyuuotuBB.ttf",*/ TextColor = Color.Black, FontSize = fontSize - 10 };
-			var progress	  = new Label { /*FontFamily = "syunkasyuuotuBB.ttf",*/ TextColor = Color.Black, FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
+			var title		  = new Label { FontFamily = "syunkasyuutouBB.ttf", TextColor = Color.Black, FontSize = fontSize + 5 };
+			var deadline	  = new Label { FontFamily = "syunkasyuutouBB.ttf", TextColor = Color.Black, FontSize = fontSize - 10 };
+			var progress	  = new Label { FontFamily = "syunkasyuutouBB.ttf", TextColor = Color.Black, FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
 			var postItView    = new PostItView { Color = Color.Red, ShadowSize = 7};
 			var checkTGR	  = new TapGestureRecognizer();
 			var fileNameLabel = new Label { IsVisible = false }; // バインディングでTaskDataのFileNameを取得するためだけにあるLabel。配置しないと.Textは使えないので見えなくしている
@@ -314,22 +313,22 @@ namespace SukimaNote
 	{
 		private const int descriptionFontSize = 15;
 
-		protected Label title		 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 13,
+		protected Label title		 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuutouBB.ttf", FontSize = descriptionFontSize + 13,
 			HorizontalOptions = LayoutOptions.Start,		   VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label restTime	 = new Label { TextColor = Color.Transparent, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 5,
+		protected Label restTime	 = new Label { TextColor = Color.Transparent, FontFamily = "syunkasyuutouBB.ttf", FontSize = descriptionFontSize + 5,
 			HorizontalOptions = LayoutOptions.Center,		   VerticalOptions = LayoutOptions.Center };
-		protected Label deadline	 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize,
+		protected Label deadline	 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuutouBB.ttf", FontSize = descriptionFontSize,
 			HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label timeToFinish = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 5,
+		protected Label timeToFinish = new Label { TextColor = Color.Black, FontFamily = "syunkasyuutouBB.ttf", FontSize = descriptionFontSize + 5,
 			HorizontalOptions = LayoutOptions.Center,		   VerticalOptions = LayoutOptions.Center };
-		protected Label place		 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 5,
+		protected Label place		 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuutouBB.ttf", FontSize = descriptionFontSize + 5,
 			HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label priority	 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize + 5,
+		protected Label priority	 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuutouBB.ttf", FontSize = descriptionFontSize + 5,
 			HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label progress	 = new Label { TextColor = Color.Blue, FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize * 2,
+		protected Label progress	 = new Label { TextColor = Color.Blue, FontFamily = "syunkasyuutouBB.ttf", FontSize = descriptionFontSize * 2,
 			HorizontalOptions = LayoutOptions.Fill,			   VerticalOptions = LayoutOptions.Fill,
 			HorizontalTextAlignment = TextAlignment.Center,	   VerticalTextAlignment = TextAlignment.Center };
-		protected Label remark		 = new Label { FontFamily = "syunkasyuuotuBB.ttf", FontSize = descriptionFontSize, TextColor = Color.Black };
+		protected Label remark		 = new Label { FontFamily = "syunkasyuutouBB.ttf", FontSize = descriptionFontSize, TextColor = Color.Black };
 		protected Slider pSlider	 = new Slider { Maximum = 99, Minimum = 0, HorizontalOptions = LayoutOptions.FillAndExpand };
 		protected Button pSave		 = new Button { Text = "save" };	// セーブの処理は各ページで記述
 		protected Frame setPFrame    = new Frame { OutlineColor = Color.Silver, HasShadow = true };

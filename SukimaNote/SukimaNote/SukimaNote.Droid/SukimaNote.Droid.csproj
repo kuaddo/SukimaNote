@@ -116,7 +116,7 @@
     <Compile Include="RoundProgressBarRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidAsset Include="Assets\syunkasyuuotuBB.ttf" />
+    <AndroidAsset Include="Assets\syunkasyuutouBB.ttf" />
     <None Include="packages.config" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />

@@ -103,7 +103,7 @@
     <ITunesArtwork Include="iTunesArtwork" />
     <None Include="packages.config" />
     <Compile Include="Notification_iOS.cs" />
-    <BundleResource Include="Resources\syunkasyuuotuBB.ttf" />
+    <BundleResource Include="Resources\syunkasyuutouBB.ttf" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SukimaNote\SukimaNote.csproj">
