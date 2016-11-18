@@ -54,28 +54,18 @@ namespace SukimaNote
 			Initialize(orderedTaskList[0]);     // frameの初期化
 			setToolBarItem();					// ツールバーアイテムの初期化
 
-			// タスクの表示切り替えのUI。早くすることでアニメーションの粗をごまかしている
-			frame.AnchorX = 0;
-			next.Clicked += async (sender, e) =>
+			// タスクの表示切り替えのUI
+			next.Clicked += (sender, e) =>
 			{
 				position++;
 				shiftSetting();
-				frame.RotationY = 0;
-
-				// アニメーション前に今の位置を保存することで、連続で呼び出されてもInitioalizeする位置が変化しない
-				int nowPosition = position;		
-				await frame.RotateYTo(-90, 400);
-				Initialize(orderedTaskList[nowPosition]);
-				frame.RotationY = 0;
+				Initialize(orderedTaskList[position]);
 			};
-			back.Clicked += async (sender, e) =>
+			back.Clicked += (sender, e) =>
 			{
 				position--;
 				shiftSetting();
 				Initialize(orderedTaskList[position]);
-				frame.RotationY = -90;
-				await frame.RotateYTo(0, 500);
-				frame.RotationY = 0;
 			};
 			var shift = new StackLayout
 			{
