@@ -105,9 +105,7 @@ namespace SukimaNote
 			var addTaskItem = new ToolbarItem
 			{
 				Text = "タスクの追加",
-				Priority = 1,
 				Icon = "pencil.png",
-				Order = ToolbarItemOrder.Primary
 			};
 			addTaskItem.Clicked += async (sender, e) =>
 			{
@@ -234,9 +232,7 @@ namespace SukimaNote
 			var deleteTaskItem = new ToolbarItem
 			{
 				Text = "タスクの削除",
-				Priority = 1,
 				Icon = "garbageBox.png",
-				Order = ToolbarItemOrder.Primary
 			};
 			deleteTaskItem.Clicked += async (sender, e) =>
 			{
