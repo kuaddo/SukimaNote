@@ -128,15 +128,6 @@ namespace SukimaNote
 			set
 			{
 				SetProperty(ref closed, value);
-				/*if (value == true)
-				{
-					BeforeProgress = Progress;
-					Progress = 100;
-				}
-				if (value == false && Progress == 100)
-				{
-					Progress = BeforeProgress;
-				}*/
 			}
 		}
 
