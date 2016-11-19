@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using System.Collections.ObjectModel;
 
 namespace SukimaNote
@@ -13,9 +9,9 @@ namespace SukimaNote
 		// Maximumを先に設定しないとエラーが出る
 		Slider taskCountLimitSlider = new Slider { Maximum = 30, Minimum = 10, Value = SharedData.TaskCountLimit };  
 		// Sliderの表示範囲を偶数にしないと誤差により1小さい値に初期値が設定されてしまうので1~9
-		Slider maxShowSlider		= new Slider { Maximum = 9,  Minimum = 1,  Value = SharedData.MaxShow };
+		Slider maxShowSlider = new Slider { Maximum = 9,  Minimum = 1,  Value = SharedData.MaxShow };
 		ObservableCollection<PlaceData> placeList = new ObservableCollection<PlaceData>();
-		Editor placeListEditor = new Editor { Text = "", BackgroundColor = Color.Gray, HorizontalOptions = LayoutOptions.FillAndExpand };
+		Entry placeListEntry = new Entry { Text = "", Placeholder = "場所の追加",　BackgroundColor = Color.FromHex(MyColor.ButtonColor), HorizontalOptions = LayoutOptions.FillAndExpand, VerticalOptions = LayoutOptions.End };
 		Switch notificationSwitch = new Switch { IsToggled = SharedData.IsNotify };
 
 		public SettingPage(RootPage rootPage)
@@ -24,14 +20,20 @@ namespace SukimaNote
 			BackgroundColor = Color.FromHex(MyColor.BackgroundColor);
 
 			// 全ての設定の保存
-			var saveButton = new Button { Text = "設定を保存する" };
-			saveButton.Clicked += (sender, e) =>
+			var saveItem = new ToolbarItem { Text = "設定を保存する" };
+			saveItem.Clicked += (sender, e) =>
 			{
 				saveSetting();
 				DisplayAlert("Saved", "設定が保存されました", "OK");
 			};
+			ToolbarItems.Add(saveItem);
 
-			Content = new StackLayout { Children = { makeTaskCountLimit(), makeMaxShow(), makePlaceList(), notificationSwitch, saveButton} };
+			Content = new StackLayout
+			{
+				Padding = new Thickness(5, 5, 5, 5),
+				Spacing = 20,
+				Children = { makeTaskCountLimit(), makeMaxShow(), makeNotification(), makePlaceList() }
+			};
 		}
 
 		// 追加しようとしている場所が重複していないかを確認するメソッド
@@ -67,6 +69,7 @@ namespace SukimaNote
 			SharedData.IsNotify = notificationSwitch.IsToggled;
 			Application.Current.Properties["isNotify"] = SharedData.IsNotify;
 		}
+
 		// タスクの保存件数の設定レイアウトの作成
 		private StackLayout makeTaskCountLimit()
 		{
@@ -124,19 +127,19 @@ namespace SukimaNote
 				}
 			};
 
-			var addPlaceButton = new Button { Text = "追加" };
+			var addPlaceButton = new Button { Text = "追加", BackgroundColor = Color.FromHex(MyColor.ButtonColor) };
 			addPlaceButton.Clicked += (sender, e) =>
 			{
-				if (placeListEditor.Text == "")
+				if (placeListEntry.Text == "")
 					DisplayAlert("Error", "追加する場所を入力してください", "OK");
-				else if (placeListEditor.Text.IndexOf(":") >= 0)
+				else if (placeListEntry.Text.IndexOf(":") >= 0)
 					DisplayAlert("Error", "場所に半角のセミコロン : は使えません", "OK");
-				else if (!checkPlace(placeListEditor.Text))
+				else if (!checkPlace(placeListEntry.Text))
 					DisplayAlert("Error", "重複して場所を登録できません", "OK");
 				else
 				{
-					placeList.Add(new PlaceData { Place = placeListEditor.Text });
-					placeListEditor.Text = "";
+					placeList.Add(new PlaceData { Place = placeListEntry.Text });
+					placeListEntry.Text = "";
 				}
 			};
 
@@ -149,9 +152,22 @@ namespace SukimaNote
 					new StackLayout
 					{
 						Orientation = StackOrientation.Horizontal,
-						Children = { placeListEditor, addPlaceButton}
+						Spacing = 3,
+						Children = { placeListEntry, addPlaceButton}
 					}
 				}
+			};
+		}
+		// 通知の設定のレイアウトの作成
+		private StackLayout makeNotification()
+		{
+			var label = new Label { Text = "通知のON/OFF", TextColor = Color.Black };
+			var paddingLabel = new Label { HorizontalOptions = LayoutOptions.FillAndExpand };
+			return new StackLayout
+			{
+				Orientation = StackOrientation.Horizontal,
+				HorizontalOptions = LayoutOptions.FillAndExpand,
+				Children = { label, paddingLabel, notificationSwitch }
 			};
 		}
 	}
