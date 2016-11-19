@@ -1,43 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Xamarin.Forms;
-using PCLStorage;
-using System.Threading.Tasks;
-// TODO: usingの整理をする
-
-namespace SukimaNote
+﻿namespace SukimaNote
 {
-	// getのみのプロパティにする
+	// 色の編集がし易いように纏めた
 	public class MyColor
 	{
-		private static string _mainColor1 = "888888";	// TaskAdd入力部分　"FF9129"
-		private static string _mainColor2 = "FCFCE5";	// TaskAdd背景 "FF8119"
-		private static string _mainColor3 = "F6D580";
-		private static string _subColor = "FFFAFA";
-
-		public static string MainColor1
-		{
-			get { return _mainColor1; }
-		}
-		public static string MainColor2
-		{
-			get { return _mainColor2; }
-		}
-		public static string MainColor3
-		{
-			get { return _mainColor3; }
-		}
-		public static string SubColor
-		{
-			get { return _subColor; }
-		}
-	}
-
-	// テーマカラーの設定ページ
-	public class ColorSettingPage : ContentPage
-	{
-
+		public static string BackgroundColor	   { get; } = "FCFCE5";
+		public static string InputColor			   { get; } = "C0C0C0";
+		public static string ButtonColor		   { get; } = "F6D580";
+		public static string BandColor			   { get; } = "FFA859";
+		public static string NavigationBarColor	   { get; } = "A6E39D";
+		public static string RoundProgressBarColor { get; } = "9BADCB";
 	}
 }

@@ -15,8 +15,8 @@ namespace SukimaNote
 		List<TaskData> orderedTaskList = new List<TaskData>();
 		RootPage rootPage;
 
-		private Button next = new Button { Text = "NEXT", BackgroundColor = Color.FromHex("EDAC6B") };
-		private Button back = new Button { Text = "BACK", BackgroundColor = Color.FromHex("EDAC6B") };
+		private Button next = new Button { Text = "NEXT", BackgroundColor = Color.FromHex(MyColor.ButtonColor) };
+		private Button back = new Button { Text = "BACK", BackgroundColor = Color.FromHex(MyColor.ButtonColor) };
 		private Label taskCountLabel = new Label { HorizontalOptions = LayoutOptions.Center };
 
 		private int position = 0;   // 表示しているorderedTaskListのindex
@@ -87,6 +87,19 @@ namespace SukimaNote
 			pSave.Clicked += async (sender, e) =>
 			{
 				var taskData = orderedTaskList[position];
+				var closeFlag = false;
+				if ((int)pSlider.Value == 100)
+				{
+					if (await DisplayAlert("Finished", "タスクを完了済みにしますか?", "YES", "NO"))
+					{
+						taskData.Closed = true;
+						closeFlag = true;
+					}
+					else
+					{
+						pSlider.Value = 99;
+					}
+				}
 				taskData.Progress = (int)pSlider.Value;
 
 				IFile updateFile = await SharedData.searchFileAsync(taskData);
@@ -95,6 +108,7 @@ namespace SukimaNote
 				// ページをめくれるように戻す
 				shiftSetting();
 				setPFrame.IsVisible = false;
+				if (closeFlag) regenerateTopPage();
 			};
 
 			// Gridでページの4/5がタスクの表示に使えるように調整
@@ -148,6 +162,7 @@ namespace SukimaNote
 			setProgressItem.Clicked += (sender, e) =>
 			{
 				setPFrame.IsVisible = true;
+				orderedTaskList[position].BeforeProgress = orderedTaskList[position].Progress;
 				pSlider.Value = orderedTaskList[position].Progress;
 
 				// ページをめくれないようにする
@@ -165,6 +180,8 @@ namespace SukimaNote
 			finishTaskItem.Clicked += async (sender, e) =>
 			{
 				var taskData = orderedTaskList[position];
+				taskData.BeforeProgress = taskData.Progress;
+				taskData.Progress = 100;
 				taskData.Closed = true;
 				// ファイルも更新
 				IFile updateFile = await SharedData.searchFileAsync(taskData);

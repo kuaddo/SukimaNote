@@ -23,18 +23,38 @@ namespace SukimaNote
 			var progress	  = new Label { FontFamily = "syunkasyuutouBB.ttf", TextColor = Color.Black, FontSize = fontSize + 10, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
 			var postItView    = new PostItView { Color = Color.Red, ShadowSize = 7};
 			var checkTGR	  = new TapGestureRecognizer();
-			var fileNameLabel = new Label { IsVisible = false }; // バインディングでTaskDataのFileNameを取得するためだけにあるLabel。配置しないと.Textは使えないので見えなくしている
+
+			// バインディングでTaskDataの一部を取得するためだけにあるLabel。配置しないと使えないので見えなくしている
+			var PLabel = new BLabel { IsVisible = false };
+			var BPLabel = new BLabel { IsVisible = false };
+			var FNLabel = new BLabel { IsVisible = false };
 			checkTGR.Tapped += async (sender, e) =>
 			{
 				if (checkBox.IsClosed == true)
 					if (!(await taskListPage.DisplayAlert("Caution", "タスクを未完了に戻しますか?", "YES", "NO")))
 						return;
 
-				IFile updateFile = await SharedData.searchFileAsync(new TaskData { FileName = fileNameLabel.Text });
-				var text = await updateFile.ReadAllTextAsync();
-				var newText = text.Replace(checkBox.IsClosed.ToString(), (!checkBox.IsClosed).ToString());
-				await updateFile.WriteAllTextAsync(newText);
 				checkBox.IsClosed = !checkBox.IsClosed;
+				IFile updateFile = await SharedData.searchFileAsync(new TaskData { FileName = FNLabel.String });
+				var text = await updateFile.ReadAllTextAsync();
+				string[] propertyArray = text.Split(':');
+				if (checkBox.IsClosed)
+				{
+					BPLabel.Int = PLabel.Int;   // BeforeProgressに値を退避
+					PLabel.Int = 100;
+				}
+				else
+				{
+					if (BPLabel.Int >= 0 && BPLabel.Int <= 100)
+						PLabel.Int = BPLabel.Int;
+					else
+						PLabel.Int = 99;
+				}
+				propertyArray[5] = PLabel.Int.ToString();
+				propertyArray[7] = checkBox.IsClosed.ToString();
+				string newText = "";
+				for(int i = 0; i < propertyArray.Count() - 1; i++) { newText += propertyArray[i] + ":"; } newText += propertyArray[propertyArray.Count() - 1];
+				await updateFile.WriteAllTextAsync(newText);
 			};
 			checkBox.GestureRecognizers.Add(checkTGR);
 
@@ -56,7 +76,9 @@ namespace SukimaNote
 			deadline	 .SetBinding(Label.TextProperty,			 nameof(TaskData.DeadlineString));
 			progress	 .SetBinding(Label.TextProperty,			 nameof(TaskData.ProgressString));
 			postItView   .SetBinding(PostItView.ColorProperty,		 nameof(TaskData.PriorityColor));
-			fileNameLabel.SetBinding(Label.TextProperty,			 nameof(TaskData.FileName), BindingMode.TwoWay);
+			PLabel.SetBinding(BLabel.IntProperty, nameof(TaskData.Progress), BindingMode.TwoWay);
+			BPLabel.SetBinding(BLabel.IntProperty, nameof(TaskData.BeforeProgress), BindingMode.TwoWay);
+			FNLabel.SetBinding(BLabel.StringProperty,			 nameof(TaskData.FileName), BindingMode.TwoWay);
 
 			// コンテキストアクションに追加
 			actionDelete.SetBinding(MenuItem.CommandParameterProperty, new Binding("."));
@@ -69,7 +91,10 @@ namespace SukimaNote
 			view.Children.Add(checkBox,		 1,  4,  1, 4);
 			view.Children.Add(sl,			 4,  20, 0, 5);
 			view.Children.Add(progress,		 20, 28, 0, 5);
-			view.Children.Add(fileNameLabel, 27, 28, 4, 5);	// 見えないけど一応端の方に表示
+			// 配置しないと使えないみたいなので、見えないけど端の方に設置
+			view.Children.Add(FNLabel, 27, 28, 4, 5);
+			view.Children.Add(PLabel, 27, 28, 4, 5);
+			view.Children.Add(BPLabel, 27, 28, 4, 5);
 
 			View = view;
 		}
@@ -81,7 +106,8 @@ namespace SukimaNote
 		public TaskListPage(RootPage rootPage)
 		{
 			Title = "タスク一覧";
-			BackgroundColor = Color.Gray;
+			BackgroundColor = Color.FromHex(MyColor.BackgroundColor);
+
 			var listView = new ListView
 			{
 				ItemsSource = SharedData.taskList,
@@ -258,6 +284,7 @@ namespace SukimaNote
 				else
 				{
 					setPFrame.IsVisible = true;
+					taskData.BeforeProgress = taskData.Progress;
 					pSlider.Value = taskData.Progress;
 				}
 			};
@@ -294,9 +321,18 @@ namespace SukimaNote
 
 			pSave.Clicked += async (sender, e) =>
 			{
-				IFile updateFile = await SharedData.searchFileAsync(taskData);
+				if ((int)pSlider.Value == 100)
+				{
+					if (await DisplayAlert("Finished", "タスクを完了済みにしますか?", "YES", "NO"))
+						taskData.Closed = true;
+					else
+						pSlider.Value = 99;
+				}
 				taskData.Progress = (int)pSlider.Value;
+
+				IFile updateFile = await SharedData.searchFileAsync(taskData);
 				await updateFile.WriteAllTextAsync(SharedData.makeSaveString(taskData));
+
 				setPFrame.IsVisible = false;
 			};
 
@@ -327,22 +363,22 @@ namespace SukimaNote
 			HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
 		protected Label priority	 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuutouBB.ttf", FontSize = descriptionFontSize + 5,
 			HorizontalOptions = LayoutOptions.CenterAndExpand, VerticalOptions = LayoutOptions.CenterAndExpand };
-		protected Label progress	 = new Label { TextColor = Color.Blue, FontFamily = "syunkasyuutouBB.ttf", FontSize = descriptionFontSize * 2,
+		protected Label progress	 = new Label { TextColor = Color.Black, FontFamily = "syunkasyuutouBB.ttf", FontSize = descriptionFontSize * 2,
 			HorizontalOptions = LayoutOptions.Fill,			   VerticalOptions = LayoutOptions.Fill,
 			HorizontalTextAlignment = TextAlignment.Center,	   VerticalTextAlignment = TextAlignment.Center };
 		protected Label remark		 = new Label { FontFamily = "syunkasyuutouBB.ttf", FontSize = descriptionFontSize, TextColor = Color.Black };
-		protected Slider pSlider	 = new Slider { Maximum = 99, Minimum = 0, HorizontalOptions = LayoutOptions.FillAndExpand };
+		protected Slider pSlider	 = new Slider { Maximum = 100, Minimum = 0, HorizontalOptions = LayoutOptions.FillAndExpand };
 		protected Button pSave		 = new Button { Text = "save" };	// セーブの処理は各ページで記述
 		protected Frame setPFrame    = new Frame { OutlineColor = Color.Silver, HasShadow = true };
 		protected Frame frame		 = new Frame { HasShadow = true, Padding = new Thickness(5, 5, 5, 5) };
 
 		// 背景色で内側の円を消しているのでColorは必須
-		protected RoundProgressBar roundProgressBar = new RoundProgressBar { Color = Color.White, StrokeColor = Color.Navy, StrokeWidth = 0.7f, WidthRequest = 90, HeightRequest = 90};
+		protected RoundProgressBar roundProgressBar = new RoundProgressBar { Color = Color.White, StrokeColor = Color.FromHex(MyColor.RoundProgressBarColor), StrokeWidth = 0.7f, WidthRequest = 90, HeightRequest = 90};
 
 		// コンストラクタ
 		public BasicTaskShowPage()
 		{
-			BackgroundColor = Color.FromHex("D1F1CC");
+			BackgroundColor = Color.FromHex(MyColor.BackgroundColor);
 			makeContent();
 		}
 
@@ -376,26 +412,26 @@ namespace SukimaNote
 				grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(10, GridUnitType.Star) });
 
 			// ノートの描画
-			grid.Children.Add(new NoteBoxView { Color = Color.FromHex("FFFFE0"), StrokeColor = Color.Gray, StrokeWidth = 3, EdgeSpaceRatio = 0.1, Row = rowCount }, 0, 20, 0, 13);
+			grid.Children.Add(new NoteBoxView { Color = Color.FromHex(MyColor.BackgroundColor), StrokeColor = Color.Gray, StrokeWidth = 3, EdgeSpaceRatio = 0.1, Row = rowCount }, 0, 20, 0, 13);
 
 			// タイトル
 			grid.Children.Add(new ContentView { Padding = new Thickness(0, 5, 0, 5), Content = new PostItView { Color = Color.Blue, ShadowSize = 5} }, 1, 15, 0, 3);
 			grid.Children.Add(new ContentView { Padding = new Thickness(15, 7, 0, 7), Content = title }, 1, 15, 0, 3);
 
 			// 残り時間
-			grid.Children.Add(new ContentView { Padding = new Thickness(0, 5, 0, 0), Content = new BicoloredBoxView { LeftColor = Color.FromHex("FCF1D388"), ShadowSize = 6, Ratio = 100 } }, 15, 19, 0, 2);
+			grid.Children.Add(new ContentView { Padding = new Thickness(0, 5, 0, 0), Content = new BicoloredBoxView { LeftColor = Color.FromHex(MyColor.ButtonColor), ShadowSize = 6, Ratio = 100 } }, 15, 19, 0, 2);
 			grid.Children.Add(restTime, 15, 19, 0, 2);
 
 			// 期限
-			grid.Children.Add(makeShadowGrid(Color.FromHex("FCF1D388"), "期限"), 1, 4, 3, 4);
+			grid.Children.Add(makeShadowGrid(Color.FromHex(MyColor.ButtonColor), "期限"), 1, 4, 3, 4);
 			grid.Children.Add(deadline, 1, 12, 4, 5);
 
 			// 場所
-			grid.Children.Add(makeShadowGrid(Color.FromHex("FCF1D388"), "場所"), 1, 4, 5, 6);
+			grid.Children.Add(makeShadowGrid(Color.FromHex(MyColor.ButtonColor), "場所"), 1, 4, 5, 6);
 			grid.Children.Add(place, 1, 12, 6, 7);
 
 			// 優先度
-			grid.Children.Add(makeShadowGrid(Color.FromHex("FCF1D388"), "優先度"), 1, 5, 7, 8);
+			grid.Children.Add(makeShadowGrid(Color.FromHex(MyColor.ButtonColor), "優先度"), 1, 5, 7, 8);
 			grid.Children.Add(priority, 1, 12, 8, 9);
 
 			// 進捗度
@@ -403,13 +439,13 @@ namespace SukimaNote
 			grid.Children.Add(new ContentView { Padding = new Thickness(3, 0, 0, 0), Content = new Grid { Children = { roundProgressBar, progress } } }, 12, 18, 3, 7);
 
 			// 予想作業時間
-			grid.Children.Add(makeShadowGrid(Color.FromHex("FCF1D388"), "作業時間"), 12, 17, 7, 8);
+			grid.Children.Add(makeShadowGrid(Color.FromHex(MyColor.ButtonColor), "作業時間"), 12, 17, 7, 8);
 			grid.Children.Add(timeToFinish, 12, 19, 8, 9);
 
 			// 備考
 			grid.Children.Add(new ContentView { Padding = new Thickness(0, 0, 0, 10), Content = new PostItView { Color = Color.Green, ShadowSize = 5 } }, 1, 19, 9, 13);
 			grid.Children.Add(new ScrollView { Content = remark } , 3, 19, 10, 12);
-			grid.Children.Add(makeShadowGrid(Color.FromHex("FCF1D388"), "備考"), 1, 4, 9, 10);
+			grid.Children.Add(makeShadowGrid(Color.FromHex(MyColor.ButtonColor), "備考"), 1, 4, 9, 10);
 
 			// 進捗度設定の際に表示する
 			pSlider.ValueChanged += (sender, e) =>

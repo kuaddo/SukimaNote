@@ -10,13 +10,13 @@ namespace SukimaNote
 	{
 		private const int descriptionFontSize = 13;
 
-		private Entry	   titleEntry		  = new Entry	   { BackgroundColor = Color.FromHex(MyColor.MainColor1), Keyboard = Keyboard.Text, FontSize = descriptionFontSize + 7 };
-		private DatePicker deadlineDatePicker = new DatePicker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HorizontalOptions = LayoutOptions.FillAndExpand };
-		private TimePicker deadlineTimePicker = new TimePicker { BackgroundColor = Color.FromHex(MyColor.MainColor1), HorizontalOptions = LayoutOptions.FillAndExpand };
-		private Picker	   timeToFinishPicker = new Picker	   { BackgroundColor = Color.FromHex(MyColor.MainColor1) };
-		private Picker	   placePicker		  = new Picker	   { BackgroundColor = Color.FromHex(MyColor.MainColor1) };
-		private Picker	   priorityPicker	  = new Picker	   { BackgroundColor = Color.FromHex(MyColor.MainColor1) };
-		private Editor	   remarkEditor		  = new Editor	   { BackgroundColor = Color.FromHex(MyColor.MainColor1), HeightRequest = 180, FontSize = descriptionFontSize + 7 };
+		private Entry	   titleEntry		  = new Entry	   { BackgroundColor = Color.FromHex(MyColor.InputColor), Keyboard = Keyboard.Text, FontSize = descriptionFontSize + 7 };
+		private DatePicker deadlineDatePicker = new DatePicker { BackgroundColor = Color.FromHex(MyColor.InputColor), HorizontalOptions = LayoutOptions.FillAndExpand };
+		private TimePicker deadlineTimePicker = new TimePicker { BackgroundColor = Color.FromHex(MyColor.InputColor), HorizontalOptions = LayoutOptions.FillAndExpand };
+		private Picker	   timeToFinishPicker = new Picker	   { BackgroundColor = Color.FromHex(MyColor.InputColor) };
+		private Picker	   placePicker		  = new Picker	   { BackgroundColor = Color.FromHex(MyColor.InputColor) };
+		private Picker	   priorityPicker	  = new Picker	   { BackgroundColor = Color.FromHex(MyColor.InputColor) };
+		private Editor	   remarkEditor		  = new Editor	   { BackgroundColor = Color.FromHex(MyColor.InputColor), HeightRequest = 180, FontSize = descriptionFontSize + 7 };
 
 		private TaskData taskData = new TaskData();
 
@@ -76,26 +76,26 @@ namespace SukimaNote
 
 			// 基本設定、追加設定を分けて配置
 			var minimumLabel = new Label { Text = "基本設定", FontSize = descriptionFontSize + 12, HorizontalOptions = LayoutOptions.Fill,
-				BackgroundColor = Color.FromHex(MyColor.MainColor3), TextColor = Color.White };
+				BackgroundColor = Color.FromHex(MyColor.BandColor), TextColor = Color.White };
 			var optionLabel  = new Label { Text = "追加設定", FontSize = descriptionFontSize + 12, HorizontalOptions = LayoutOptions.Fill,
-				BackgroundColor = Color.FromHex(MyColor.MainColor3), TextColor = Color.White };
+				BackgroundColor = Color.FromHex(MyColor.BandColor), TextColor = Color.White };
 
 			var minimum = new StackLayout
 			{
-				BackgroundColor = Color.FromHex(MyColor.MainColor2),
+				BackgroundColor = Color.FromHex(MyColor.BackgroundColor),
 				Padding = new Thickness(10, 0, 10, 40),
 				Children = { title, deadline, timeToFinish, save[0] }
 			};
 			var option = new StackLayout
 			{
-				BackgroundColor = Color.FromHex(MyColor.MainColor2),
+				BackgroundColor = Color.FromHex(MyColor.BackgroundColor),
 				Padding = new Thickness(10, 0, 10, 40),
 				Children = { place, priority, remark, save[1] }
 			};
 
 			Content = new ScrollView
 			{
-				BackgroundColor = Color.FromHex(MyColor.MainColor2),
+				BackgroundColor = Color.FromHex(MyColor.BackgroundColor),
 				Content = new StackLayout
 				{
 					Children = { minimumLabel, minimum, optionLabel, option }
@@ -160,7 +160,7 @@ namespace SukimaNote
 			{
 				Text = "Save",
 				FontSize = descriptionFontSize + 13,
-				BackgroundColor = Color.FromHex("F6D580"),
+				BackgroundColor = Color.FromHex(MyColor.ButtonColor),
 			};
 			saveButton.Clicked += async (sender, e) =>
 			{

@@ -46,6 +46,22 @@ namespace SukimaNote
 		public ExNavigationPage(Page root) : base(root) { }
 	}
 
+	// Cellでバインディングデータを取得するために使うLabel
+	public class BLabel : Label
+	{
+		public static readonly BindableProperty IntProperty = BindableProperty.Create<BLabel, int>(p => p.Int, 0);
+		public int Int
+		{
+			get { return (int)GetValue(IntProperty); }
+			set { SetValue(IntProperty, value); }
+		}
+		public static readonly BindableProperty StringProperty = BindableProperty.Create<BLabel, string>(p => p.String, "");
+		public string String
+		{
+			get { return (string)GetValue(StringProperty); }
+			set { SetValue(StringProperty, value); }
+		}
+	}
 
 	// 進捗度を円形のプログレスバーで表示するView
 	public class RoundProgressBar : BoxView

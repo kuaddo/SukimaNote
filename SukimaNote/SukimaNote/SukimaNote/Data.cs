@@ -128,21 +128,15 @@ namespace SukimaNote
 			set
 			{
 				SetProperty(ref closed, value);
-				if (value == true)
+				/*if (value == true)
 				{
 					BeforeProgress = Progress;
 					Progress = 100;
 				}
 				if (value == false && Progress == 100)
 				{
-					if (BeforeProgress == 100)	// ファイルから読み出した時に100%だった場合
-						Progress = 99;
-					else
-					{
-						Progress = BeforeProgress;
-						BeforeProgress = -1;
-					}
-				}
+					Progress = BeforeProgress;
+				}*/
 			}
 		}
 
@@ -164,7 +158,7 @@ namespace SukimaNote
 			} }
 
 		public string	FileName	   { get; set; }
-		public int		BeforeProgress { get; set; } = -1;
+		public int	    BeforeProgress { get; set; } = -1;
 
 		// ジェネリックで全ての型に対応。refで呼び出し元に反映させる
 		private void SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
@@ -176,87 +170,6 @@ namespace SukimaNote
 			}
 		}
 	}
-
-	// 評価得点に対するフラグの列挙
-	public enum TaskDataFlags
-    {
-        // 残り時間表示順序の昇降フラグ（フラグがたっていると昇順/そうでなければ降順）
-        RestTimeOrderByAscending = 1,
-
-		// 進捗度考慮フラグ（フラグがたっていれば進捗度 0 のものに倍率を掛ける）  
-		Progress = 2,
-    }
-
-	// ユーザの入力・選択オプションでの実装すべきもの
-	interface IUserOption
-    {
-        // TaskDataに受け渡す項目
-        TaskDataFlags FlagsList       { get; set; }　// TaskDataに受け渡すフラグ
-        int           CurrentFreeTime { get; set; }  // ユーザの今使える時間
-        int           DesignatedPlace { get; set; }  // ユーザの指定場所：デフォルトでは"指定なし"
-    }
-
-    // ユーザの入力・選択オプション
-    public class UserOption : IUserOption
-    {
-        // IUserOptionで指定されたプロパティ
-        public TaskDataFlags FlagsList       { get; set; } = TaskDataFlags.RestTimeOrderByAscending | TaskDataFlags.Progress;
-		public int           CurrentFreeTime { get; set; }
-        public int           DesignatedPlace { get; set; } = 0;
-	}
-
-    // サンプルのタスクリスト生成専用のクラス
-    static class SampleClass
-    {
-        private const int MaxDateRange = 4;       // GenerateRandomTaskDateメソッドのswitch文のカバー範囲
-        private const int MinTimeToFinish = 10;   // TimeToFinishの最小値
-        private const int MaxTimeToFinish = 360;  // TimeToFinishの最大値
-        private const int MaxPriorityRange = 3;   // Priorityの範囲の最大値
-        private const int MaxProgressRange = 90;  // Progressの指定範囲の最大値
-
-        // サンプルのタスクリスト生成メソッド、generateNumber数のサンプルを生成
-        public static List<TaskData> GenerateSampleData(int generateNumber)
-        {
-            List<TaskData> sampleTaskDataList = new List<TaskData>();
-            Random random = new Random();
-
-            for (int i = 1; i <= generateNumber; i++)
-            {
-                sampleTaskDataList.Add
-                    (
-                        new TaskData
-                        {
-                            Title = "Task" + i,                                            
-                            Deadline = GenerateRandomTaskDate(random.Next(MaxDateRange)),  // 後述メソッドのランダム日付付与 
-                            TimeToFinish = random.Next(MinTimeToFinish, MaxTimeToFinish),  // MinTimeToFinish ~ MaxTimeToFinish
-                            Priority = random.Next(MaxPriorityRange),                      // 0, 1, 2のいずれかを与える
-                            Progress = random.Next(MaxProgressRange),                      // 0 ~ (MaxProgressRange - 1)
-                        }
-                    );
-            }
-
-            return sampleTaskDataList;
-        }
-
-        // 乱数を使ってサンプルデータに日付を与えるメソッド
-        private static DateTime GenerateRandomTaskDate(int randomNum)
-        {
-            DateTime today            = DateTime.Now.AddHours(1);  
-            DateTime tomorrow         = DateTime.Now.AddDays(1);    
-            DateTime dayAfterTomorrow = DateTime.Now.AddDays(2);   // 明後日の日付
-            DateTime dayAfter2Days    = DateTime.Now.AddDays(3);   // 明々後日の日付
-
-            switch (randomNum)
-            {
-                case 0:  return today;
-                case 1:  return tomorrow;
-                case 2:  return dayAfterTomorrow;
-                case 3:  return dayAfter2Days;
-                default: return tomorrow;
-            }
-        }
-    }
-
 
     // アプリ内の様々な場所に使うTaskに関しての静的データ、メソッドのクラス
     public static class SharedData
@@ -371,8 +284,59 @@ namespace SukimaNote
 		}
 	}
 
-    // Linqの拡張メソッド用クラス
-    public static class ExtendedMethodClass
+	// サンプルのタスクリスト生成専用のクラス
+	static class SampleClass
+	{
+		private const int MaxDateRange = 4;       // GenerateRandomTaskDateメソッドのswitch文のカバー範囲
+		private const int MinTimeToFinish = 10;   // TimeToFinishの最小値
+		private const int MaxTimeToFinish = 360;  // TimeToFinishの最大値
+		private const int MaxPriorityRange = 3;   // Priorityの範囲の最大値
+		private const int MaxProgressRange = 90;  // Progressの指定範囲の最大値
+
+		// サンプルのタスクリスト生成メソッド、generateNumber数のサンプルを生成
+		public static List<TaskData> GenerateSampleData(int generateNumber)
+		{
+			List<TaskData> sampleTaskDataList = new List<TaskData>();
+			Random random = new Random();
+
+			for (int i = 1; i <= generateNumber; i++)
+			{
+				sampleTaskDataList.Add
+					(
+						new TaskData
+						{
+							Title = "Task" + i,
+							Deadline = GenerateRandomTaskDate(random.Next(MaxDateRange)),  // 後述メソッドのランダム日付付与 
+							TimeToFinish = random.Next(MinTimeToFinish, MaxTimeToFinish),  // MinTimeToFinish ~ MaxTimeToFinish
+							Priority = random.Next(MaxPriorityRange),                      // 0, 1, 2のいずれかを与える
+							Progress = random.Next(MaxProgressRange),                      // 0 ~ (MaxProgressRange - 1)
+						}
+					);
+			}
+
+			return sampleTaskDataList;
+		}
+
+		// 乱数を使ってサンプルデータに日付を与えるメソッド
+		private static DateTime GenerateRandomTaskDate(int randomNum)
+		{
+			DateTime today = DateTime.Now.AddHours(1);
+			DateTime tomorrow = DateTime.Now.AddDays(1);
+			DateTime dayAfterTomorrow = DateTime.Now.AddDays(2);   // 明後日の日付
+			DateTime dayAfter2Days = DateTime.Now.AddDays(3);   // 明々後日の日付
+
+			switch (randomNum)
+			{
+				case 0: return today;
+				case 1: return tomorrow;
+				case 2: return dayAfterTomorrow;
+				case 3: return dayAfter2Days;
+				default: return tomorrow;
+			}
+		}
+	}
+	// Linqの拡張メソッド用クラス
+	public static class ExtendedMethodClass
     {
         // 評価関数メソッド
         public static IEnumerable<TaskData> OptimizeTaskData(this IEnumerable<IGrouping<int, TaskData>> taskList)

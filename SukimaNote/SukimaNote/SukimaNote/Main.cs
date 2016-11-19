@@ -75,7 +75,7 @@ namespace SukimaNote
 				// 各ページに移動するときにバーの色を再設定する
 				Detail = new ExNavigationPage(displayPage)
 				{
-					BarBackgroundColor = Color.FromHex("A6E39D"),
+					BarBackgroundColor = Color.FromHex(MyColor.NavigationBarColor),
 					BarTextColor = Color.Black,
 				};
 
