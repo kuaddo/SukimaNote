@@ -240,9 +240,9 @@ namespace SukimaNote
 		// 引数のTaskをtaskListとファイルから削除する
 		public static async Task deleteTaskAsync(TaskData taskData)
 		{
-			taskList.Remove(taskData);
 			var deleteFile = await searchFileAsync(taskData);
 			await deleteFile.DeleteAsync();
+			taskList.Remove(taskData);
 		}
 		// Properties Dictionaryから設定データを読み込む
 		public static void makeSettingData()
