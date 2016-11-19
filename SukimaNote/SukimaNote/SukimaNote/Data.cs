@@ -257,9 +257,9 @@ namespace SukimaNote
 		public static void makeSettingData()
 		{
 			// TaskCountLimitの取得
-			if (Application.Current.Properties.ContainsKey("taskCountList"))
+			if (Application.Current.Properties.ContainsKey("taskCountLimit"))
 			{
-				TaskCountLimit = (int)Application.Current.Properties["taskCountList"];
+				TaskCountLimit = (int)Application.Current.Properties["taskCountLimit"];
 			}
 
 			// placeListの取得
