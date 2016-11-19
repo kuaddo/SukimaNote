@@ -46,7 +46,7 @@ namespace SukimaNote
         private const int MinPriority = 0, MaxPriority = 2;
 
 		// プロパティに用いる変数。
-		private string	 title		  = "Task";
+		private string	 title		  = "";
 		private DateTime deadline;
 		private int		 timeToFinish = 1;
 		private string	 place		  = "指定無し";
