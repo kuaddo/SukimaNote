@@ -39,6 +39,7 @@ namespace SukimaNote
 				{
 					HorizontalOptions = LayoutOptions.Center,
 					VerticalOptions = LayoutOptions.Center,
+					BackgroundColor = Color.FromHex(MyColor.ButtonColor),
 					Text = "タスクの追加",
 					FontSize = 40,
 				};

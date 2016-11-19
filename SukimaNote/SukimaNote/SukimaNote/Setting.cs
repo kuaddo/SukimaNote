@@ -108,7 +108,8 @@ namespace SukimaNote
 			var placeListView = new ListView
 			{
 				ItemsSource = placeList,
-				ItemTemplate = new DataTemplate(typeof(TextCell))
+				ItemTemplate = new DataTemplate(typeof(TextCell)),
+				SeparatorColor = Color.Black
 			};
 			placeListView.ItemTemplate.SetBinding(TextCell.TextProperty, nameof(PlaceData.Place));
 			placeListView.ItemSelected += async (sender, e) =>

@@ -112,6 +112,7 @@ namespace SukimaNote
 			{
 				ItemsSource = SharedData.taskList,
 				ItemTemplate = new DataTemplate(() => new TaskListViewCell(this)),
+				SeparatorVisibility = SeparatorVisibility.None,
 				RowHeight = (int)(TaskListViewCell.fontSize * 2.4)
 			};
 
