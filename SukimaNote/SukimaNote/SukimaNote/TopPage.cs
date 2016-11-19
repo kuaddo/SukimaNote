@@ -278,7 +278,7 @@ namespace SukimaNote
 		}       
 
 		// タスク生成メソッド(発表用)
-		private void makeTaskList()
+		private async void makeTaskList()
 		{
 			var taskArray = new TaskData[8];
 			taskArray[0] = new TaskData { Title = "課題1",	   Deadline = DateTime.Now.AddDays(1),    TimeToFinish = 3,  Place = "家",         Priority = 2, Progress = 30,  Remark = "SampleTask1", Closed = false };
@@ -290,8 +290,17 @@ namespace SukimaNote
 			taskArray[6] = new TaskData { Title = "調べ物1",   Deadline = DateTime.Now.AddHours(-15), TimeToFinish = 0,  Place = "図書館",     Priority = 0, Progress = 64,  Remark = "SampleTask7", Closed = false };
 			taskArray[7] = new TaskData { Title = "調べ物2",   Deadline = DateTime.Now.AddHours(1),   TimeToFinish = 12, Place = "図書館",     Priority = 2, Progress = 100, Remark = "SampleTask8", Closed = true };
 
+			IFolder rootFolder = FileSystem.Current.LocalStorage;
+			IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);    // 存在しなかったならば作成
+			IFile file;
 			for (int i = 0; i < taskArray.Count(); i++)
-				SharedData.taskList.Add(taskArray[i]); 
+			{
+				file = await taskDataFolder.CreateFileAsync(taskArray[i].Title + ".txt", CreationCollisionOption.GenerateUniqueName);
+				await file.WriteAllTextAsync(SharedData.makeSaveString(taskArray[i]));
+				taskArray[i].FileName = file.Name;
+				SharedData.taskList.Add(taskArray[i]);
+			}
+			regenerateTopPage();
 		}
     }
 }
