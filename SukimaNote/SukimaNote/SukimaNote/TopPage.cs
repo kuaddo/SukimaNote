@@ -202,24 +202,11 @@ namespace SukimaNote
 				await Navigation.PushAsync(new TaskAddPage(rootPage, orderedTaskList[position]));
 			};
 
-			// タスク一覧を生成するツールバーアイテム(発表用)
-			var makeTaskItem = new ToolbarItem
-			{
-				Text = "タスクの生成",
-				Priority = 4,
-				Order = ToolbarItemOrder.Secondary
-			};
-			makeTaskItem.Clicked += (sender, e) =>
-			{
-				makeTaskList();
-			};
-
 			ToolbarItems.Add(addTaskItem);
 			ToolbarItems.Add(deleteTaskItem);
 			ToolbarItems.Add(setProgressItem);
 			ToolbarItems.Add(finishTaskItem);
 			ToolbarItems.Add(editTaskItem);
-			ToolbarItems.Add(makeTaskItem);
 		}
 		// shiftのボタンとラベルの設定をするメソッド。タスクが1つ以上の場合でのみ使用される
 		private void shiftSetting()
@@ -276,31 +263,5 @@ namespace SukimaNote
 				              .Take(pickUpCount)
                               .ToList();
 		}       
-
-		// タスク生成メソッド(発表用)
-		private async void makeTaskList()
-		{
-			var taskArray = new TaskData[8];
-			taskArray[0] = new TaskData { Title = "課題1",	   Deadline = DateTime.Now.AddDays(1),    TimeToFinish = 3,  Place = "家",         Priority = 2, Progress = 30,  Remark = "SampleTask1", Closed = false };
-			taskArray[1] = new TaskData { Title = "サークル1", Deadline = DateTime.Now.AddHours(10),  TimeToFinish = 6,  Place = "グラウンド", Priority = 0, Progress = 0,   Remark = "SampleTask2", Closed = false };
-			taskArray[2] = new TaskData { Title = "課題2",	   Deadline = DateTime.Now.AddHours(6),   TimeToFinish = 4,  Place = "大学",       Priority = 2, Progress = 76,  Remark = "SampleTask3", Closed = false };
-			taskArray[3] = new TaskData { Title = "サークル2", Deadline = DateTime.Now.AddDays(7),    TimeToFinish = 10, Place = "グラウンド", Priority = 1, Progress = 0,   Remark = "SampleTask4", Closed = false };
-			taskArray[4] = new TaskData { Title = "バイト1",   Deadline = DateTime.Now.AddDays(5),    TimeToFinish = 8,  Place = "バイト先",   Priority = 2, Progress = 0,   Remark = "SampleTask5", Closed = false };
-			taskArray[5] = new TaskData { Title = "課題3",	   Deadline = DateTime.Now.AddHours(20),  TimeToFinish = 2,  Place = "指定無し",   Priority = 1, Progress = 100, Remark = "SampleTask6", Closed = true };
-			taskArray[6] = new TaskData { Title = "調べ物1",   Deadline = DateTime.Now.AddHours(-15), TimeToFinish = 0,  Place = "図書館",     Priority = 0, Progress = 64,  Remark = "SampleTask7", Closed = false };
-			taskArray[7] = new TaskData { Title = "調べ物2",   Deadline = DateTime.Now.AddHours(1),   TimeToFinish = 12, Place = "図書館",     Priority = 2, Progress = 100, Remark = "SampleTask8", Closed = true };
-
-			IFolder rootFolder = FileSystem.Current.LocalStorage;
-			IFolder taskDataFolder = await rootFolder.CreateFolderAsync("taskDataFolder", CreationCollisionOption.OpenIfExists);    // 存在しなかったならば作成
-			IFile file;
-			for (int i = 0; i < taskArray.Count(); i++)
-			{
-				file = await taskDataFolder.CreateFileAsync(taskArray[i].Title + ".txt", CreationCollisionOption.GenerateUniqueName);
-				await file.WriteAllTextAsync(SharedData.makeSaveString(taskArray[i]));
-				taskArray[i].FileName = file.Name;
-				SharedData.taskList.Add(taskArray[i]);
-			}
-			regenerateTopPage();
-		}
     }
 }

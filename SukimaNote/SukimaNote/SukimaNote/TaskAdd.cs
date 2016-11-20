@@ -244,7 +244,7 @@ namespace SukimaNote
 		// 補足説明のレイアウト作成
 		private Grid makeSupplementaryGrid(string title, string sup)
 		{
-			var supplementary = new Label { Text = sup, FontSize = descriptionFontSize, IsVisible = false };
+			var supplementary = new Label { Text = sup, TextColor = Color.Black, FontSize = descriptionFontSize, IsVisible = false };
 			var TGR = new TapGestureRecognizer();	// タップの判別
 			TGR.Tapped += (sender, e) =>
 			{
@@ -254,7 +254,7 @@ namespace SukimaNote
 			image.GestureRecognizers.Add(TGR);
 
 			var grid = new Grid { Padding = new Thickness(5, 0, 0, 0) };
-			grid.Children.Add(new Label { Text = title, FontSize = descriptionFontSize }, 0, 4, 0, 1);
+			grid.Children.Add(new Label { Text = title, TextColor = Color.Black, FontSize = descriptionFontSize }, 0, 4, 0, 1);
 			grid.Children.Add(new StackLayout { Orientation = StackOrientation.Horizontal, Spacing = 7, Children = { image, supplementary } }, 4, 10, 0, 1);
 
 			return grid;
