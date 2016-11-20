@@ -17,7 +17,7 @@ namespace SukimaNote
 
 		private Button next = new Button { Text = "NEXT", BackgroundColor = Color.FromHex(MyColor.ButtonColor) };
 		private Button back = new Button { Text = "BACK", BackgroundColor = Color.FromHex(MyColor.ButtonColor) };
-		private Label taskCountLabel = new Label { HorizontalOptions = LayoutOptions.Center };
+		private Label taskCountLabel = new Label { HorizontalOptions = LayoutOptions.Center, TextColor = Color.Black };
 
 		private int position = 0;   // 表示しているorderedTaskListのindex
 		private int taskCount = 0;	// 表示可能なタスクの数
