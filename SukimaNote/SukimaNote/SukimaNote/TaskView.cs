@@ -178,13 +178,8 @@ namespace SukimaNote
 				else if (await DisplayAlert("Caution", "完了済みのタスクを全て削除しますか?", "YES", "NO"))
 				{
 					TaskData deleteTask;
-					while (SharedData.taskList.Where(task => task.Closed).Count() > 0)
-					{
-						deleteTask = SharedData.taskList.First(task => task.Closed);
+					while ((deleteTask = SharedData.taskList.FirstOrDefault(task => task.Closed)) != null)
 						await SharedData.deleteTaskAsync(deleteTask);
-					}
-					//deleteTaskList.Select(async task => await SharedData.deleteTaskAsync(task));
-					//await DisplayAlert("Deleted", deleteTaskList.ToArray()[0].Title, "OK");
 					await DisplayAlert("Deleted", "削除しました", "OK");
 				}
 			};
